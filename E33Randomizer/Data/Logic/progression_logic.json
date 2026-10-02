@@ -1,0 +1,1221 @@
+{
+  "comment": "DRAFT progression logic data. Checks are identified as '<asset file>#<section key>' and matched against checkRules in order; the first match wins ('*' is a wildcard). A check is eligible for progression items unless its rule or region says otherwise; missable checks are never eligible.",
+  "regions": {
+    "Lumiere - Act 1": {
+      "act": 0,
+      "missable": true,
+      "confidence": "high",
+      "note": "Prologue; can't be revisited"
+    },
+    "Spring Meadows": {
+      "act": 1,
+      "missable": false,
+      "confidence": "high",
+      "note": ""
+    },
+    "Flying Waters": {
+      "act": 1,
+      "missable": false,
+      "confidence": "high",
+      "note": ""
+    },
+    "Ancient Sanctuary": {
+      "act": 1,
+      "missable": false,
+      "confidence": "high",
+      "note": ""
+    },
+    "Gestral Village": {
+      "act": 1,
+      "missable": false,
+      "confidence": "high",
+      "note": ""
+    },
+    "Esquie's Nest": {
+      "act": 1,
+      "missable": false,
+      "confidence": "high",
+      "note": ""
+    },
+    "Stone Wave Cliffs": {
+      "act": 1,
+      "missable": false,
+      "confidence": "high",
+      "note": ""
+    },
+    "Forgotten Battlefield": {
+      "act": 1,
+      "missable": false,
+      "confidence": "high",
+      "note": ""
+    },
+    "Monoco's Station": {
+      "act": 1,
+      "missable": false,
+      "confidence": "high",
+      "note": ""
+    },
+    "Old Lumiere": {
+      "act": 1,
+      "missable": false,
+      "confidence": "medium",
+      "note": "End of Act I; assumed to be revisitable from the world map"
+    },
+    "Camp": {
+      "act": 1,
+      "missable": false,
+      "confidence": "high",
+      "note": "Many rewards also depend on relationship levels or story progress"
+    },
+    "World Map": {
+      "act": 1,
+      "missable": false,
+      "confidence": "medium",
+      "note": "Chests spread over the whole map; some need later Esquie abilities"
+    },
+    "The Small Bourgeon": {
+      "act": 1,
+      "missable": false,
+      "confidence": "medium",
+      "note": ""
+    },
+    "Abbest Cave": {
+      "act": 1,
+      "missable": false,
+      "confidence": "medium",
+      "note": ""
+    },
+    "Stone Wave Cliffs Cave": {
+      "act": 1,
+      "missable": false,
+      "confidence": "medium",
+      "note": ""
+    },
+    "Coastal Cave": {
+      "act": 1,
+      "missable": false,
+      "confidence": "medium",
+      "note": ""
+    },
+    "Yellow Harvest": {
+      "act": 1,
+      "missable": false,
+      "confidence": "low",
+      "note": ""
+    },
+    "Stone Quarry": {
+      "act": 1,
+      "missable": false,
+      "confidence": "low",
+      "note": ""
+    },
+    "Visages": {
+      "act": 2,
+      "missable": false,
+      "confidence": "high",
+      "note": ""
+    },
+    "Sirene": {
+      "act": 2,
+      "missable": false,
+      "confidence": "high",
+      "note": ""
+    },
+    "The Monolith": {
+      "act": 2,
+      "missable": true,
+      "confidence": "low",
+      "note": "End of Act II; treated as missable until confirmed to be revisitable"
+    },
+    "Frozen Hearts": {
+      "act": 2,
+      "missable": false,
+      "confidence": "medium",
+      "note": ""
+    },
+    "Gestral Beach": {
+      "act": 2,
+      "missable": false,
+      "confidence": "low",
+      "note": ""
+    },
+    "Falling Leaves": {
+      "act": 2,
+      "missable": false,
+      "confidence": "low",
+      "note": ""
+    },
+    "Crimson Forest": {
+      "act": 2,
+      "missable": false,
+      "confidence": "low",
+      "note": ""
+    },
+    "Esoteric Ruins": {
+      "act": 2,
+      "missable": false,
+      "confidence": "low",
+      "note": ""
+    },
+    "Flying Cemetery": {
+      "act": 2,
+      "missable": false,
+      "confidence": "low",
+      "note": ""
+    },
+    "Sinister Cave": {
+      "act": 2,
+      "missable": false,
+      "confidence": "low",
+      "note": ""
+    },
+    "Dark Shores": {
+      "act": 2,
+      "missable": false,
+      "confidence": "low",
+      "note": ""
+    },
+    "The Manor": {
+      "act": 2,
+      "missable": false,
+      "confidence": "low",
+      "note": ""
+    },
+    "Sunless Cliffs": {
+      "act": 2,
+      "missable": false,
+      "confidence": "low",
+      "note": ""
+    },
+    "Endless Night Sanctuary": {
+      "act": 2,
+      "missable": false,
+      "confidence": "low",
+      "note": ""
+    },
+    "The Chosen Path": {
+      "act": 2,
+      "missable": false,
+      "confidence": "low",
+      "note": ""
+    },
+    "Hidden Gestral Arena": {
+      "act": 2,
+      "missable": false,
+      "confidence": "low",
+      "note": ""
+    },
+    "Dark Gestral Arena": {
+      "act": 2,
+      "missable": false,
+      "confidence": "low",
+      "note": ""
+    },
+    "The Carousel": {
+      "act": 2,
+      "missable": false,
+      "confidence": "low",
+      "note": ""
+    },
+    "Flying Casino": {
+      "act": 2,
+      "missable": false,
+      "confidence": "low",
+      "note": ""
+    },
+    "White Sands": {
+      "act": 2,
+      "missable": false,
+      "confidence": "low",
+      "note": ""
+    },
+    "Fixed-Camera Levels": {
+      "act": 2,
+      "missable": false,
+      "confidence": "low",
+      "note": ""
+    },
+    "Rock Trailing": {
+      "act": 2,
+      "missable": false,
+      "confidence": "low",
+      "note": "Unknown small level"
+    },
+    "Lumiere - Act 3": {
+      "act": 3,
+      "missable": true,
+      "confidence": "low",
+      "note": "Final act; treated as missable until confirmed to be revisitable after the ending"
+    },
+    "Flying Manor": {
+      "act": 3,
+      "missable": false,
+      "confidence": "medium",
+      "note": ""
+    },
+    "Renoir's Drafts": {
+      "act": 3,
+      "missable": false,
+      "confidence": "medium",
+      "note": ""
+    },
+    "The Reacher": {
+      "act": 3,
+      "missable": false,
+      "confidence": "medium",
+      "note": ""
+    },
+    "Endless Tower": {
+      "act": 3,
+      "missable": false,
+      "confidence": "medium",
+      "note": ""
+    },
+    "The Abyss": {
+      "act": 3,
+      "missable": false,
+      "confidence": "medium",
+      "note": ""
+    },
+    "Sky Island": {
+      "act": 3,
+      "missable": false,
+      "confidence": "low",
+      "note": ""
+    },
+    "Painting Workshop": {
+      "act": 3,
+      "missable": false,
+      "confidence": "low",
+      "note": ""
+    },
+    "Sacred River": {
+      "act": 3,
+      "missable": false,
+      "confidence": "low",
+      "note": ""
+    },
+    "Crushing Cavern": {
+      "act": 3,
+      "missable": false,
+      "confidence": "low",
+      "note": ""
+    },
+    "Red Woods": {
+      "act": 3,
+      "missable": false,
+      "confidence": "low",
+      "note": ""
+    },
+    "The Fountain": {
+      "act": 3,
+      "missable": false,
+      "confidence": "low",
+      "note": ""
+    },
+    "The Heart of the Canvas": {
+      "act": 4,
+      "missable": true,
+      "confidence": "high",
+      "note": "Epilogue after the final boss"
+    }
+  },
+  "progressionItems": {
+    "FestivalToken": {
+      "group": "Key Item",
+      "randomize": false,
+      "confidence": "high",
+      "reason": "Only used in Act I Lumiere, which can't be revisited: stays where it is"
+    },
+    "Quest_UniformForSon": {
+      "group": "Key Item",
+      "randomize": false,
+      "confidence": "high",
+      "reason": "Only used in Act I Lumiere, which can't be revisited: stays where it is"
+    },
+    "Quest_FlowerforSophie": {
+      "group": "Key Item",
+      "randomize": false,
+      "confidence": "high",
+      "reason": "Given by something the randomizer doesn't edit (world pickup or script): stays where it is"
+    },
+    "LostGestral": {
+      "group": "Key Item",
+      "randomize": false,
+      "confidence": "high",
+      "reason": "Given by something the randomizer doesn't edit (world pickup or script): stays where it is"
+    },
+    "Quest_MoltenHeart": {
+      "group": "Key Item",
+      "randomize": false,
+      "confidence": "high",
+      "reason": "Given by something the randomizer doesn't edit (world pickup or script): stays where it is"
+    },
+    "Quest_ChromaticInk": {
+      "group": "Key Item",
+      "randomize": false,
+      "confidence": "high",
+      "reason": "Given by something the randomizer doesn't edit (world pickup or script): stays where it is"
+    },
+    "Quest_StationKey": {
+      "group": "Key Item",
+      "randomize": false,
+      "confidence": "high",
+      "reason": "Given by something the randomizer doesn't edit (world pickup or script): stays where it is"
+    },
+    "Quest_ManorFamilyCanvas": {
+      "group": "Key Item",
+      "randomize": false,
+      "confidence": "high",
+      "reason": "Given by something the randomizer doesn't edit (world pickup or script): stays where it is"
+    },
+    "Quest_Resin": {
+      "group": "Key Item",
+      "randomize": true,
+      "confidence": "high",
+      "reason": "Consumer is known and randomized"
+    },
+    "Quest_Mine": {
+      "group": "Key Item",
+      "randomize": true,
+      "confidence": "high",
+      "reason": "Consumer is known and randomized"
+    },
+    "Quest_WoodBoards": {
+      "group": "Key Item",
+      "randomize": true,
+      "confidence": "high",
+      "reason": "Consumer is known and randomized"
+    },
+    "Quest_Mushroom": {
+      "group": "Key Item",
+      "randomize": true,
+      "confidence": "high",
+      "reason": "Consumer is known and randomized"
+    },
+    "Quest_HexgaRock": {
+      "group": "Key Item",
+      "randomize": true,
+      "confidence": "high",
+      "reason": "Consumer is known and randomized"
+    },
+    "Quest_WeirdPictos": {
+      "group": "Key Item",
+      "randomize": true,
+      "confidence": "high",
+      "reason": "Consumer is known and randomized"
+    },
+    "Quest_BourgeonSkin": {
+      "group": "Key Item",
+      "randomize": true,
+      "confidence": "medium",
+      "reason": "Originally an enemy drop (lost with enemy randomization); consumer is outside the randomized data"
+    },
+    "Quest_EternalIce": {
+      "group": "Key Item",
+      "randomize": true,
+      "confidence": "medium",
+      "reason": "Originally an enemy drop (lost with enemy randomization); consumer is outside the randomized data"
+    },
+    "Quest_CleaWorkshop_Part1": {
+      "group": "Key Item",
+      "randomize": true,
+      "confidence": "low",
+      "reason": "Consumer unknown"
+    },
+    "Quest_CleaWorkshop_Part2": {
+      "group": "Key Item",
+      "randomize": true,
+      "confidence": "low",
+      "reason": "Consumer unknown"
+    },
+    "Quest_CleaWorkshop_Part3": {
+      "group": "Key Item",
+      "randomize": true,
+      "confidence": "low",
+      "reason": "Consumer unknown"
+    },
+    "Quest_WoodenStick": {
+      "group": "Key Item",
+      "randomize": true,
+      "confidence": "low",
+      "reason": "Consumer unknown"
+    },
+    "Quest_OldKey": {
+      "group": "Key Item",
+      "randomize": true,
+      "confidence": "low",
+      "reason": "Received in Act I Lumiere, consumer unknown: if it is used in Act I Lumiere it must stay where it is"
+    },
+    "Quest_ApprenticesJournal": {
+      "group": "Key Item",
+      "randomize": true,
+      "confidence": "low",
+      "reason": "Received in Act I Lumiere, consumer unknown: if it is used in Act I Lumiere it must stay where it is"
+    }
+  },
+  "checkRules": [
+    {
+      "match": "DT_jRPG_Enemies#*",
+      "eligible": false,
+      "reason": "Enemy drop: enemy randomization moves the enemy, and drops have a chance"
+    },
+    {
+      "match": "DT_LootTable_UpgradeItems_*#*",
+      "eligible": false,
+      "reason": "Shared level-scaled loot table, not a location"
+    },
+    {
+      "match": "DT_BattleTowerStages#*",
+      "region": "Endless Tower",
+      "eligible": false,
+      "reason": "Late game combat challenge (draft decision, can be enabled)"
+    },
+    {
+      "match": "DT_Merchant_CleaIsland#*",
+      "region": "Flying Manor",
+      "eligible": false,
+      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+    },
+    {
+      "match": "DT_Merchant_CoastalCave_*#*",
+      "region": "Coastal Cave",
+      "eligible": false,
+      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+    },
+    {
+      "match": "DT_Merchant_FH_Custo_Danseuse#*",
+      "region": "Frozen Hearts",
+      "eligible": false,
+      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+    },
+    {
+      "match": "DT_Merchant_ForgottenBattlefield#*",
+      "region": "Forgotten Battlefield",
+      "eligible": false,
+      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+    },
+    {
+      "match": "DT_Merchant_GV_1_CustoSuits_*#*",
+      "region": "Gestral Village",
+      "eligible": false,
+      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+    },
+    {
+      "match": "DT_Merchant_GestralVillage1#*",
+      "region": "Gestral Village",
+      "eligible": false,
+      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+    },
+    {
+      "match": "DT_Merchant_GestralVillage2#*",
+      "region": "Gestral Village",
+      "eligible": false,
+      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+    },
+    {
+      "match": "DT_Merchant_GestralVillage3#*",
+      "region": "Sacred River",
+      "eligible": false,
+      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+    },
+    {
+      "match": "DT_Merchant_GoblusLair#*",
+      "region": "Flying Waters",
+      "eligible": false,
+      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+    },
+    {
+      "match": "DT_Merchant_GrandisStation#*",
+      "region": "Monoco's Station",
+      "eligible": false,
+      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+    },
+    {
+      "match": "DT_Merchant_Lumiere#*",
+      "region": "Lumiere - Act 3",
+      "eligible": false,
+      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+    },
+    {
+      "match": "DT_Merchant_MonocosMountain#*",
+      "region": "Frozen Hearts",
+      "eligible": false,
+      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+    },
+    {
+      "match": "DT_Merchant_Monolith#*",
+      "region": "The Monolith",
+      "eligible": false,
+      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+    },
+    {
+      "match": "DT_Merchant_OldLumiere#*",
+      "region": "Old Lumiere",
+      "eligible": false,
+      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+    },
+    {
+      "match": "DT_Merchant_Optional3#*",
+      "region": "Renoir's Drafts",
+      "eligible": false,
+      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+    },
+    {
+      "match": "DT_Merchant_OrangeForest#*",
+      "region": "Falling Leaves",
+      "eligible": false,
+      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+    },
+    {
+      "match": "DT_Merchant_Reacher#*",
+      "region": "The Reacher",
+      "eligible": false,
+      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+    },
+    {
+      "match": "DT_Merchant_SeaCliff#*",
+      "region": "Stone Wave Cliffs",
+      "eligible": false,
+      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+    },
+    {
+      "match": "DT_Merchant_Sirene#*",
+      "region": "Sirene",
+      "eligible": false,
+      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+    },
+    {
+      "match": "DT_Merchant_TwilightSanctuary#*",
+      "region": "Endless Night Sanctuary",
+      "eligible": false,
+      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+    },
+    {
+      "match": "DT_Merchant_Visages#*",
+      "region": "Visages",
+      "eligible": false,
+      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+    },
+    {
+      "match": "DT_Merchant_YellowForest#*",
+      "region": "Yellow Harvest",
+      "eligible": false,
+      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+    },
+    {
+      "match": "DT_Merchant_WM_*#*",
+      "region": "World Map",
+      "eligible": false,
+      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_Generic_*",
+      "eligible": false,
+      "reason": "Special chest used by scripts (e.g. starting weapon)"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_Placeholder",
+      "eligible": false,
+      "reason": "Placeholder chest"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_Lumiere_ACT1_*",
+      "region": "Lumiere - Act 1"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SmallLevel_GoblusLair_02_*",
+      "region": "The Small Bourgeon"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_StonewaveCliffsCave_*",
+      "region": "Stone Wave Cliffs Cave"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SmallLevel_StonewaveCliffsCave_*",
+      "region": "Stone Wave Cliffs Cave"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SpringMeadows_*",
+      "region": "Spring Meadows"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SmallLevel_SpringMeadows_*",
+      "region": "Spring Meadows"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SeaCliff_*",
+      "region": "Stone Wave Cliffs"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SmallLevel_SeaCliff_*",
+      "region": "Stone Wave Cliffs"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_GoblusLair_*",
+      "region": "Flying Waters"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SmallLevel_GoblusLair_*",
+      "region": "Flying Waters"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_ForgottenBattlefield_*",
+      "region": "Forgotten Battlefield"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SmallLevel_ForgottenBattlefield_*",
+      "region": "Forgotten Battlefield"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_GrandisStation_*",
+      "region": "Monoco's Station"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SmallLevel_GrandisStation_*",
+      "region": "Monoco's Station"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_AncientSanctuary_*",
+      "region": "Ancient Sanctuary"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SmallLevel_AncientSanctuary_*",
+      "region": "Ancient Sanctuary"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_GestralVillage_*",
+      "region": "Gestral Village"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SmallLevel_GestralVillage_*",
+      "region": "Gestral Village"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_EsquiesNest_*",
+      "region": "Esquie's Nest"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SmallLevel_EsquiesNest_*",
+      "region": "Esquie's Nest"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_OldLumiere_*",
+      "region": "Old Lumiere"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SmallLevel_OldLumiere_*",
+      "region": "Old Lumiere"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_WorldMap_*",
+      "region": "World Map"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SmallLevel_WorldMap_*",
+      "region": "World Map"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_FlyingManor_*",
+      "region": "Flying Manor"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SmallLevel_FlyingManor_*",
+      "region": "Flying Manor"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_Manor_*",
+      "region": "The Manor"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SmallLevel_Manor_*",
+      "region": "The Manor"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_Monolith_*",
+      "region": "The Monolith"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SmallLevel_Monolith_*",
+      "region": "The Monolith"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_Lumiere_*",
+      "region": "Lumiere - Act 3"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SmallLevel_Lumiere_*",
+      "region": "Lumiere - Act 3"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_YellowForest_*",
+      "region": "Yellow Harvest"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SmallLevel_YellowForest_*",
+      "region": "Yellow Harvest"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_FallingLeaves_*",
+      "region": "Falling Leaves"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SmallLevel_FallingLeaves_*",
+      "region": "Falling Leaves"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_CrimsonForest_*",
+      "region": "Crimson Forest"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SmallLevel_CrimsonForest_*",
+      "region": "Crimson Forest"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_FrozenHearts_*",
+      "region": "Frozen Hearts"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SmallLevel_FrozenHearts_*",
+      "region": "Frozen Hearts"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_Reacher_*",
+      "region": "The Reacher"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SmallLevel_Reacher_*",
+      "region": "The Reacher"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_RenoirSDraft_*",
+      "region": "Renoir's Drafts"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SmallLevel_RenoirSDraft_*",
+      "region": "Renoir's Drafts"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_DarkShores_*",
+      "region": "Dark Shores"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SmallLevel_DarkShores_*",
+      "region": "Dark Shores"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_TwilightSanctuary_*",
+      "region": "Endless Night Sanctuary"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SmallLevel_TwilightSanctuary_*",
+      "region": "Endless Night Sanctuary"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_RedWoods_*",
+      "region": "Red Woods"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SmallLevel_RedWoods_*",
+      "region": "Red Woods"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_ChosenPath_*",
+      "region": "The Chosen Path"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SmallLevel_ChosenPath_*",
+      "region": "The Chosen Path"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_FloatingIsland_*",
+      "region": "Sky Island"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SmallLevel_FloatingIsland_*",
+      "region": "Sky Island"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_RockTrailing_*",
+      "region": "Rock Trailing"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SmallLevel_RockTrailing_*",
+      "region": "Rock Trailing"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_Cemetery_*",
+      "region": "Flying Cemetery"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SmallLevel_Cemetery_*",
+      "region": "Flying Cemetery"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_CoastalCave_*",
+      "region": "Coastal Cave"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SmallLevel_CoastalCave_*",
+      "region": "Coastal Cave"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_DoorMaze_*",
+      "region": "Esoteric Ruins"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SmallLevel_DoorMaze_*",
+      "region": "Esoteric Ruins"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SinisterCave_*",
+      "region": "Sinister Cave"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SmallLevel_SinisterCave_*",
+      "region": "Sinister Cave"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_MiniLevels_*",
+      "region": "Fixed-Camera Levels"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SmallLevel_MiniLevels_*",
+      "region": "Fixed-Camera Levels"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_FlyingCasinoEntrance_*",
+      "region": "Flying Casino"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SmallLevel_FlyingCasinoEntrance_*",
+      "region": "Flying Casino"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_TheCarrousel_*",
+      "region": "The Carousel"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SmallLevel_TheCarrousel_*",
+      "region": "The Carousel"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_WhiteSands_*",
+      "region": "White Sands"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SmallLevel_WhiteSands_*",
+      "region": "White Sands"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SacredRiver_*",
+      "region": "Sacred River"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SmallLevel_SacredRiver_*",
+      "region": "Sacred River"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_CavernCrusher_*",
+      "region": "Crushing Cavern"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SmallLevel_CavernCrusher_*",
+      "region": "Crushing Cavern"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_Sirene_*",
+      "region": "Sirene"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SmallLevel_Sirene_*",
+      "region": "Sirene"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_Visages_*",
+      "region": "Visages"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SmallLevel_Visages_*",
+      "region": "Visages"
+    },
+    {
+      "match": "BP_Dialogue_Boulangerie#*",
+      "region": "Lumiere - Act 1",
+      "eligible": false,
+      "requires": [
+        "FestivalToken"
+      ],
+      "reason": "New Game+ only"
+    },
+    {
+      "match": "BP_Dialogue_Jules#*",
+      "region": "Lumiere - Act 1",
+      "requires": [
+        "Quest_UniformForSon"
+      ]
+    },
+    {
+      "match": "BP_Dialogue_Lumiere_ExpFestival_Token_Artifact_Colette#*",
+      "region": "Lumiere - Act 1",
+      "requires": [
+        "FestivalToken"
+      ]
+    },
+    {
+      "match": "BP_Dialogue_Lumiere_ExpFestival_Token_Haircut_Amandine#*",
+      "region": "Lumiere - Act 1",
+      "requires": [
+        "FestivalToken"
+      ]
+    },
+    {
+      "match": "BP_Dialogue_Lumiere_ExpFestival_Token_Pictos_Claude#*",
+      "region": "Lumiere - Act 1",
+      "requires": [
+        "FestivalToken"
+      ]
+    },
+    {
+      "match": "BP_Dialogue_Eloise#*",
+      "region": "Lumiere - Act 1"
+    },
+    {
+      "match": "BP_Dialogue_Gardens_Maelle_FirstDuel#*",
+      "region": "Lumiere - Act 1"
+    },
+    {
+      "match": "BP_Dialogue_Harbour_HotelLove#*",
+      "region": "Lumiere - Act 1"
+    },
+    {
+      "match": "BP_Dialogue_LUAct1_Mime#*",
+      "region": "Lumiere - Act 1"
+    },
+    {
+      "match": "BP_Dialogue_MainPlaza_Furnitures#*",
+      "region": "Lumiere - Act 1"
+    },
+    {
+      "match": "BP_Dialogue_MainPlaza_Trashcan#*",
+      "region": "Lumiere - Act 1"
+    },
+    {
+      "match": "BP_Dialogue_Nicolas#*",
+      "region": "Lumiere - Act 1"
+    },
+    {
+      "match": "BP_Dialogue_Richard#*",
+      "region": "Lumiere - Act 1"
+    },
+    {
+      "match": "BP_Dialogue_Lumiere_ExpFestival_Apprentices#*",
+      "region": "Lumiere - Act 1"
+    },
+    {
+      "match": "BP_Dialogue_Lumiere_ExpFestival_Maelle#*",
+      "region": "Lumiere - Act 1"
+    },
+    {
+      "match": "BP_Dialogue_GestralBeach_*#*",
+      "region": "Gestral Beach",
+      "eligible": false,
+      "reason": "Skill-based minigame (draft decision: no key items behind minigames)"
+    },
+    {
+      "match": "BP_Dialogue_GestralRace#*",
+      "region": "Gestral Beach",
+      "eligible": false,
+      "reason": "Skill-based minigame (draft decision: no key items behind minigames)"
+    },
+    {
+      "match": "BP_Dialogue_VolleyBall#*",
+      "region": "Gestral Beach",
+      "eligible": false,
+      "reason": "Skill-based minigame (draft decision: no key items behind minigames)"
+    },
+    {
+      "match": "BP_Dialogue_CleaWorkshop_*#*",
+      "region": "Painting Workshop",
+      "note": "Unknown whether path 2/3 require the key item of the previous path"
+    },
+    {
+      "match": "BP_Dialogue_DarkGestralArena_Pots#*",
+      "region": "Dark Gestral Arena"
+    },
+    {
+      "match": "BP_Dialogue_Grandis_Carrousel#*",
+      "region": "The Carousel"
+    },
+    {
+      "match": "BP_Dialogue_GV_Karatot#*",
+      "region": "Gestral Village",
+      "requires": [
+        "Quest_Mushroom"
+      ]
+    },
+    {
+      "match": "BP_Dialogue_GV_GestralBazar9#*",
+      "region": "Gestral Village",
+      "note": "Excalibur quest; unknown whether it needs an item"
+    },
+    {
+      "match": "BP_Dialogue_GV_*#*",
+      "region": "Gestral Village"
+    },
+    {
+      "match": "BP_Dialog_Merchant_GV_GestralBazar1#*",
+      "region": "Gestral Village",
+      "requires": [
+        "Quest_WeirdPictos"
+      ]
+    },
+    {
+      "match": "BP_Dialogue_HexgaLuster#*",
+      "region": "Stone Wave Cliffs",
+      "requires": [
+        "Quest_HexgaRock"
+      ]
+    },
+    {
+      "match": "BP_Dialogue_HiddenArena_Keeper#*",
+      "region": "Hidden Gestral Arena"
+    },
+    {
+      "match": "BP_Dialogue_JudgeOfMercy#*",
+      "region": "The Fountain"
+    },
+    {
+      "match": "BP_Dialogue_*Camp_Quest_*#*",
+      "region": "Camp",
+      "note": "Relationship quest"
+    },
+    {
+      "match": "BP_Dialogue_Quest_LostGestralChief#*",
+      "region": "Camp",
+      "requires": [
+        "LostGestral"
+      ],
+      "note": "Rewards need different numbers of Lost Gestrals"
+    },
+    {
+      "match": "BP_Dialogue_Manor_Wardrobe#*",
+      "region": "The Manor"
+    },
+    {
+      "match": "BP_Dialogue_MimeChromaZoneEntrance#*",
+      "region": "Sunless Cliffs"
+    },
+    {
+      "match": "BP_Dialogue_MS_Grandis_WM_GuideOldLumiere#*",
+      "region": "World Map"
+    },
+    {
+      "match": "BP_Dialogue_MS_Grandis_*#*",
+      "region": "Monoco's Station"
+    },
+    {
+      "match": "BP_Dialogue_SleepingBenisseur#*",
+      "region": "Red Woods"
+    },
+    {
+      "match": "BP_Dialogue_TheAbyss_SimonP2Rematch#*",
+      "region": "The Abyss"
+    },
+    {
+      "match": "BP_Dialogue_TroubadourCantPlay#*",
+      "region": "Stone Quarry",
+      "note": "Unknown whether it needs an item"
+    },
+    {
+      "match": "BP_Dialog_DanseuseDanceClass#*",
+      "region": "Frozen Hearts"
+    },
+    {
+      "match": "BP_Dialog_FacelessBoy_CleasFlyingHouse_Main#*",
+      "region": "Flying Manor"
+    },
+    {
+      "match": "BP_Dialog_FacelessBoy_OrangeForest#*",
+      "region": "Falling Leaves"
+    },
+    {
+      "match": "BP_Dialog_Goblu_DemineurMissingMine#*",
+      "region": "Flying Waters",
+      "requires": [
+        "Quest_Mine"
+      ]
+    },
+    {
+      "match": "BP_Dialog_GV_Gestral_FlyingCasino_InsideGuy#*",
+      "region": "Flying Casino"
+    },
+    {
+      "match": "BP_Dialog_GV_Gestral_InvisibleCave#*",
+      "region": "Sinister Cave"
+    },
+    {
+      "match": "BP_Dialog_JarNeedLight#*",
+      "region": "Spring Meadows",
+      "requires": [
+        "Quest_Resin"
+      ]
+    },
+    {
+      "match": "BP_Dialog_SpiritClea_CleasTower#*",
+      "region": "Endless Tower"
+    },
+    {
+      "match": "BP_Dialog_SpiritPortier#*",
+      "region": "Esoteric Ruins",
+      "requires": [
+        "Quest_WoodBoards"
+      ]
+    },
+    {
+      "match": "BP_Dialog_WeaponlessChalier1#*",
+      "region": "Flying Cemetery",
+      "note": "Unknown whether it needs an item"
+    },
+    {
+      "match": "DA_GA_GRADIENT_*#*",
+      "region": "Camp",
+      "note": "Relationship level reward"
+    },
+    {
+      "match": "DA_GA_SQT_BossMirrorRenoir#*",
+      "region": "The Monolith",
+      "missable": false,
+      "reason": "Forced story cutscene: the reward can't be missed"
+    },
+    {
+      "match": "DA_GA_SQT_BossSimon#*",
+      "region": "The Abyss"
+    },
+    {
+      "match": "DA_GA_SQT_CampAfter*#*",
+      "region": "Camp",
+      "act": 2,
+      "reason": "Forced story cutscene: the reward can't be missed"
+    },
+    {
+      "match": "DA_GA_SQT_GradientTutorial#*",
+      "region": "Monoco's Station",
+      "reason": "Forced story cutscene: the reward can't be missed"
+    },
+    {
+      "match": "DA_GA_SQT_RedAndWhiteTree#*",
+      "region": "Lumiere - Act 3",
+      "missable": false,
+      "reason": "Forced story cutscene: the reward can't be missed"
+    },
+    {
+      "match": "DA_GA_SQT_TheGommage#*",
+      "region": "Lumiere - Act 1"
+    },
+    {
+      "match": "SA_GA_SQT_Epilogue*#*",
+      "region": "The Heart of the Canvas"
+    }
+  ]
+}
