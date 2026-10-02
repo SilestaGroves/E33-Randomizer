@@ -1,4 +1,5 @@
 ﻿using UAssetAPI;
+using UAssetAPI.ExportTypes;
 using UAssetAPI.PropertyTypes.Objects;
 using UAssetAPI.UnrealTypes;
 
@@ -59,6 +60,61 @@ public abstract class ItemSource
     public abstract UAsset SaveToAsset();
 
     /// <summary>
+    /// Items (section key, index) that must keep their original item, because the same asset also dresses a
+    /// character in it. Replacing such an item makes the game put on a cosmetic the character doesn't have,
+    /// which crashes it (e.g. right after the Gommage).
+    /// </summary>
+    public HashSet<(string key, int index)> LockedSlots = new();
+
+    public bool IsLocked(string key, int index) => LockedSlots.Contains((key, index));
+
+    public void LockEquippedItems()
+    {
+        var equipped = FindEquippedItems(_asset);
+        LockedSlots = SourceSections
+            .SelectMany(s => s.Value.Select((particle, index) => (s.Key, index, particle.Item.CodeName)))
+            .Where(slot => equipped.Contains(slot.CodeName))
+            .Select(slot => (slot.Key, slot.index))
+            .ToHashSet();
+    }
+
+    /// <summary>The items the asset puts on a character with a SetCharacterCustomization game action.</summary>
+    private static HashSet<string> FindEquippedItems(UAsset asset)
+    {
+        var equipped = new HashSet<string>();
+        var names = asset.GetNameMapIndexList();
+        foreach (var export in asset.Exports)
+        {
+            if (export.GetExportClassType()?.ToString().Contains("SetCharacterCustomization") != true) continue;
+            // The mappings don't cover this action, so its properties are only available as raw bytes,
+            // where names are stored as (name map index, number) pairs
+            if (export is not RawExport raw) continue;
+            for (int offset = 0; offset + 8 <= raw.Data.Length; offset++)
+            {
+                var index = BitConverter.ToInt32(raw.Data, offset);
+                var number = BitConverter.ToInt32(raw.Data, offset + 4);
+                if (index < 0 || index >= names.Count || number != 0) continue;
+                var name = names[index].ToString();
+                if (Controllers.ItemsController.IsItem(name)) equipped.Add(name);
+            }
+        }
+
+        // Customization actions in other assets (DA_GA_CUSTO_*) put on the cosmetics this asset gives
+        if (asset.Imports.Any(i => i.ObjectName.ToString().StartsWith("DA_GA_CUSTO_")))
+        {
+            foreach (var name in names.Select(n => n.ToString()))
+            {
+                if (Controllers.ItemsController.IsItem(name) &&
+                    Controllers.ItemsController.GetObject(name).Type == "CharacterCustomization")
+                {
+                    equipped.Add(name);
+                }
+            }
+        }
+        return equipped;
+    }
+
+    /// <summary>
     /// Re-reads the original asset from disk. Every SaveToAsset must start with this: writing modifies the asset
     /// in place, and template structs taken from an already modified table would leak into the next generation.
     /// </summary>
@@ -93,6 +149,8 @@ public abstract class ItemSource
     {
         foreach (var sourceSection in SourceSections)
         {
+            // Resizing could drop a locked item
+            if (LockedSlots.Any(slot => slot.key == sourceSection.Key)) continue;
             if (!RandomizerLogic.Settings.ChangeSizesOfNonRandomizedChecks && sourceSection.Value.Count > 0)
             {
                 var encounterRandomized = sourceSection.Value.Any(e => !RandomizerLogic.CustomItemPlacement.NotRandomizedCodeNames.Contains(e.Item.CodeName));
@@ -127,8 +185,10 @@ public abstract class ItemSource
         if (_changeNumberOfItems) RandomizeNumberOfItems(_minNumberOfItems, _maxNumberOfItems);
         foreach (var rewardData in SourceSections)
         {
-            foreach (var item in rewardData.Value)
+            for (int index = 0; index < rewardData.Value.Count; index++)
             {
+                if (IsLocked(rewardData.Key, index)) continue;
+                var item = rewardData.Value[index];
                 var newItemName = RandomizerLogic.CustomItemPlacement.Replace(item.Item.CodeName);
                 item.Item = Controllers.ItemsController.GetObject(newItemName);
                 item.Quantity = item.Item.HasQuantities ? item.Quantity : 1;

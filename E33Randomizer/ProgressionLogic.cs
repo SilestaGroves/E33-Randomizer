@@ -1,4 +1,4 @@
-using E33Randomizer.ItemSources;
+﻿using E33Randomizer.ItemSources;
 
 namespace E33Randomizer;
 
@@ -150,6 +150,7 @@ public static class ProgressionLogic
                     // Never overwrite items that must stay (skill and merchant unlocks by default) or other key items
                     if (notRandomized.Contains(code) || progressionCodes.Contains(code)) continue;
                     if (check.UnlockedSlotsOnly && section[i].MerchantInventoryLocked) continue;
+                    if (source.IsLocked(key, i)) continue;
                     slots.Add(new ProgressionSlot { Source = source, Key = key, Index = i, Check = check });
                 }
             }

@@ -63,8 +63,10 @@ public class GenericItemSource: ItemSource
     
     public override void Randomize()
     {
-        foreach (var itemSourceParticle in SourceSections[FileName])
+        for (int index = 0; index < SourceSections[FileName].Count; index++)
         {
+            if (IsLocked(FileName, index)) continue;
+            var itemSourceParticle = SourceSections[FileName][index];
             var oldItem = itemSourceParticle.Item;
             var newItem = Controllers.ItemsController.GetObject(RandomizerLogic.CustomItemPlacement.Replace(oldItem.CodeName));
             itemSourceParticle.Item = newItem;

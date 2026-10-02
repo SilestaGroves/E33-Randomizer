@@ -119,6 +119,7 @@ public class ItemsController: Controller<ItemData>
         }
 
         newSource.LoadFromAsset(asset);
+        newSource.LockEquippedItems();
         ItemsSources.Add(newSource);
         
         if (!CheckTypes.ContainsKey(checkType))
