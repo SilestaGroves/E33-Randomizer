@@ -2,10 +2,13 @@
 A randomizer mod for Clair Obscur: Expedition 33 that gives users complete control over every enemy placement in the game, as well as a lot of different tools to customize them to their heart's desire.
 
 Installation:
-- Download the latest release
-- If you don't have it, install [.NET 9.0 Desktop Runtime](https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/9.0.7/windowsdesktop-runtime-9.0.7-win-x64.exe)
+- Download the latest release from [Releases](https://github.com/SilestaGroves/E33-Randomizer/releases/latest):
+  - `E33Randomizer-<version>-win-x64.zip` works as is, nothing else to install
+  - `E33Randomizer-<version>-win-x64-framework.zip` is much smaller, but needs the [.NET 9.0 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/9.0)
 - Unpack the zip file in a non-admin folder
 - Run E33Randomizer.exe
+
+Publishing a new release: push a tag like `v1.2.3`; GitHub Actions runs the tests, builds both zips and creates the release. Release notes come from `docs/release-notes/<tag>.md` if that file exists.
 <br>
 
 Running the randomizer:

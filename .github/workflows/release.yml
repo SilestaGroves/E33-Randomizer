@@ -1,0 +1,56 @@
+name: Release
+
+# Pushing a tag like v1.2.3 runs the tests, builds the randomizer and publishes a GitHub release with:
+#   E33Randomizer-<tag>-win-x64.zip            self-contained, runs without installing .NET
+#   E33Randomizer-<tag>-win-x64-framework.zip  small, needs the .NET 9 Desktop Runtime
+# Release notes are taken from docs/release-notes/<tag>.md if it exists, otherwise generated from commits.
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
+
+      - name: Test
+        run: dotnet test E33Randomizer.Tests -c Release
+
+      - name: Publish
+        shell: pwsh
+        run: |
+          $common = @("E33Randomizer/E33Randomizer.csproj", "-c", "Release", "-r", "win-x64", "-p:SatelliteResourceLanguages=en")
+          dotnet publish @common --self-contained true -o out/full/E33Randomizer
+          dotnet publish @common --self-contained false -o out/framework/E33Randomizer
+
+      - name: Package
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          New-Item -ItemType Directory -Force dist | Out-Null
+          Compress-Archive -Path out/full/E33Randomizer -DestinationPath "dist/E33Randomizer-$tag-win-x64.zip"
+          Compress-Archive -Path out/framework/E33Randomizer -DestinationPath "dist/E33Randomizer-$tag-win-x64-framework.zip"
+          Get-ChildItem dist/*.zip | ForEach-Object {
+            "$((Get-FileHash $_ -Algorithm SHA256).Hash.ToLower())  $($_.Name)"
+          } | Set-Content dist/SHA256SUMS.txt
+
+      - name: Create release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $notes = "docs/release-notes/$tag.md"
+          $notesArgs = if (Test-Path $notes) { @("--notes-file", $notes) } else { @("--generate-notes") }
+          gh release create $tag (Get-ChildItem dist/*).FullName --title "E33 Randomizer $tag" @notesArgs
