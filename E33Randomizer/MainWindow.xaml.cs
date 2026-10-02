@@ -126,7 +126,7 @@ public partial class MainWindow
         try
         {
             RandomizerLogic.Randomize();
-            MessageBox.Show($"Generation done! You can find the mod in the rand_{RandomizerLogic.usedSeed} folder.\n\n" +
+            MessageBox.Show($"Generation done! You can find the mod and spoiler_log.txt in the {RandomizerLogic.LastExportPath} folder.\n\n" +
                             $"Used Seed: {RandomizerLogic.usedSeed}\n",
                 "Generation Summary", MessageBoxButton.OK, MessageBoxImage.Information);
         }
@@ -298,6 +298,7 @@ public class SettingsViewModel : INotifyPropertyChanged
     public bool RandomizeAddedEnemies { get; set; } = false;
     public bool EnsureBossesInBossEncounters { get; set; } = false;
     public bool ReduceBossRepetition { get; set; } = false;
+    public bool ScaleEnemyLevelsToEncounter { get; set; } = false;
     // public bool TieDropsToEncounters { get; set; } = false; 
 
     public bool ChangeSizesOfNonRandomizedChecks { get; set; } = false;

@@ -170,6 +170,12 @@
                                   FontSize="14"
                                   Grid.Row="8" />
 
+                        <CheckBox Name="ScaleEnemyLevelsCheckBox"
+                                  Content="Scale enemy levels to the original encounter level"
+                                  ToolTip="Encounters that get new enemies are fought at the level of the original encounter (its level override, or its strongest original enemy), so a late game boss in Spring Meadows is fought at a Spring Meadows level and vice versa."
+                                  IsChecked="{Binding ScaleEnemyLevelsToEncounter}"
+                                  Margin="0,0,0,0"
+                                  FontSize="14" />
                         <CheckBox Content="Replace Phase 2 Simon with Phase 1 in mandatory fights until after the Lune tutorial fight"
                                   IsChecked="{Binding NoSimonP2BeforeLune}"
                                   Margin="0,0,0,0"

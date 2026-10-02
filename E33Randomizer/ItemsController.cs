@@ -35,6 +35,10 @@ public class ItemsController: Controller<ItemData>
     private UDataTable itemsCompositeTable;
     private Dictionary<string, UAsset> _itemsDataTables = new();
     private string _cleanSnapshot;
+    private Dictionary<string, List<ItemSourceParticle>> _originalSections = new();
+
+    /// <summary>Starting weapons and cosmetics chosen during the last WriteAssets, for the spoiler log.</summary>
+    public List<string> StartingEquipment = new();
     
     public bool IsItem(string itemCodeName)
     {
@@ -276,6 +280,17 @@ public class ItemsController: Controller<ItemData>
         ViewModel.ContainerName = "Check";
         ViewModel.ObjectName = "Item";
         _cleanSnapshot = ConvertToTxt();
+        _originalSections = ItemsSources
+            .SelectMany(source => source.SourceSections.Select(section => (source, section)))
+            .ToDictionary(
+                pair => $"{pair.source.FileName}#{pair.section.Key}",
+                pair => pair.section.Value.Select(ItemSourceParticle.Clone).ToList());
+    }
+
+    /// <summary>The items a check contained in the original game files.</summary>
+    public List<ItemSourceParticle> GetOriginalSection(ItemSource source, string key)
+    {
+        return _originalSections.GetValueOrDefault($"{source.FileName}#{key}", []);
     }
 
     public override void Reset()
@@ -286,6 +301,7 @@ public class ItemsController: Controller<ItemData>
     public void RandomizeStartingEquipment()
     {
         List<string> characterNames = ["Gustave", "Lune", "Maelle", "Sciel", "Verso", "Monoco"];
+        StartingEquipment.Clear();
         if (RandomizerLogic.Settings.RandomizeStartingWeapons)
         {
             var tableAsset = new UAsset($"{RandomizerLogic.DataDirectory}/Originals/StartingInfoTables/DT_jRPG_CharacterSaveStates.uasset", EngineVersion.VER_UE5_4, RandomizerLogic.mappings);
@@ -300,6 +316,7 @@ public class ItemsController: Controller<ItemData>
                 var randomWeapon = GetRandomWeapon(characterName);
                 tableAsset.AddNameReference(FString.FromString(randomWeapon.CodeName));
                 nameProperty.Value = FName.FromString(tableAsset, randomWeapon.CodeName);
+                StartingEquipment.Add($"{characterName} weapon: {randomWeapon.CustomName}");
             }
             Utils.WriteAsset(tableAsset);
         }
@@ -324,6 +341,7 @@ public class ItemsController: Controller<ItemData>
                 
                 (cosmeticsStruct.Value[0] as NamePropertyData).Value = FName.FromString(tableAsset, randomOutfit.CodeName);
                 (cosmeticsStruct.Value[1] as NamePropertyData).Value = FName.FromString(tableAsset, randomHaircut.CodeName);
+                StartingEquipment.Add($"{propertyData.Name} outfit: {randomOutfit.CustomName}, haircut: {randomHaircut.CustomName}");
             }
             Utils.WriteAsset(tableAsset);
         }

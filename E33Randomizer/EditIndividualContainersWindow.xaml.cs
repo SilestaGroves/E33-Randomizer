@@ -86,7 +86,7 @@ namespace E33Randomizer
             try
             {
                 RandomizerLogic.PackAndConvertData();
-                MessageBox.Show($"Generation done! You can find the mod in the rand_{RandomizerLogic.usedSeed} folder.\n\n" +
+                MessageBox.Show($"Generation done! You can find the mod and spoiler_log.txt in the {RandomizerLogic.LastExportPath} folder.\n\n" +
                                 $"Used Seed: {RandomizerLogic.usedSeed}\n",
                     "Generation Summary", MessageBoxButton.OK, MessageBoxImage.Information);
             }

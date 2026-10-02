@@ -18,12 +18,33 @@ public class Encounter
     public EnemyData LootEnemy;
     
     public bool FleeImpossible { get; private set; }
-    public int LevelOverride { get; set; }
+    public int LevelOverride { get; private set; }
     public bool DisableCameraEndMovement { get; private set; }
     public bool DisableReactionBattleLines { get; private set; }
     public bool IsNarrativeBattle { get; private set; }
     
     public int Size => Enemies.Count;
+
+    /// <summary>Enemies of the encounter in the original game files.</summary>
+    public List<string> OriginalEnemyCodeNames { get; } = [];
+
+    /// <summary>
+    /// The level the original encounter is fought at: its level override if it has one, otherwise the level of
+    /// its strongest enemy. 0 if unknown (enemies with level 0 have no level data).
+    /// </summary>
+    public int OriginalLevel { get; private set; }
+
+    /// <summary>True if the encounter contains enemies that weren't in the original encounter.</summary>
+    public bool HasNewEnemies => Enemies.Any(e => !OriginalEnemyCodeNames.Contains(e.CodeName));
+
+    /// <summary>
+    /// The level override written to the game files. With level scaling, encounters that got new enemies are
+    /// fought at the original encounter level, so the enemies match the area instead of their own level.
+    /// </summary>
+    public int GetLevelOverrideToWrite(bool scaleToOriginalLevel)
+    {
+        return scaleToOriginalLevel && OriginalLevel > 0 && HasNewEnemies ? OriginalLevel : LevelOverride;
+    }
 
     public Encounter(StructPropertyData encounterData, UAsset asset)
     {
@@ -63,6 +84,10 @@ public class Encounter
         DisableReactionBattleLines = (_encounterData.Value[4] as BoolPropertyData).Value;
         IsNarrativeBattle = (_encounterData.Value[5] as BoolPropertyData).Value;
         PossibleLootDrops =  PossibleLootDrops.Distinct().ToList();
+
+        OriginalEnemyCodeNames.AddRange(Enemies.Select(e => e.CodeName));
+        var knownLevels = Enemies.Select(e => e.Level).Where(l => l > 0).ToList();
+        OriginalLevel = LevelOverride > 0 ? LevelOverride : knownLevels.DefaultIfEmpty(0).Max();
     }
 
     public void SaveToStruct(StructPropertyData encounterStruct)
@@ -94,7 +119,7 @@ public class Encounter
         }
 
         fleeImpossibleField.Value = FleeImpossible;
-        levelOverrideField.Value = LevelOverride;
+        levelOverrideField.Value = GetLevelOverrideToWrite(RandomizerLogic.Settings.ScaleEnemyLevelsToEncounter);
         disableCameraEndMovementField.Value = DisableCameraEndMovement;
         disableReactionBattleLinesField.Value = DisableReactionBattleLines;
         isNarrativeBattleField.Value = IsNarrativeBattle;

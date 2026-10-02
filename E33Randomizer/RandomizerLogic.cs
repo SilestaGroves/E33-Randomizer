@@ -105,6 +105,7 @@ public static class RandomizerLogic
     public static Dictionary<string, Dictionary<string, float>> EnemyFrequenciesWithinArchetype = new();
     public static Dictionary<string, float> TotalEnemyFrequencies;
     public static string PresetName = "";
+    public static string LastExportPath = "";
     #if DEBUG
         public static string DataDirectory = Environment.GetEnvironmentVariable("E33RandoDataPath");
     #else
@@ -158,6 +159,7 @@ public static class RandomizerLogic
     {
         var presetName = PresetName.Length == 0 ? usedSeed.ToString() : PresetName;
         var exportPath = $"rand_{presetName}/";
+        LastExportPath = exportPath;
         if (Directory.Exists("randomizer"))
         {
             Directory.Delete("randomizer", true);
@@ -180,6 +182,12 @@ public static class RandomizerLogic
         // }
 
         Controllers.WriteAssets();
+
+        if (writeTxt)
+        {
+            // Written after the assets, since starting equipment is only rolled while writing them
+            SpoilerLog.Write(exportPath + "spoiler_log.txt");
+        }
         
         var retocArgs = $"to-zen --version UE5_4 randomizer \"{exportPath}randomizer_P.utoc\"";
 
