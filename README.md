@@ -26,6 +26,7 @@ For other modders - enemy rando overrides DT_jRPG_Encounters, DT_jRPG_Encounters
 Running from source:
 - Install the [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0) (or newer)
 - `git clone --recursive https://github.com/SilestaGroves/E33-Randomizer.git` (or run `git submodule update --init` after a plain clone)
+  - If git reports "Unable to checkout" in external/UAssetAPI, the clone is in a deep folder and some of UAssetAPI's own test files exceed the Windows path length limit. They aren't needed to build or run; to avoid the message, run `git config --global core.longpaths true` before cloning or clone into a short path like C:\E33-Randomizer
 - `dotnet run --project E33Randomizer`, or open E33Randomizer.sln and run it
 - Everything else comes with the repository: the game data and the external tools are copied next to the exe on build, and generated mods, settings and logs are written there too
 
