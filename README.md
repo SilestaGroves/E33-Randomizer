@@ -11,8 +11,10 @@ Installation:
 Running the randomizer:
 - Start the E33Randomizer.exe
 - Configure the mod as you see fit
+- Set the game folder at the bottom of the main window once ("Find Steam install" or "Browse..."); it's remembered in game_path.txt
 - Click "Generate and pack mod" button in the main window or "Generate mod files from current"
-- Put the generated .pak, .utoc, and .ucas files into **Expedition 33\Sandfall\Content\Paks\\~mods** folder, creating ~mods directory if necessary
+- The generated .pak, .utoc, and .ucas files are copied into **Expedition 33\Sandfall\Content\Paks\\~mods** automatically, replacing the previous randomizer files. Without a game folder (or with "Copy the mod into the game folder" unchecked), copy them there yourself from the rand_&lt;seed&gt; folder, creating ~mods directory if necessary
+- A human-readable spoiler_log.txt is written next to the mod
 - Start the game and enjoy the chaos
 
 

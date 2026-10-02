@@ -79,6 +79,10 @@
         <!-- Bottom Section -->
         <Border Grid.Row="1" Background="#F0F0F0" Padding="20">
             <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
@@ -134,6 +138,32 @@
                         Background="#4CAF50"
                         Foreground="White"
                         FontWeight="Bold" />
+
+                <!-- Game folder the mod is copied into -->
+                <DockPanel Grid.Row="1" Grid.ColumnSpan="4" Margin="0,15,0,0" LastChildFill="True">
+                    <CheckBox DockPanel.Dock="Left"
+                              Content="Copy the mod into the game folder:"
+                              IsChecked="{Binding CopyModToGame}"
+                              VerticalAlignment="Center"
+                              Margin="0,0,10,0" />
+                    <Button DockPanel.Dock="Right"
+                            Content="Find Steam install"
+                            Width="120"
+                            Height="25"
+                            Margin="5,0,0,0"
+                            Click="DetectGameDirectoryButton_Click" />
+                    <Button DockPanel.Dock="Right"
+                            Content="Browse..."
+                            Width="80"
+                            Height="25"
+                            Margin="5,0,0,0"
+                            Click="BrowseGameDirectoryButton_Click" />
+                    <TextBox Text="{Binding GameDirectory, Mode=OneWay}"
+                             IsReadOnly="True"
+                             Height="25"
+                             VerticalContentAlignment="Center"
+                             ToolTip="The mod is copied into Sandfall\Content\Paks\~mods inside this folder" />
+                </DockPanel>
 
             </Grid>
         </Border>

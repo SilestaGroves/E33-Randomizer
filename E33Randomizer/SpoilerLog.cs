@@ -45,6 +45,8 @@ public static class SpoilerLog
         AppendHeader(log, "SETTINGS");
         foreach (var property in typeof(SettingsViewModel).GetProperties().OrderBy(p => p.Name))
         {
+            // A local path, not a randomization setting
+            if (property.Name == nameof(SettingsViewModel.GameDirectory)) continue;
             log.AppendLine($"  {property.Name}: {property.GetValue(RandomizerLogic.Settings)}");
         }
         log.AppendLine();

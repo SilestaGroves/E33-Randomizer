@@ -170,9 +170,9 @@
                                   FontSize="14"
                                   Grid.Row="8" />
 
-                        <CheckBox Content="Keep scripted story battles (Gustave vs Renoir, the final duel, Maelle's and other tutorials)"
-                                  ToolTip="Encounters the game marks as narrative battles. Randomizing them can break the scripted outcome."
-                                  IsChecked="{Binding KeepNarrativeBattles}"
+                        <CheckBox Content="Keep scripted story battles and tutorials (Gustave vs Renoir, the final duel, tutorial fights)"
+                                  ToolTip="Randomizing them can break the scripted outcome or leave a tutorial waiting for an action the new enemy doesn't have."
+                                  IsChecked="{Binding KeepStoryBattlesAndTutorials}"
                                   Margin="0,0,0,0"
                                   FontSize="14" />
                         <CheckBox Content="Keep fights whose enemies drop progression items (merchant unlocks, Maelle's painter skills)"

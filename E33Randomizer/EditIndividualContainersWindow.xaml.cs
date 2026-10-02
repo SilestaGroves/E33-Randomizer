@@ -87,6 +87,7 @@ namespace E33Randomizer
             {
                 RandomizerLogic.PackAndConvertData();
                 MessageBox.Show($"Generation done! You can find the mod and spoiler_log.txt in the {RandomizerLogic.LastExportPath} folder.\n\n" +
+                                MainWindow.GetInstallSummary() +
                                 $"Used Seed: {RandomizerLogic.usedSeed}\n",
                     "Generation Summary", MessageBoxButton.OK, MessageBoxImage.Information);
             }

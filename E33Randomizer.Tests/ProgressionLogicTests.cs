@@ -162,16 +162,20 @@ public class ProgressionLogicTests(GameDataFixture fixture)
     }
 
     [Fact]
-    public void NarrativeBattlesAreKept()
+    public void StoryBattlesAndTutorialsAreKept()
     {
         GameDataFixture.ResetSettings(13);
         RandomizerLogic.Settings.RandomizeEncounterSizes = true;
         RandomizerLogic.Settings.EncounterSizeThree = true;
         RandomizerLogic.Randomize(saveData: false);
 
-        var narrative = Controllers.EnemiesController.Encounters.Where(e => e.IsNarrativeBattle).ToList();
-        Assert.Contains(narrative, e => e.Name == "SC_MirrorRenoir_GustaveEnd");
-        foreach (var encounter in narrative)
+        var kept = Controllers.EnemiesController.Encounters.Where(e => e.IsNarrativeBattle || SpecialRules.IsTutorial(e)).ToList();
+        foreach (var name in new[] { "SC_MirrorRenoir_GustaveEnd", "FinalBossVerso", "FB_Chalier_GradientCounterTutorial*1",
+                     "MM_Stalact_GradientAttackTutorial*1", "SM_Eveque_ShieldTutorial*1", "SM_Volester_TutoFlying*1",
+                     "SM_FirstLancelier*1", "SM_FirstPortier_NoTuto*1", "LU_Act1_PunchingBall" })
+            Assert.Contains(kept, e => e.Name == name);
+        Assert.DoesNotContain(kept, e => e.Name == "OL_MirrorRenoir_FirstFight");
+        foreach (var encounter in kept)
             Assert.Equal(encounter.OriginalEnemyCodeNames, encounter.Enemies.Select(e => e.CodeName).ToList());
     }
 

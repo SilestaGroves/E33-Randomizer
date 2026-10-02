@@ -312,14 +312,25 @@ public static class SpecialRules
         return true;
     }
 
+    /// <summary>
+    /// Tutorial fights: their tutorial prompts can wait for actions the replacement enemies don't have.
+    /// Matches the tutorial and "NoTuto" variants, the first Spring Meadows fights and the training dummy.
+    /// Scripted story fights are covered by the game's own narrative battle flag instead.
+    /// </summary>
+    public static bool IsTutorial(Encounter encounter)
+    {
+        static bool IsTutorialName(string name) =>
+            name.Contains("Tuto", StringComparison.OrdinalIgnoreCase) || name.StartsWith("SM_First") || name.Contains("PunchingBall");
+        return IsTutorialName(encounter.Name) || encounter.OriginalEnemyCodeNames.Any(IsTutorialName);
+    }
+
     public static bool Randomizable(Encounter encounter)
     {
         if (!RandomizerLogic.Settings.RandomizeMerchantFights && encounter.Name.Contains("Merchant"))
         {
             return false;
         }
-        // Scripted fights the game marks as narrative: Gustave vs Renoir, the final duel, Maelle's and other tutorials
-        if (RandomizerLogic.Settings.KeepNarrativeBattles && encounter.IsNarrativeBattle)
+        if (RandomizerLogic.Settings.KeepStoryBattlesAndTutorials && (encounter.IsNarrativeBattle || IsTutorial(encounter)))
         {
             return false;
         }

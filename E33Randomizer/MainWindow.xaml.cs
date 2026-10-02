@@ -46,8 +46,53 @@ public partial class MainWindow
         {
             SaveSettings("default_settings.json");
         }
+
+        RandomizerLogic.Settings.GameDirectory =
+            GameInstallation.LoadSavedGameDirectory() ?? GameInstallation.FindSteamGameDirectory();
     }
-    
+
+    private void BrowseGameDirectoryButton_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new OpenFolderDialog
+        {
+            Title = "Select the Expedition 33 game folder",
+            InitialDirectory = RandomizerLogic.Settings.GameDirectory ?? "",
+        };
+        if (dialog.ShowDialog() != true) return;
+
+        var gameDirectory = GameInstallation.NormalizeGameDirectory(dialog.FolderName);
+        if (gameDirectory == null)
+        {
+            MessageBox.Show("This isn't the Expedition 33 game folder: it has no Sandfall\\Content\\Paks inside.",
+                "Wrong folder", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+        RandomizerLogic.Settings.GameDirectory = gameDirectory;
+        GameInstallation.SaveGameDirectory(gameDirectory);
+    }
+
+    private void DetectGameDirectoryButton_Click(object sender, RoutedEventArgs e)
+    {
+        var gameDirectory = GameInstallation.FindSteamGameDirectory();
+        if (gameDirectory == null)
+        {
+            MessageBox.Show("Couldn't find a Steam installation of Expedition 33. Use Browse to select the game folder.",
+                "Game not found", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+        RandomizerLogic.Settings.GameDirectory = gameDirectory;
+        GameInstallation.SaveGameDirectory(gameDirectory);
+    }
+
+    public static string GetInstallSummary()
+    {
+        if (RandomizerLogic.LastInstalledModsDirectory != null)
+            return $"The mod was copied into {RandomizerLogic.LastInstalledModsDirectory}, just start the game.\n\n";
+        if (RandomizerLogic.Settings.CopyModToGame)
+            return "The game folder isn't set, so the mod wasn't copied into the game. Set it at the bottom of the main window.\n\n";
+        return "";
+    }
+
     public void CustomEnemyPlacementButton_Click(object sender, RoutedEventArgs e)
     {
         if (_customEnemyPlacementWindow == null)
@@ -127,6 +172,7 @@ public partial class MainWindow
         {
             RandomizerLogic.Randomize();
             MessageBox.Show($"Generation done! You can find the mod and spoiler_log.txt in the {RandomizerLogic.LastExportPath} folder.\n\n" +
+                            GetInstallSummary() +
                             $"Used Seed: {RandomizerLogic.usedSeed}\n",
                 "Generation Summary", MessageBoxButton.OK, MessageBoxImage.Information);
         }
@@ -246,6 +292,7 @@ public partial class MainWindow
             {
                 string json = r.ReadToEnd();
                 var newSettingsData = JsonConvert.DeserializeObject<SettingsViewModel>(json);
+                newSettingsData.GameDirectory = RandomizerLogic.Settings.GameDirectory;
                 RandomizerLogic.Settings = newSettingsData;
                 DataContext = RandomizerLogic.Settings;
             }
@@ -300,7 +347,7 @@ public class SettingsViewModel : INotifyPropertyChanged
     public bool ReduceBossRepetition { get; set; } = false;
     public bool ScaleEnemyLevelsToEncounter { get; set; } = false;
     public bool KeepProgressionDropFights { get; set; } = true;
-    public bool KeepNarrativeBattles { get; set; } = true;
+    public bool KeepStoryBattlesAndTutorials { get; set; } = true;
     // public bool TieDropsToEncounters { get; set; } = false; 
 
     public bool ChangeSizesOfNonRandomizedChecks { get; set; } = false;
@@ -345,6 +392,25 @@ public class SettingsViewModel : INotifyPropertyChanged
     public bool IncludeCutContentItems { get; set; } = true;
     
     public bool RandomizeSkills { get; set; } = false;
+
+    public bool CopyModToGame { get; set; } = true;
+
+    private string _gameDirectory;
+
+    /// <summary>
+    /// The game folder the mod is copied into. Not part of presets, since it's specific to this computer;
+    /// it's stored in game_path.txt instead.
+    /// </summary>
+    [JsonIgnore]
+    public string GameDirectory
+    {
+        get => _gameDirectory;
+        set
+        {
+            _gameDirectory = value;
+            OnPropertyChanged(nameof(GameDirectory));
+        }
+    }
     public bool ReduceSkillRepetition { get; set; } = true;
     
     public event PropertyChangedEventHandler PropertyChanged;

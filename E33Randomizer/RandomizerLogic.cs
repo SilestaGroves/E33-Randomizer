@@ -106,6 +106,8 @@ public static class RandomizerLogic
     public static Dictionary<string, float> TotalEnemyFrequencies;
     public static string PresetName = "";
     public static string LastExportPath = "";
+    /// <summary>The game's ~mods folder the last generated mod was copied into, or null if it wasn't copied.</summary>
+    public static string LastInstalledModsDirectory;
     #if DEBUG
         public static string DataDirectory = Environment.GetEnvironmentVariable("E33RandoDataPath");
     #else
@@ -190,9 +192,38 @@ public static class RandomizerLogic
         }
         
         var retocArgs = $"to-zen --version UE5_4 randomizer \"{exportPath}randomizer_P.utoc\"";
-
-        Process.Start("retoc.exe", retocArgs);
+        RunRetoc(retocArgs);
         Controllers.EnemiesController.Reset();
+
+        LastInstalledModsDirectory = null;
+        if (Settings.CopyModToGame && !string.IsNullOrEmpty(Settings.GameDirectory))
+        {
+            LastInstalledModsDirectory = GameInstallation.InstallMod(exportPath, Settings.GameDirectory);
+        }
+    }
+
+    /// <summary>Packs the written assets and waits for it, so the packed files exist when this returns.</summary>
+    private static void RunRetoc(string arguments)
+    {
+        var startInfo = new ProcessStartInfo("retoc.exe", arguments)
+        {
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+        };
+        using var process = Process.Start(startInfo);
+        var output = process.StandardOutput.ReadToEndAsync();
+        var errors = process.StandardError.ReadToEndAsync();
+        if (!process.WaitForExit(TimeSpan.FromMinutes(5)))
+        {
+            process.Kill();
+            throw new TimeoutException("retoc.exe didn't finish packing the mod in 5 minutes.");
+        }
+        if (process.ExitCode != 0)
+        {
+            throw new InvalidOperationException($"retoc.exe failed with exit code {process.ExitCode}: {errors.Result}{output.Result}".Trim());
+        }
     }
 
     public static EnemyData GetRandomByArchetype(string archetype)
