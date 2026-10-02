@@ -1,66 +1,107 @@
-from sys import argv
+"""Sets named ID flags (story progression flags) in an Expedition 33 save file.
+
+Usage: python save_file_patcher.py "path_to_save.sav" <flag_guid> [true|false]
+
+Needs uesave.exe next to this script, in the current folder, or in ../tools.
+Works with the JSON formats of uesave 0.7+ and of older versions.
+The original save is kept next to it as .sav.bak.
+"""
 import json
+import os
+import shutil
 import subprocess
+import tempfile
+from sys import argv
 from typing import Dict
-from glob import glob
+
+NAMED_IDS_PROPERTY = "NamedIDsStates_0"
+NAMED_IDS_SCHEMA = "NamedIDsStates"
+NAMED_IDS_TYPE = {"data": {"Map": {"key_type": {"Struct": {"struct_type": "Guid", "id": "00000000-0000-0000-0000-000000000000"}},
+                                   "value_type": {"Other": "BoolProperty"}}}}
 
 
-NID_TEMPLATE_JSON = '{"key": {"Struct": {"Guid": "NID"}},"value": {"Bool": VALUE}}'
-
-NamedIDsStates_JSON = '{"tag": {"data": {"Map": {"key_type": {"Struct": {"struct_type": "Guid", "id": "00000000-0000-0000-0000-000000000000"}},"value_type": {"Other": "BoolProperty"}}}},"Map": []}'
-
-
-def get_flag_json(flag_id: str, flag_value: bool = True) -> str:
-    return NID_TEMPLATE_JSON.replace("NID", flag_id).replace("VALUE", str(flag_value).lower())
-
-
-def handle_json(path_to_json: str, flags: Dict[str, bool]) -> None:
-    with open(path_to_json, 'r') as f:
-        json_content = f.read()
-
-    save_obj = json.loads(json_content)
-
-    if "NamedIDsStates_0" not in save_obj["root"]["properties"]:
-        save_obj["root"]["properties"]["NamedIDsStates_0"] = json.loads(NamedIDsStates_JSON)
-
-    flags_present = []
-
-    for kv_pair in save_obj["root"]["properties"]["NamedIDsStates_0"]["Map"]:
-        guid = kv_pair["key"]["Struct"]["Guid"]
-        if guid in flags:
-            flags_present.append(guid)
-            kv_pair["value"]["Bool"] = flags[guid]
-
-    for flag_key, flag_value in flags.items():
-        if flag_key in flags_present:
-            continue
-        save_obj["root"]["properties"]["NamedIDsStates_0"]["Map"].append(
-            json.loads(get_flag_json(flag_key, flag_value))
-        )
-
-    with open("save.json", 'w') as f:
-        json.dump(save_obj, f, indent=2)
+def find_uesave() -> str:
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    for folder in (script_dir, os.getcwd(), os.path.join(script_dir, "..", "tools")):
+        path = os.path.join(folder, "uesave.exe")
+        if os.path.isfile(path):
+            return os.path.abspath(path)
+    return None
 
 
-def patch(save_file_path: str, flags: Dict[str, bool]) -> None:
-    to_json_args = f'to-json -i "{save_file_path}" -o save.json'
-    from_json_args = f'from-json -i save.json -o "{save_file_path}"'
+def is_new_format(save_obj: dict) -> bool:
+    """uesave 0.7+ keeps property types in "schemas" and writes plain values."""
+    return "schemas" in save_obj
 
-    subprocess.run(f"uesave.exe {to_json_args}", shell=True, check=True)
 
-    handle_json("save.json", flags)
+def patch_json(save_obj: dict, flags: Dict[str, bool]) -> dict:
+    properties = save_obj["root"]["properties"]
+    new_format = is_new_format(save_obj)
 
-    subprocess.run(f"uesave.exe {from_json_args}", shell=True)
+    if NAMED_IDS_PROPERTY not in properties:
+        if new_format:
+            properties[NAMED_IDS_PROPERTY] = []
+            save_obj["schemas"].setdefault("schemas", {}).setdefault(NAMED_IDS_SCHEMA, NAMED_IDS_TYPE)
+        else:
+            properties[NAMED_IDS_PROPERTY] = {"tag": NAMED_IDS_TYPE, "Map": []}
+
+    if new_format:
+        entries = properties[NAMED_IDS_PROPERTY]
+        for guid, value in flags.items():
+            entry = next((e for e in entries if e["key"] == guid), None)
+            if entry is None:
+                entries.append({"key": guid, "value": value})
+            else:
+                entry["value"] = value
+    else:
+        entries = properties[NAMED_IDS_PROPERTY]["Map"]
+        for guid, value in flags.items():
+            entry = next((e for e in entries if e["key"]["Struct"]["Guid"] == guid), None)
+            if entry is None:
+                entries.append({"key": {"Struct": {"Guid": guid}}, "value": {"Bool": value}})
+            else:
+                entry["value"]["Bool"] = value
+
+    return save_obj
+
+
+def run_uesave(uesave: str, *arguments: str) -> None:
+    result = subprocess.run([uesave, *arguments], capture_output=True, text=True)
+    if result.returncode != 0:
+        raise RuntimeError(f"uesave failed with exit code {result.returncode}: {result.stderr.strip()}")
+
+
+def patch(save_file_path: str, flags: Dict[str, bool], uesave: str = None) -> None:
+    uesave = uesave or find_uesave()
+    json_path = os.path.join(tempfile.gettempdir(), f"e33rando_save_{os.getpid()}.json")
+    try:
+        run_uesave(uesave, "to-json", "-i", save_file_path, "-o", json_path)
+        with open(json_path, encoding="utf-8") as f:
+            save_obj = json.load(f)
+        with open(json_path, "w", encoding="utf-8") as f:
+            json.dump(patch_json(save_obj, flags), f, indent=2)
+
+        shutil.copyfile(save_file_path, save_file_path + ".bak")
+        run_uesave(uesave, "from-json", "-i", json_path, "-o", save_file_path)
+    finally:
+        if os.path.exists(json_path):
+            os.remove(json_path)
+
 
 if __name__ == '__main__':
-    if not glob('uesave.exe'):
+    if not find_uesave():
         print('uesave.exe not found, please put it in the same directory as this script.')
+        input('Press enter to exit...')
+        exit()
+    if len(argv) < 3:
+        print('Usage: python save_file_patcher.py "path_to_save.sav" <flag_guid> [true|false]')
         input('Press enter to exit...')
         exit()
     filename = argv[1]
     flag_guid = argv[2]
-    flag_value = argv[3] == 'true' if len(argv) > 3 else True
+    flag_value = argv[3].lower() == 'true' if len(argv) > 3 else True
     patch(filename, {flag_guid: flag_value})
+    print(f'Patched. The original save was kept as {filename}.bak')
 
 
 
