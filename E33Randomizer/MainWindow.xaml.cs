@@ -300,6 +300,7 @@ public class SettingsViewModel : INotifyPropertyChanged
     public bool ReduceBossRepetition { get; set; } = false;
     public bool ScaleEnemyLevelsToEncounter { get; set; } = false;
     public bool KeepProgressionDropFights { get; set; } = true;
+    public bool KeepNarrativeBattles { get; set; } = true;
     // public bool TieDropsToEncounters { get; set; } = false; 
 
     public bool ChangeSizesOfNonRandomizedChecks { get; set; } = false;

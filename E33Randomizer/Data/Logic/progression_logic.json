@@ -57,9 +57,9 @@
     },
     "Old Lumiere": {
       "act": 2,
-      "missable": true,
-      "confidence": "medium",
-      "note": "End of Act II; treated as missable until confirmed to be revisitable"
+      "missable": false,
+      "confidence": "high",
+      "note": "End of Act II; can be revisited"
     },
     "Camp": {
       "act": 1,

@@ -162,6 +162,20 @@ public class ProgressionLogicTests(GameDataFixture fixture)
     }
 
     [Fact]
+    public void NarrativeBattlesAreKept()
+    {
+        GameDataFixture.ResetSettings(13);
+        RandomizerLogic.Settings.RandomizeEncounterSizes = true;
+        RandomizerLogic.Settings.EncounterSizeThree = true;
+        RandomizerLogic.Randomize(saveData: false);
+
+        var narrative = Controllers.EnemiesController.Encounters.Where(e => e.IsNarrativeBattle).ToList();
+        Assert.Contains(narrative, e => e.Name == "SC_MirrorRenoir_GustaveEnd");
+        foreach (var encounter in narrative)
+            Assert.Equal(encounter.OriginalEnemyCodeNames, encounter.Enemies.Select(e => e.CodeName).ToList());
+    }
+
+    [Fact]
     public void SpoilerLogShowsKeyItemLocations()
     {
         GameDataFixture.ResetSettings(12);

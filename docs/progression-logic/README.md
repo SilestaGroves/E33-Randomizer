@@ -34,10 +34,10 @@ E33_WRITE_LOGIC_REVIEW=1 dotnet test E33Randomizer.Tests --filter WriteReviewTab
 - Бои, где враги роняют прогрессионные предметы (разблокировки торговцев, навыки-художника Маэль с Paintress), **не рандомизируются**: дроп принадлежит типу врага. Настройка «Keep fights whose enemies drop progression items».
 - Ключевые предметы **не кладутся** в:
   - пролог и эпилог (NG+-награды Boulangerie туда же);
-  - **Lumière, Акт III** и **Old Lumière** — пока не подтверждено, что туда можно вернуться;
+  - **Lumière, Акт III** — пока не подтверждено, что туда можно вернуться после финала;
   - дроп с врагов, общие лут-таблицы, Endless Tower, мини-игры Gestral Beach;
   - **закрытый** ассортимент торговцев. Открытый разрешён.
-- Монолит возвратный и допускает ключевые предметы.
+- Монолит и Old Lumière возвратные и допускают ключевые предметы.
 - Каждый ключевой предмет кладётся один раз и в отдельную проверку.
 
 ## Ключевые предметы
@@ -69,8 +69,27 @@ Wooden Stick — шуточный предмет без применения, п
 
 Акт влияет только на подписи в спойлер-логе и в таблице, на достижимость он не влияет: логика гарантирует, что предмет можно получить, но не то, что он попадётся раньше места применения.
 
-## Открытые вопросы
+## Сюжетные бои
 
-1. Можно ли вернуться в **Lumière Акт III** после финала? Если да, это ещё 45 допустимых проверок.
-2. Можно ли вернуться в **Old Lumière** после Акта II? Если да — ещё около 20.
-3. Регионы с низкой уверенностью в акте (влияет только на подписи): Yellow Harvest, Stone Quarry, Gestral Beach, Falling Leaves, Crimson Forest, Esoteric Ruins, Flying Cemetery, Sinister Cave, Dark Shores, The Manor, Sunless Cliffs, Endless Night Sanctuary, The Chosen Path, арены, The Carousel, Flying Casino, White Sands, Fixed-Camera Levels, Rock Trailing, Sky Island, Painting Workshop, Sacred River, Crushing Cavern, Red Woods, The Fountain.
+Энкаунтеры, которые игра сама помечает как сюжетные (`IsNarrativeBattle`), не рандомизируются (настройка «Keep scripted story battles»):
+
+- `SC_MirrorRenoir_GustaveEnd` — Гюстав против Ренуара;
+- `FinalBossVerso`, `FinalBossMaelle` — финальная дуэль;
+- `L_MaelleTutorial*1` и варианты (4 шт.) — обучающий бой с Маэль в прологе;
+- `GO_Curator_JumpTutorial*1` — туториал прыжка;
+- `QUEST_DominiqueGiantFeet_ScielTuto*1`, `MM_Pelerin_MonocoTuto*1` — туториалы Сиэль и Моноко.
+
+Остальные бои с Ренуаром флага не имеют и рандомизируются: `OL_MirrorRenoir_FirstFight` (Old Lumière) и `MM_MirrorRenoir` (Монолит, после него выдаётся костюм Ренуара для Гюстава).
+
+## Проверить в игре
+
+1. Ключевой предмет из сундука или от торговца засчитывается квестом.
+2. Торговец после дуэли открывает ассортимент (подтверждает, что защита боёв с дропом нужна).
+3. Масштабирование уровней.
+4. Рандомизированные бои с Ренуаром `OL_MirrorRenoir_FirstFight` и `MM_MirrorRenoir` проходятся и не ломают сюжет.
+5. Туториалы без сюжетного флага, которые рандомизируются: `FB_Chalier_GradientCounterTutorial*1` (контратака на градиент), `MM_Stalact_GradientAttackTutorial*1` (градиентная атака), `SM_Eveque_ShieldTutorial*1` (щиты), `SM_Volester_TutoFlying*1` (летающие враги). Если подсказка туториала ждёт действия, которого у нового врага нет, будет софтлок.
+6. Можно ли вернуться в **Lumière Акт III** после финала. Если да, это ещё 45 допустимых проверок: в `progression_logic.json` у региона `"Lumiere - Act 3"` поставить `"missable": false`.
+
+## Регионы с низкой уверенностью в акте
+
+Влияет только на подписи: Yellow Harvest, Stone Quarry, Gestral Beach, Falling Leaves, Crimson Forest, Esoteric Ruins, Flying Cemetery, Sinister Cave, Dark Shores, The Manor, Sunless Cliffs, Endless Night Sanctuary, The Chosen Path, арены, The Carousel, Flying Casino, White Sands, Fixed-Camera Levels, Rock Trailing, Sky Island, Painting Workshop, Sacred River, Crushing Cavern, Red Woods, The Fountain.

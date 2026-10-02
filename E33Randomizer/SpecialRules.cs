@@ -318,6 +318,11 @@ public static class SpecialRules
         {
             return false;
         }
+        // Scripted fights the game marks as narrative: Gustave vs Renoir, the final duel, Maelle's and other tutorials
+        if (RandomizerLogic.Settings.KeepNarrativeBattles && encounter.IsNarrativeBattle)
+        {
+            return false;
+        }
         if (RandomizerLogic.Settings.KeepProgressionDropFights && encounter.OriginalEnemyCodeNames.Any(HasProgressionDrops))
         {
             return false;
