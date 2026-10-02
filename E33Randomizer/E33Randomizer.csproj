@@ -17,5 +17,10 @@
     <ItemGroup>
         <ProjectReference Include="..\external\UAssetAPI\UAssetAPI\UAssetAPI.csproj" />
     </ItemGroup>
+    <!-- Game data and the packing/save tools go next to the exe, so a fresh clone runs as is -->
+    <ItemGroup>
+        <None Update="Data\**\*" CopyToOutputDirectory="PreserveNewest" />
+        <None Include="..\tools\*.exe" Link="%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
 
 </Project>

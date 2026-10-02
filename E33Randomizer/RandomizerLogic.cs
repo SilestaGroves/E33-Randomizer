@@ -108,11 +108,10 @@ public static class RandomizerLogic
     public static string LastExportPath = "";
     /// <summary>The game's ~mods folder the last generated mod was copied into, or null if it wasn't copied.</summary>
     public static string LastInstalledModsDirectory;
-    #if DEBUG
-        public static string DataDirectory = Environment.GetEnvironmentVariable("E33RandoDataPath");
-    #else
-        public static string DataDirectory = "Data";
-    #endif
+    // E33RandoDataPath overrides the Data folder that is copied next to the exe on build
+    public static string DataDirectory = Environment.GetEnvironmentVariable("E33RandoDataPath") is { Length: > 0 } dataPath
+        ? dataPath
+        : Path.Combine(AppContext.BaseDirectory, "Data");
 
     public static List<string> Archetypes =
         ["Regular", "Weak", "Strong", "Elite", "Boss", "Alpha", "Elusive", "Petank"];

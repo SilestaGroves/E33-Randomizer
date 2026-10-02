@@ -23,7 +23,13 @@ For other modders - enemy rando overrides DT_jRPG_Encounters, DT_jRPG_Encounters
 <br>
 <br>
 <br>
-This project uses external tools (namely repak, retoc, and uesave). If built from source code, please include the .exes in the project root folder. The release already contains them for ease of use. By using E33 Randomizer, users must also adhere to the licenses of repak, retoc, and uesave, as well as UAssetAPI, in addition to E33 Randomizers' own.
+Running from source:
+- Install the [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0) (or newer)
+- `git clone --recursive https://github.com/SilestaGroves/E33-Randomizer.git` (or run `git submodule update --init` after a plain clone)
+- `dotnet run --project E33Randomizer`, or open E33Randomizer.sln and run it
+- Everything else comes with the repository: the game data and the external tools are copied next to the exe on build, and generated mods, settings and logs are written there too
+
+This project uses external tools (namely repak, retoc, and uesave), included in the tools folder, built from source; see [tools/README.md](tools/README.md) for versions and how to rebuild them. By using E33 Randomizer, users must also adhere to the licenses of repak, retoc, and uesave (tools/licenses), as well as UAssetAPI, in addition to E33 Randomizers' own.
 <br>
 <br>
 <br>

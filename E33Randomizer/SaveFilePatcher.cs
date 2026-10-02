@@ -1,6 +1,7 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.IO;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace E33Randomizer;
 
@@ -10,58 +11,105 @@ public static class SaveFilePatcher
     private const string GRADIENT_COUNTER_NID = "30e2946e-432c-b0e8-363e-d29811577e30";
     private const string LUMIERE_CURTAIN_NID = "aa6633b1-4fed-a61d-092e-ed80cd949751";
 
-    private const string NID_TEMPLATE_JSON =
-        "{\"key\": {\"Struct\": {\"Guid\": \"NID\"}},\"value\": {\"Bool\": VALUE}}";
-    
-    private const string NamedIDsStates_JSON =
-        "{\"tag\": {\"data\": {\"Map\": {\"key_type\": {\"Struct\": {\"struct_type\": \"Guid\", \"id\": \"00000000-0000-0000-0000-000000000000\"}},\"value_type\": {\"Other\": \"BoolProperty\"}}}},\"Map\": []}";
-    
-    private static string GetFlagJson(string flagId, bool flagValue = true)
-    {
-        return NID_TEMPLATE_JSON.Replace("NID", flagId).Replace("VALUE", flagValue.ToString().ToLower());
-    }
-    
-    private static void HandleJson(string pathToJSON, Dictionary<string, bool> flags)
-    {
-        var json = File.ReadAllText(pathToJSON);
-        dynamic saveObj = JsonConvert.DeserializeObject(json);
+    private const string NamedIDsStatesProperty = "NamedIDsStates_0";
 
-        if (saveObj.root.properties.NamedIDsStates_0 == null)
-        {
-            saveObj.root.properties.NamedIDsStates_0 = JsonConvert.DeserializeObject(NamedIDsStates_JSON);
-        }
+    // Type of the NamedIDsStates map (Guid -> bool), in both uesave JSON formats
+    private const string NamedIDsStatesType =
+        "{\"data\": {\"Map\": {\"key_type\": {\"Struct\": {\"struct_type\": \"Guid\", \"id\": \"00000000-0000-0000-0000-000000000000\"}},\"value_type\": {\"Other\": \"BoolProperty\"}}}}";
 
-        var flagsPresent = new List<string>();
-        
-        foreach (var kvPair in saveObj.root.properties.NamedIDsStates_0.Map)
+    /// <summary>
+    /// Sets named ID flags in a save converted to JSON by uesave. Supports both JSON formats: uesave 0.7+
+    /// (types in "schemas", map entries as {"key": guid, "value": bool}) and older versions (type in "tag",
+    /// entries as {"key": {"Struct": {"Guid": guid}}, "value": {"Bool": bool}}).
+    /// </summary>
+    public static string PatchJson(string json, Dictionary<string, bool> flags)
+    {
+        var save = JObject.Parse(json);
+        var properties = (JObject)save["root"]!["properties"]!;
+        var schemas = save["schemas"]?["schemas"] as JObject;
+        var newFormat = save["schemas"] != null;
+
+        if (properties[NamedIDsStatesProperty] == null)
         {
-            var guid = kvPair.key.Struct.Guid.ToString();
-            if (flags.ContainsKey(guid))
+            if (newFormat)
             {
-                flagsPresent.Add(guid);
-                kvPair.value.Bool = flags[guid];
+                properties[NamedIDsStatesProperty] = new JArray();
+                if (schemas != null && schemas["NamedIDsStates"] == null)
+                {
+                    schemas["NamedIDsStates"] = JObject.Parse(NamedIDsStatesType);
+                }
+            }
+            else
+            {
+                properties[NamedIDsStatesProperty] = new JObject
+                {
+                    ["tag"] = JObject.Parse(NamedIDsStatesType),
+                    ["Map"] = new JArray(),
+                };
             }
         }
 
-        foreach (var flag in flags)
+        var entries = properties[NamedIDsStatesProperty] is JArray array ? array : (JArray)properties[NamedIDsStatesProperty]!["Map"]!;
+        var isOldEntry = properties[NamedIDsStatesProperty] is JObject;
+
+        foreach (var (guid, value) in flags)
         {
-            if (flagsPresent.Contains(flag.Key)) continue;
-            saveObj.root.properties.NamedIDsStates_0.Map.Add(JsonConvert.DeserializeObject(GetFlagJson(flag.Key, flag.Value)));
+            var entry = entries.FirstOrDefault(e =>
+                (isOldEntry ? e["key"]?["Struct"]?["Guid"] : e["key"])?.ToString() == guid);
+            if (entry == null)
+            {
+                entries.Add(isOldEntry
+                    ? new JObject { ["key"] = new JObject { ["Struct"] = new JObject { ["Guid"] = guid } }, ["value"] = new JObject { ["Bool"] = value } }
+                    : new JObject { ["key"] = guid, ["value"] = value });
+            }
+            else if (isOldEntry)
+            {
+                entry["value"]!["Bool"] = value;
+            }
+            else
+            {
+                entry["value"] = value;
+            }
         }
-        string output = JsonConvert.SerializeObject(saveObj, Formatting.Indented);
-        File.WriteAllText("save.json", output);
+
+        return save.ToString(Formatting.Indented);
     }
-    
+
+    private static void RunUesave(string arguments)
+    {
+        var startInfo = new ProcessStartInfo("uesave.exe", arguments)
+        {
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            RedirectStandardError = true,
+        };
+        using var process = Process.Start(startInfo);
+        var errors = process.StandardError.ReadToEndAsync();
+        process.WaitForExit();
+        if (process.ExitCode != 0)
+        {
+            throw new InvalidOperationException($"uesave.exe failed with exit code {process.ExitCode}: {errors.Result}".Trim());
+        }
+    }
+
+    /// <summary>
+    /// Sets the flags in the save file. The original save is kept next to it as .bak.
+    /// </summary>
     public static void Patch(string saveFilePath, Dictionary<string, bool> flags)
     {
-        var to_json_args = $"to-json -i \"{saveFilePath}\" -o save.json";
-        var from_json_args = $"from-json -i save.json -o \"{saveFilePath}\"";
+        var jsonPath = Path.Combine(Path.GetTempPath(), $"e33rando_save_{Guid.NewGuid():N}.json");
+        try
+        {
+            RunUesave($"to-json -i \"{saveFilePath}\" -o \"{jsonPath}\"");
+            File.WriteAllText(jsonPath, PatchJson(File.ReadAllText(jsonPath), flags));
 
-        Process.Start("uesave.exe", to_json_args).WaitForExit();
-        
-        HandleJson("save.json", flags);
-        
-        Process.Start("uesave.exe", from_json_args);
+            File.Copy(saveFilePath, saveFilePath + ".bak", true);
+            RunUesave($"from-json -i \"{jsonPath}\" -o \"{saveFilePath}\"");
+        }
+        finally
+        {
+            if (File.Exists(jsonPath)) File.Delete(jsonPath);
+        }
     }
 
     public static void AddCounters(string saveFilePath)

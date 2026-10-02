@@ -223,7 +223,7 @@ public partial class MainWindow
                         break;
                 }
                 
-                MessageBox.Show($"Save File Patched!",
+                MessageBox.Show($"Save File Patched! The original save was kept as {Path.GetFileName(openFileDialog.FileName)}.bak",
                     "Patched", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
