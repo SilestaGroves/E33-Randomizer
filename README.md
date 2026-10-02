@@ -7,6 +7,7 @@ Installation:
   - `E33Randomizer-<version>-win-x64-framework.zip` is much smaller, but needs the [.NET 9.0 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/9.0)
 - Unpack the zip file in a non-admin folder
 - Run E33Randomizer.exe
+- Updates: the randomizer checks for a new release on startup (and with the "Check for updates" button at the bottom of the main window), and can download and install it itself. Your settings, game folder, custom presets and generated mods are kept
 
 Publishing a new release: push a tag like `v1.2.3`; GitHub Actions runs the tests, builds both zips and creates the release. Release notes come from `docs/release-notes/<tag>.md` if that file exists.
 <br>

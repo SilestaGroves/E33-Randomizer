@@ -30,7 +30,9 @@ jobs:
       - name: Publish
         shell: pwsh
         run: |
-          $common = @("E33Randomizer/E33Randomizer.csproj", "-c", "Release", "-r", "win-x64", "-p:SatelliteResourceLanguages=en")
+          # The version from the tag (v1.2.3 -> 1.2.3) is what the built-in updater compares with the latest release
+          $version = "${{ github.ref_name }}".TrimStart("v")
+          $common = @("E33Randomizer/E33Randomizer.csproj", "-c", "Release", "-r", "win-x64", "-p:SatelliteResourceLanguages=en", "-p:Version=$version")
           dotnet publish @common --self-contained true -o out/full/E33Randomizer
           dotnet publish @common --self-contained false -o out/framework/E33Randomizer
 

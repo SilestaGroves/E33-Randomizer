@@ -82,6 +82,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -164,6 +165,18 @@
                              VerticalContentAlignment="Center"
                              ToolTip="The mod is copied into Sandfall\Content\Paks\~mods inside this folder" />
                 </DockPanel>
+
+                <!-- Updates -->
+                <StackPanel Grid.Row="2" Grid.ColumnSpan="4" Orientation="Horizontal" Margin="0,10,0,0">
+                    <CheckBox Content="Check for updates on startup"
+                              IsChecked="{Binding CheckForUpdatesOnStartup}"
+                              VerticalAlignment="Center"
+                              Margin="0,0,15,0" />
+                    <Button Content="Check for updates"
+                            Width="140"
+                            Height="25"
+                            Click="CheckForUpdatesButton_Click" />
+                </StackPanel>
 
             </Grid>
         </Border>

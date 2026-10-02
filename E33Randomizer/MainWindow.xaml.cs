@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Windows;
@@ -49,6 +50,130 @@ public partial class MainWindow
 
         RandomizerLogic.Settings.GameDirectory =
             GameInstallation.LoadSavedGameDirectory() ?? GameInstallation.FindSteamGameDirectory();
+
+        Title = Updater.IsDevelopmentBuild ? $"{Title} (development build)" : $"{Title} v{Updater.CurrentVersion.ToString(3)}";
+        ShowLastUpdateResult();
+        Loaded += async (_, _) =>
+        {
+            if (RandomizerLogic.Settings.CheckForUpdatesOnStartup) await CheckForUpdatesAsync(userAsked: false);
+        };
+    }
+
+    private bool _updateInProgress;
+
+    private void ShowLastUpdateResult()
+    {
+        var result = Updater.TakeLastUpdateResult();
+        if (result == null) return;
+        if (result == "OK")
+        {
+            MessageBox.Show($"The randomizer was updated to v{Updater.CurrentVersion.ToString(3)}.",
+                "Update complete", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+        else
+        {
+            MessageBox.Show($"The update couldn't be installed: {result}\n\nYou can download it from https://github.com/{Updater.Repository}/releases/latest",
+                "Update failed", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private async void CheckForUpdatesButton_Click(object sender, RoutedEventArgs e)
+    {
+        await CheckForUpdatesAsync(userAsked: true);
+    }
+
+    /// <summary>
+    /// Looks for a newer release and offers to install it. On startup (userAsked = false) it only speaks up
+    /// when there is an update.
+    /// </summary>
+    private async Task CheckForUpdatesAsync(bool userAsked)
+    {
+        if (_updateInProgress) return;
+        var current = Updater.CurrentVersion.ToString(3);
+        if (Updater.IsDevelopmentBuild)
+        {
+            if (userAsked)
+                MessageBox.Show("This is a development build, it isn't updated automatically. Update it with git pull.",
+                    "Updates", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        ReleaseInfo release;
+        try
+        {
+            release = await Updater.GetLatestReleaseAsync();
+        }
+        catch (Exception ex)
+        {
+            if (userAsked)
+                MessageBox.Show($"Couldn't check for updates: {ex.Message}", "Updates", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        if (!Updater.IsNewer(release))
+        {
+            if (userAsked)
+                MessageBox.Show($"You have the latest version (v{current}).", "Updates", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        var notes = release.Notes.Length > 1500 ? release.Notes[..1500] + "..." : release.Notes;
+        var answer = MessageBox.Show(
+            $"Version {release.Tag} is available (you have v{current}).\n\n{notes}\n\nDownload and install it now? The randomizer will restart.",
+            "Update available", MessageBoxButton.YesNo, MessageBoxImage.Information);
+        if (answer != MessageBoxResult.Yes) return;
+
+        if (!Updater.CanWriteInstallFolder())
+        {
+            MessageBox.Show($"The randomizer can't replace its files in {AppContext.BaseDirectory}. Move it to a folder you can write to, or download the update from {release.PageUrl}",
+                "Update", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        _updateInProgress = true;
+        var (progressWindow, progressBar, progressText) = CreateProgressWindow(release.Tag);
+        IsEnabled = false;
+        progressWindow.Show();
+        try
+        {
+            var progress = new Progress<double>(p =>
+            {
+                progressBar.Value = p;
+                progressText.Text = $"Downloading {release.Tag}... {p:P0}";
+            });
+            var newFiles = await Updater.DownloadAsync(release, Updater.IsSelfContained, progress);
+            progressText.Text = "Installing, the randomizer will restart...";
+            Process.Start(Updater.CreateInstallProcess(newFiles, AppContext.BaseDirectory, Environment.ProcessId, Environment.ProcessPath));
+            Application.Current.Shutdown();
+        }
+        catch (Exception ex)
+        {
+            progressWindow.Close();
+            IsEnabled = true;
+            _updateInProgress = false;
+            MessageBox.Show($"Update failed: {ex.Message}", "Update", MessageBoxButton.OK, MessageBoxImage.Error);
+            File.WriteAllText("update_error_log.txt", ex.ToString(), Encoding.UTF8);
+        }
+    }
+
+    private (Window window, ProgressBar bar, TextBlock text) CreateProgressWindow(string tag)
+    {
+        var text = new TextBlock { Text = $"Downloading {tag}...", Margin = new Thickness(0, 0, 0, 10) };
+        var bar = new ProgressBar { Height = 20, Minimum = 0, Maximum = 1 };
+        var panel = new StackPanel { Margin = new Thickness(20) };
+        panel.Children.Add(text);
+        panel.Children.Add(bar);
+        var window = new Window
+        {
+            Title = "Updating E33 Randomizer",
+            Content = panel,
+            Width = 420,
+            SizeToContent = SizeToContent.Height,
+            ResizeMode = ResizeMode.NoResize,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            Owner = this,
+        };
+        return (window, bar, text);
     }
 
     private void BrowseGameDirectoryButton_Click(object sender, RoutedEventArgs e)
@@ -396,6 +521,7 @@ public class SettingsViewModel : INotifyPropertyChanged
     public bool RandomizeSkills { get; set; } = false;
 
     public bool CopyModToGame { get; set; } = true;
+    public bool CheckForUpdatesOnStartup { get; set; } = true;
 
     private string _gameDirectory;
 
