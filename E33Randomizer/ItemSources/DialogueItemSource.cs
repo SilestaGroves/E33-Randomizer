@@ -187,6 +187,7 @@ public class DialogueItemSource : ItemSource
 
     public override UAsset SaveToAsset()
     {
+        ReloadAsset();
         var rewardPaths = DialogueRewardPaths[FileName];
 
         foreach (var rewardPath in rewardPaths)

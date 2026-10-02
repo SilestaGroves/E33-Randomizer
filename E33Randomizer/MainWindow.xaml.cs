@@ -85,7 +85,7 @@ public partial class MainWindow
             {
                 Owner = this
             };
-            _customPlacementWindows[objectType].Closed += (_, _) => _customPlacementWindows[objectType] = null;
+            _customPlacementWindows[objectType].Closed += (_, _) => _customPlacementWindows.Remove(objectType);
         }
 
         _customPlacementWindows[objectType].Show();
@@ -114,7 +114,7 @@ public partial class MainWindow
             {
                 Owner = this
             };
-            _editIndividualContainersWindows[objectType].Closed += (_, _) => _editIndividualContainersWindows[objectType] = null;
+            _editIndividualContainersWindows[objectType].Closed += (_, _) => _editIndividualContainersWindows.Remove(objectType);
         }
 
         _editIndividualContainersWindows[objectType].Show();
@@ -134,7 +134,7 @@ public partial class MainWindow
         {
             MessageBox.Show($"Error generating: {ex.Message}",
                 "Generating Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            File.WriteAllText("generation_error_log.txt", e.ToString(), Encoding.UTF8);
+            File.WriteAllText("generation_error_log.txt", ex.ToString(), Encoding.UTF8);
         }
     }
 
@@ -184,7 +184,7 @@ public partial class MainWindow
             {
                 MessageBox.Show($"Error patching: {ex.Message}",
                     "Patching Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                File.WriteAllText("save_patch_error_log.txt", e.ToString(), Encoding.UTF8);
+                File.WriteAllText("save_patch_error_log.txt", ex.ToString(), Encoding.UTF8);
             }
         }
     }

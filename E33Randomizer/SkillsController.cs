@@ -25,8 +25,7 @@ public class SkillsController: Controller<SkillData>
 
     public override void InitFromTxt(string text)
     {
-        var graphLines = text.Split('\n');
-        foreach (var line in graphLines)
+        foreach (var line in Utils.SplitLines(text))
         {
             var characterName = line.Split('|')[0];
             var skillGraph = SkillGraphs.Find(sG => sG.CharacterName == characterName);

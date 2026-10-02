@@ -52,6 +52,7 @@ public class GenericItemSource: ItemSource
 
     public override UAsset SaveToAsset()
     {
+        ReloadAsset();
         var newItems = SourceSections[FileName].Select(i => i.Item.CodeName).ToList();
         for (int i = 0; i < Math.Min(_originalNameReferenceIndexes.Count, newItems.Count); i++)
         {

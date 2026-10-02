@@ -49,7 +49,7 @@ public class ItemsController: Controller<ItemData>
     public ItemData GetRandomWeapon(string characterName)
     {
         var allCharacterWeapons = ObjectsData.Where(i => i.CustomName.Contains($"{characterName} Weapon")).ToList();
-        var filteredWeapons = allCharacterWeapons.Where(w => !RandomizerLogic.CustomItemPlacement.Excluded.Contains(w.CodeName)).ToList();
+        var filteredWeapons = allCharacterWeapons.Where(w => !RandomizerLogic.CustomItemPlacement.ExcludedCodeNames.Contains(w.CodeName)).ToList();
         if (filteredWeapons.Any()) allCharacterWeapons = filteredWeapons;
         
         return Utils.Pick(allCharacterWeapons);
@@ -242,9 +242,8 @@ public class ItemsController: Controller<ItemData>
 
     public override void InitFromTxt(string text)
     {
-        foreach (var line in text.Split('\n'))
+        foreach (var line in Utils.SplitLines(text))
         {
-            if (line == "") continue;
             var itemSourceName = line.Split('#')[0];
             var sectionKey = line.Split('#')[1].Split('|')[0];
             var particles = line.Contains(":") ? line.Split('|')[1].Split(',').Select(ItemSourceParticle.FromString).ToList() : [];
@@ -271,6 +270,7 @@ public class ItemsController: Controller<ItemData>
     public override void Initialize()
     {
         ReadObjectsData($"{RandomizerLogic.DataDirectory}/item_data.json");
+        ObjectsData.ForEach(i => i.IsBroken = RandomizerLogic.BrokenItems.Contains(i.CodeName) || i.CustomName.Contains("(Broken"));
         ReadTableAssets($"{RandomizerLogic.DataDirectory}/Originals/ItemTables");
         BuildItemSources($"{RandomizerLogic.DataDirectory}/ItemData");
         ViewModel.ContainerName = "Check";

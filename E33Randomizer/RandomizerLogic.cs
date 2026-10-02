@@ -189,7 +189,9 @@ public static class RandomizerLogic
 
     public static EnemyData GetRandomByArchetype(string archetype)
     {
-        return Controllers.EnemiesController.GetObject(Utils.GetRandomWeighted(EnemyFrequenciesWithinArchetype[archetype]));
+        var codeName = Utils.GetRandomWeighted(EnemyFrequenciesWithinArchetype[archetype], CustomEnemyPlacement.ExcludedCodeNames)
+                       ?? Utils.GetRandomWeighted(EnemyFrequenciesWithinArchetype[archetype]);
+        return Controllers.EnemiesController.GetObject(codeName);
     }
 
     public static EnemyData GetRandomEnemy()

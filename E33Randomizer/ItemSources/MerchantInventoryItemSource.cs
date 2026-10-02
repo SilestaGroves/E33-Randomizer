@@ -107,6 +107,7 @@ public class MerchantInventoryItemSource: ItemSource
 
     public override UAsset SaveToAsset()
     {
+        ReloadAsset();
         var tableData = (_asset.Exports[0] as DataTableExport).Table.Data;
 
         ObjectPropertyData dummyConditionStructLocked = null;
@@ -132,7 +133,7 @@ public class MerchantInventoryItemSource: ItemSource
         var dummyItemStruct = tableData[0].Clone() as StructPropertyData;
         tableData.Clear();
         
-        foreach (var inventoryItem in SourceSections[""])
+        foreach (var inventoryItem in GetMergedInventory())
         {
             _asset.AddNameReference(FString.FromString(inventoryItem.Item.CodeName));
             var newItemStruct = dummyItemStruct.Clone() as StructPropertyData;
@@ -156,12 +157,48 @@ public class MerchantInventoryItemSource: ItemSource
         return _asset;
     }
     
+    /// <summary>
+    /// The row name of a merchant table entry is the item code name, so every item may appear only once.
+    /// Duplicates (e.g. from manual edits) are merged into one entry with their quantities added up.
+    /// </summary>
+    public List<ItemSourceParticle> GetMergedInventory()
+    {
+        var merged = new List<ItemSourceParticle>();
+        foreach (var group in SourceSections[""].GroupBy(p => p.Item.CodeName))
+        {
+            var entry = ItemSourceParticle.Clone(group.First());
+            entry.Quantity = group.Sum(p => Math.Max(p.Quantity, 1));
+            merged.Add(entry);
+        }
+        return merged;
+    }
+
+    /// <summary>
+    /// Rerolls items that already appear earlier in the inventory, using the same placement rules.
+    /// </summary>
+    private void RerollDuplicates()
+    {
+        const int maxAttempts = 20;
+        var seen = new HashSet<string>();
+        foreach (var particle in SourceSections[""])
+        {
+            for (int attempt = 0; attempt < maxAttempts && seen.Contains(particle.Item.CodeName); attempt++)
+            {
+                var newItemName = RandomizerLogic.CustomItemPlacement.Replace(particle.Item.CodeName);
+                particle.Item = Controllers.ItemsController.GetObject(newItemName);
+                particle.Quantity = particle.Item.HasQuantities ? particle.Quantity : 1;
+            }
+            seen.Add(particle.Item.CodeName);
+        }
+    }
+
     public override void Randomize()
     {
         _minNumberOfItems = RandomizerLogic.Settings.MerchantInventorySizeMin;
         _maxNumberOfItems = RandomizerLogic.Settings.MerchantInventorySizeMax;
         _changeNumberOfItems = RandomizerLogic.Settings.ChangeMerchantInventorySize;
         base.Randomize();
+        RerollDuplicates();
         foreach (var item in SourceSections[""])
         {
             if (RandomizerLogic.Settings.ChangeMerchantInventoryLocked)

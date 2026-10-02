@@ -17,11 +17,11 @@ public class Encounter
     public bool IsBroken;
     public EnemyData LootEnemy;
     
-    private bool fleeImpossible;
-    private int levelOverride;
-    private bool disableCameraEndMovement;
-    private bool disableReactionBattleLines;
-    private bool isNarrativeBattle;
+    public bool FleeImpossible { get; private set; }
+    public int LevelOverride { get; set; }
+    public bool DisableCameraEndMovement { get; private set; }
+    public bool DisableReactionBattleLines { get; private set; }
+    public bool IsNarrativeBattle { get; private set; }
     
     public int Size => Enemies.Count;
 
@@ -57,22 +57,11 @@ public class Encounter
         }
 
         Archetypes = new ArchetypeGroup(enemyArchetypes);
-        fleeImpossible = (_encounterData.Value[1] as BoolPropertyData).Value;
-        levelOverride = (_encounterData.Value[2] as IntPropertyData).Value;
-        disableCameraEndMovement = (_encounterData.Value[3] as BoolPropertyData).Value;
-        disableReactionBattleLines = (_encounterData.Value[4] as BoolPropertyData).Value;
-        isNarrativeBattle = (_encounterData.Value[5] as BoolPropertyData).Value;
-        PossibleLootDrops =  PossibleLootDrops.Distinct().ToList();
-    }
-
-    public Encounter(string encounterName, List<string> encounterEnemies)
-    {
-        Name = encounterName;
-        Enemies = Controllers.EnemiesController.GetObjects(encounterEnemies);
-        foreach (var enemyData in Enemies)
-        {
-            PossibleLootDrops.AddRange(enemyData.PossibleLoot);
-        }
+        FleeImpossible = (_encounterData.Value[1] as BoolPropertyData).Value;
+        LevelOverride = (_encounterData.Value[2] as IntPropertyData).Value;
+        DisableCameraEndMovement = (_encounterData.Value[3] as BoolPropertyData).Value;
+        DisableReactionBattleLines = (_encounterData.Value[4] as BoolPropertyData).Value;
+        IsNarrativeBattle = (_encounterData.Value[5] as BoolPropertyData).Value;
         PossibleLootDrops =  PossibleLootDrops.Distinct().ToList();
     }
 
@@ -104,16 +93,21 @@ public class Encounter
             enemiesField.Value.Add(dummyEnemyKey, dummyEnemy);
         }
 
-        fleeImpossibleField.Value = fleeImpossible;
-        levelOverrideField.Value = levelOverride;
-        disableCameraEndMovementField.Value = disableCameraEndMovement;
-        disableReactionBattleLinesField.Value = disableReactionBattleLines;
-        isNarrativeBattleField.Value = isNarrativeBattle;
+        fleeImpossibleField.Value = FleeImpossible;
+        levelOverrideField.Value = LevelOverride;
+        disableCameraEndMovementField.Value = DisableCameraEndMovement;
+        disableReactionBattleLinesField.Value = DisableReactionBattleLines;
+        isNarrativeBattleField.Value = IsNarrativeBattle;
     }
     
     public override bool Equals(object? obj)
     {
-        return obj != null && (obj as Encounter).Name == Name;
+        return obj is Encounter other && other.Name == Name;
+    }
+
+    public override int GetHashCode()
+    {
+        return Name.GetHashCode();
     }
 
     public override string ToString()

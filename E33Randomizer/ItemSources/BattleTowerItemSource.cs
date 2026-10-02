@@ -44,6 +44,7 @@ public class BattleTowerItemSource: ItemSource
 
     public override UAsset SaveToAsset()
     {
+        ReloadAsset();
         var tableData = (_asset.Exports[0] as DataTableExport).Table.Data;
         StructPropertyData dummyRewardStruct = null;
         ObjectPropertyData compositeTableReference = null;

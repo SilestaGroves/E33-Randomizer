@@ -92,6 +92,7 @@ public class ChestsContentItemSource: ItemSource
 
     public override UAsset SaveToAsset()
     {
+        ReloadAsset();
         var tableData = (_asset.Exports[0] as DataTableExport).Table.Data;
         StructPropertyData dummyLootStruct = null;
         StructPropertyData dummyLootTableStruct = null;

@@ -19,6 +19,7 @@ public class EnemiesController: Controller<EnemyData>
         ViewModel.ContainerName = "Encounter";
         ViewModel.ObjectName = "Enemy";
         ReadObjectsData($"{RandomizerLogic.DataDirectory}/enemy_data.json");
+        ObjectsData.ForEach(e => e.IsBroken = RandomizerLogic.BrokenEnemies.Contains(e.CodeName));
         ReadEncounterAssets();
         ConstructEncountersByLocation();
     }
@@ -83,13 +84,63 @@ public class EnemiesController: Controller<EnemyData>
         WriteEncounterAsset($"{RandomizerLogic.DataDirectory}/Originals/DT_WorldMap_Encounters.uasset");
     }
     
+    /// <summary>
+    /// Sets the enemies of the encounters listed in the text (one "EncounterName|Enemy1,Enemy2" per line).
+    /// Existing encounters are updated in place, so their battle flags and level overrides are kept;
+    /// encounters missing from the text are left unchanged. The whole text is validated before anything is applied.
+    /// </summary>
     public override void InitFromTxt(string text)
     {
-        Encounters.Clear();
-        foreach (var line in text.Split('\n'))
+        var encountersByName = Encounters.ToDictionary(e => e.Name);
+        var parsed = new List<(Encounter encounter, List<EnemyData> enemies)>();
+        var errors = new List<string>();
+        var lineNumber = 0;
+
+        foreach (var line in text.Split('\n').Select(l => l.TrimEnd('\r')))
         {
-            var newEncounter = new Encounter(line.Split('|')[0], line.Split('|')[1].Split(',').ToList());
-            Encounters.Add(newEncounter);
+            lineNumber++;
+            if (line.Trim().Length == 0) continue;
+
+            var parts = line.Split('|');
+            if (parts.Length != 2)
+            {
+                errors.Add($"Line {lineNumber}: expected \"EncounterName|Enemy1,Enemy2,...\"");
+                continue;
+            }
+
+            var encounterName = parts[0].Trim();
+            if (!encountersByName.TryGetValue(encounterName, out var encounter))
+            {
+                errors.Add($"Line {lineNumber}: unknown encounter \"{encounterName}\"");
+                continue;
+            }
+
+            var enemyCodeNames = parts[1].Split(',').Select(n => n.Trim()).Where(n => n.Length > 0).ToList();
+            var unknownEnemies = enemyCodeNames.Where(n => !ObjectsByName.ContainsKey(n)).ToList();
+            if (unknownEnemies.Count > 0)
+            {
+                errors.Add($"Line {lineNumber}: unknown enemies {string.Join(", ", unknownEnemies)}");
+                continue;
+            }
+            if (enemyCodeNames.Count == 0)
+            {
+                errors.Add($"Line {lineNumber}: encounter \"{encounterName}\" has no enemies");
+                continue;
+            }
+
+            parsed.Add((encounter, GetObjects(enemyCodeNames)));
+        }
+
+        if (errors.Count > 0)
+        {
+            var shownErrors = errors.Take(10).ToList();
+            if (errors.Count > shownErrors.Count) shownErrors.Add($"...and {errors.Count - shownErrors.Count} more");
+            throw new InvalidDataException("Nothing was loaded:\n" + string.Join("\n", shownErrors));
+        }
+
+        foreach (var (encounter, enemies) in parsed)
+        {
+            encounter.Enemies = enemies;
         }
         UpdateViewModel();
     }
@@ -97,12 +148,12 @@ public class EnemiesController: Controller<EnemyData>
     public override string ConvertToTxt()
     {
         ApplyViewModel();
-        var result = "";
+        var result = new StringBuilder();
         foreach (var encounter in Encounters)
         {
-            result += encounter + "\n";
+            result.Append(encounter).Append('\n');
         }
-        return result;
+        return result.ToString();
     }
 
     public override void Randomize()
@@ -195,12 +246,11 @@ public class EnemiesController: Controller<EnemyData>
     {
         var dataTable = asset.Exports[0] as DataTableExport;
         var encountersTable = dataTable.Table.Data;
+        var encountersByName = encounters.GroupBy(e => e.Name).ToDictionary(g => g.Key, g => g.First());
 
         foreach (var encounterStruct in encountersTable)
         {
-            var originalEncounter = new Encounter(encounterStruct, asset);
-            var newEncounter = encounters.Find(e => e.Name == originalEncounter.Name);
-            if (newEncounter != null)
+            if (encountersByName.TryGetValue(encounterStruct.Name.ToString(), out var newEncounter))
             {
                 newEncounter.SaveToStruct(encounterStruct);
             }

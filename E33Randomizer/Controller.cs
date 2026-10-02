@@ -24,6 +24,7 @@ public abstract class Controller<T>: BaseController where T: ObjectData, new()
     
     public T GetObject(string objectCodeName)
     {
+        if (objectCodeName == null) return DefaultObject;
         return ObjectsByName.TryGetValue(objectCodeName, out var obj) ? obj : DefaultObject;
     }
 

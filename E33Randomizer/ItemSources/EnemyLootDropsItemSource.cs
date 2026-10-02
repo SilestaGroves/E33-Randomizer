@@ -18,20 +18,7 @@ public class EnemyLootDropsItemSource: ItemSource
         HasItemQuantities = true;
         base.LoadFromAsset(asset);
         var tableData = (asset.Exports[0] as DataTableExport).Table.Data;
-        
-        foreach (var enemyData in tableData)
-        {
-            if ((enemyData.Value[10] as ArrayPropertyData).Value.Length > 0)
-            {
-                _dummyDropStruct = (enemyData.Value[10] as ArrayPropertyData).Value[0].Clone() as StructPropertyData;
-                _compositeTableReference = (_dummyDropStruct.Value[0] as StructPropertyData).Value[0].Clone() as ObjectPropertyData;
-            }
-
-            if (_dummyDropStruct != null)
-            {
-                break;
-            } 
-        }
+        CaptureTemplates();
         
         foreach (var enemyData in tableData)
         {
@@ -62,8 +49,25 @@ public class EnemyLootDropsItemSource: ItemSource
         }
     }
 
+    private void CaptureTemplates()
+    {
+        _dummyDropStruct = null;
+        _compositeTableReference = null;
+        foreach (var enemyData in (_asset.Exports[0] as DataTableExport).Table.Data)
+        {
+            if ((enemyData.Value[10] as ArrayPropertyData).Value.Length > 0)
+            {
+                _dummyDropStruct = (enemyData.Value[10] as ArrayPropertyData).Value[0].Clone() as StructPropertyData;
+                _compositeTableReference = (_dummyDropStruct.Value[0] as StructPropertyData).Value[0].Clone() as ObjectPropertyData;
+                break;
+            }
+        }
+    }
+
     public override UAsset SaveToAsset()
     {
+        ReloadAsset();
+        CaptureTemplates();
         var tableData = (_asset.Exports[0] as DataTableExport).Table.Data;
         
         foreach (var enemyData in tableData)

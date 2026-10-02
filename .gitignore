@@ -2,3 +2,5 @@
 E33Randomizer/bin/
 E33Randomizer/obj/
 *.user
+E33Randomizer.Tests/bin/
+E33Randomizer.Tests/obj/

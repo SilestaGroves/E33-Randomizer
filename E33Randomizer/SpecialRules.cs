@@ -79,8 +79,8 @@ public static class SpecialRules
         EnemyData[] bossPoolArray = Controllers.EnemiesController.GetObjects(bossPoolCodeNames).ToArray();
         RandomizerLogic.rand.Shuffle(bossPoolArray);
         RemainingBossPool = new List<EnemyData>(bossPoolArray);
-        var translatedExcluded = Controllers.EnemiesController.GetObjects(RandomizerLogic.CustomEnemyPlacement.ExcludedCodeNames);
-        RemainingBossPool = RemainingBossPool.Where(e => !translatedExcluded.Contains(e)).ToList();
+        var excluded = RandomizerLogic.CustomEnemyPlacement.ExcludedCodeNames;
+        RemainingBossPool = RemainingBossPool.Where(e => !excluded.Contains(e.CodeName)).ToList();
         if (!RandomizerLogic.Settings.IncludeCutContentEnemies)
         {
             RemainingBossPool = RemainingBossPool.Where(e => !e.CustomName.Contains("Cut")).ToList();
@@ -178,8 +178,8 @@ public static class SpecialRules
             var numberOfBosses = encounter.Enemies.Count(e => e.IsBoss);
             if (numberOfBosses == 0)
             {
-                //This will ignore custom placement 
-                encounter.Enemies[0] = Utils.Pick(Controllers.EnemiesController.GetAllByArchetype("Boss")); // RandomizerLogic.GetRandomByArchetype("Boss");
+                //This will ignore custom placement rules, but respects excluded enemies
+                encounter.Enemies[0] = RandomizerLogic.GetRandomByArchetype("Boss");
             }
         }
         

@@ -20,8 +20,10 @@ public abstract class CustomPlacement
 {
     public List<string> NotRandomized = [];
     public List<string> Excluded = [];
-    public List<string> NotRandomizedCodeNames = [];
-    public List<string> ExcludedCodeNames = [];
+    // Derived from NotRandomized/Excluded by RecomputeCodeNames(); never edit these directly.
+    // ExcludedCodeNames also always contains broken objects, so they can't be placed by randomization.
+    public HashSet<string> NotRandomizedCodeNames = [];
+    public HashSet<string> ExcludedCodeNames = [];
     
     public List<string> PlainNamesList = [];
     public Dictionary<string, List<string>> PlainNameToCodeNames = new();
@@ -71,10 +73,8 @@ public abstract class CustomPlacement
         };
         FrequencyAdjustments.Clear();
         Excluded.Clear();
-        ExcludedCodeNames.Clear();
-                
         NotRandomized.Clear();
-        NotRandomizedCodeNames.Clear();
+        RecomputeCodeNames();
     }
     
     public void LoadFromJson(string pathToJson)
@@ -83,19 +83,7 @@ public abstract class CustomPlacement
         {
             string json = r.ReadToEnd();
             var presetData = JsonConvert.DeserializeObject<CustomPlacementPreset>(json);
-            NotRandomized.Clear();
-            NotRandomizedCodeNames.Clear();
-            Excluded.Clear();
-            ExcludedCodeNames.Clear();
-            
-            foreach (var notRandomized in presetData.NotRandomized)
-            {
-                AddNotRandomized(notRandomized);
-            }
-            foreach (var excluded in presetData.Excluded)
-            {
-                AddExcluded(excluded);
-            }
+            SetLists(presetData.NotRandomized, presetData.Excluded);
             CustomPlacementRules = presetData.CustomPlacement;
             FrequencyAdjustments = presetData.FrequencyAdjustments;
         }
@@ -109,28 +97,54 @@ public abstract class CustomPlacement
         r.Write(json);
     }
 
+    /// <summary>
+    /// Replaces the not randomized and excluded lists, e.g. when loading a preset.
+    /// </summary>
+    protected void SetLists(IEnumerable<string> notRandomized, IEnumerable<string> excluded)
+    {
+        NotRandomized = notRandomized.Distinct().ToList();
+        Excluded = excluded.Distinct().ToList();
+        RecomputeCodeNames();
+    }
+
+    /// <summary>
+    /// Rebuilds the code name sets from the plain name lists. Rebuilding instead of adding/removing
+    /// individual code names keeps objects that belong to several listed categories correct.
+    /// </summary>
+    public void RecomputeCodeNames()
+    {
+        NotRandomizedCodeNames = NotRandomized.SelectMany(n => PlainNameToCodeNames[n]).ToHashSet();
+        ExcludedCodeNames = Excluded.SelectMany(n => PlainNameToCodeNames[n]).ToHashSet();
+        if (AllObjects != null)
+        {
+            ExcludedCodeNames.UnionWith(AllObjects.Where(o => o.IsBroken).Select(o => o.CodeName));
+        }
+    }
+
     public void AddExcluded(string plainName)
     {
+        if (Excluded.Contains(plainName)) return;
         Excluded.Add(plainName);
-        ExcludedCodeNames.AddRange(PlainNameToCodeNames[plainName]);
+        RecomputeCodeNames();
     }
 
     public void RemoveExcluded(string plainName)
     {
         Excluded.Remove(plainName);
-        ExcludedCodeNames = ExcludedCodeNames.Except(PlainNameToCodeNames[plainName]).ToList();
+        RecomputeCodeNames();
     }
-    
+
     public void AddNotRandomized(string plainName)
     {
+        if (NotRandomized.Contains(plainName)) return;
         NotRandomized.Add(plainName);
-        NotRandomizedCodeNames.AddRange(PlainNameToCodeNames[plainName]);
+        RecomputeCodeNames();
     }
 
     public void RemoveNotRandomized(string plainName)
     {
         NotRandomized.Remove(plainName);
-        NotRandomizedCodeNames = NotRandomizedCodeNames.Except(PlainNameToCodeNames[plainName]).ToList();
+        RecomputeCodeNames();
     }
     
     public void SetCustomPlacement(string from, string to, float frequency)
@@ -171,10 +185,15 @@ public abstract class CustomPlacement
             var translatedKey = PlainNameToCodeNames[pair.Key];
             foreach (var codeName in translatedKey)
             {
-                result[codeName] = pair.Value;
                 if (adjustForCategorySize)
                 {
-                    result[codeName] /= translatedKey.Count;
+                    // Each target category shares its weight between its members; an object that belongs
+                    // to several target categories gets a share from each of them.
+                    result[codeName] = result.GetValueOrDefault(codeName) + pair.Value / translatedKey.Count;
+                }
+                else
+                {
+                    result[codeName] = pair.Value;
                 }
             }
         }
@@ -224,7 +243,7 @@ public abstract class CustomPlacement
     {
         return Utils.GetRandomWeighted(DefaultFrequencies, ExcludedCodeNames);
     }
-    
+
     public string Replace(string originalCodeName)
     {
         if (NotRandomizedCodeNames.Contains(originalCodeName))
@@ -233,7 +252,7 @@ public abstract class CustomPlacement
         }
 
         if (!FinalReplacementFrequencies.TryGetValue(originalCodeName, out var frequency))
-            return GetTrulyRandom();
+            return GetTrulyRandom() ?? originalCodeName;
         
         var newItem = Utils.GetRandomWeighted(
             frequency,

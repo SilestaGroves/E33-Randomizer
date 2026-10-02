@@ -31,7 +31,7 @@ public class CustomSkillPlacement: CustomPlacement
 
     public override void LoadDefaultPreset()
     {
-        AddNotRandomized("Consumables");
+        SetLists(["Consumables"], []);
         CustomPlacementRules = new Dictionary<string, Dictionary<string, float>>
         {
             { "Gustave", new Dictionary<string, float> { { "Gustave", 1 } } },

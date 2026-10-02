@@ -68,6 +68,7 @@ public class GameActionItemSource: ItemSource
 
     public override UAsset SaveToAsset()
     {
+        ReloadAsset();
         foreach (var export in _asset.Exports)
         {
             if (!export.ObjectName.Value.Value.Contains("AddItemToInventory"))

@@ -5,26 +5,39 @@ namespace E33Randomizer;
 
 public static class Utils
 {
-    public static string GetRandomWeighted(Dictionary<string, float> weights, List<string> banned = null)
+    /// <summary>
+    /// Picks a key with probability proportional to its weight. Banned and zero-weight keys are removed
+    /// before the total is computed, so they never lend their weight to their neighbours.
+    /// Returns null if no key can be picked.
+    /// </summary>
+    public static string GetRandomWeighted(Dictionary<string, float> weights, ICollection<string> banned = null)
     {
-        banned ??= [];
-        float total = 0;
-        foreach (var weight in weights)
+        var candidates = weights.Where(w => w.Value > 0.0001 && (banned == null || !banned.Contains(w.Key))).ToList();
+        if (candidates.Count == 0)
         {
-            total += weight.Value;
+            return null;
         }
 
+        float total = candidates.Sum(c => c.Value);
         var chance = RandomizerLogic.rand.NextSingle() * total;
         float running = 0;
-        foreach (var weight in weights)
+        foreach (var candidate in candidates)
         {
-            running += weight.Value;
-            if (running >= chance && !banned.Contains(weight.Key) && weight.Value > 0.0001)
+            running += candidate.Value;
+            if (chance < running)
             {
-                return weight.Key;
+                return candidate.Key;
             }
         }
-        return weights.Keys.LastOrDefault(k => !banned.Contains(k));
+        return candidates[^1].Key;
+    }
+
+    /// <summary>
+    /// Splits text into lines, accepting both \n and \r\n line endings and skipping empty lines.
+    /// </summary>
+    public static IEnumerable<string> SplitLines(string text)
+    {
+        return text.Split('\n').Select(l => l.TrimEnd('\r')).Where(l => l.Trim().Length > 0);
     }
     
     public static T Pick<T>(List<T> from)

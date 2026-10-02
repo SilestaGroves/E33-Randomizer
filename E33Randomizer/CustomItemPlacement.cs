@@ -31,9 +31,7 @@ public class CustomItemPlacement: CustomPlacement
 
     public override void LoadDefaultPreset()
     {
-        AddNotRandomized("Skill Unlock");
-        AddNotRandomized("Merchant Unlock");
-        AddExcluded("Consumable");
+        SetLists(["Skill Unlock", "Merchant Unlock"], ["Consumable"]);
         CustomPlacementRules = new Dictionary<string, Dictionary<string, float>>
         {
             { "Pictos", new Dictionary<string, float> { { "Pictos", 1 } } },

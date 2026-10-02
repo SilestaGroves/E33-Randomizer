@@ -67,6 +67,7 @@ public class LootTableItemSource: ItemSource
 
     public override UAsset SaveToAsset()
     {
+        ReloadAsset();
         var tableData = (_asset.Exports[0] as DataTableExport).Table.Data;
         StructPropertyData dummyEntryStruct = null;
         foreach (var entryData in tableData)

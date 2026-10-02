@@ -1,5 +1,6 @@
 ﻿using UAssetAPI;
 using UAssetAPI.PropertyTypes.Objects;
+using UAssetAPI.UnrealTypes;
 
 namespace E33Randomizer.ItemSources;
 
@@ -56,6 +57,15 @@ public abstract class ItemSource
         SourceSections.Clear();
     }
     public abstract UAsset SaveToAsset();
+
+    /// <summary>
+    /// Re-reads the original asset from disk. Every SaveToAsset must start with this: writing modifies the asset
+    /// in place, and template structs taken from an already modified table would leak into the next generation.
+    /// </summary>
+    protected void ReloadAsset()
+    {
+        _asset = new UAsset(_asset.FilePath, EngineVersion.VER_UE5_4, RandomizerLogic.mappings);
+    }
     public List<ItemData> GetCheckItems(string key)
     {
         return SourceSections[key].Select(s => s.Item).ToList();
@@ -101,7 +111,7 @@ public abstract class ItemSource
             if (oldSize == 0)
             {
                 for (int i = 0; i < newSize; i++)
-                    sourceSection.Value.Add(new ItemSourceParticle(Controllers.ItemsController.GetRandomObject(), 1));
+                    sourceSection.Value.Add(new ItemSourceParticle(RandomizerLogic.GetRandomItem(), 1));
                 continue;
             }
             
