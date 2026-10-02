@@ -72,6 +72,57 @@ public static class SpecialRules
         ResetBossPool();
         ResetKeyItemPool();
         ResetProgressionDropEnemies();
+        _giants = RandomizerLogic.CustomEnemyPlacement.PlainNameToCodeNames
+            .GetValueOrDefault("Giant Enemies/Bosses", []).ToHashSet();
+    }
+
+    private static HashSet<string> _giants = [];
+
+    public static bool IsGiant(string enemyCodeName) => _giants.Contains(enemyCodeName);
+
+    /// <summary>
+    /// A fight with a boss or a chromatic boss, or one with only minibosses (a miniboss duel). Packs where a
+    /// miniboss comes with regular enemies are not boss fights.
+    /// </summary>
+    public static bool IsBossFight(Encounter encounter)
+    {
+        var archetypes = encounter.OriginalEnemyCodeNames
+            .Select(c => Controllers.EnemiesController.GetObject(c).Archetype)
+            .ToList();
+        return archetypes.Count > 0 && (archetypes.Any(a => a is "Boss" or "Alpha") || archetypes.All(a => a == "Elite"));
+    }
+
+    /// <summary>
+    /// Giant enemies only fit the arenas of fights that had a giant in the original game. Elsewhere they are
+    /// rerolled with the same placement rules minus the giants, and a fight never gets more giants than it had.
+    /// </summary>
+    public static void LimitGiants(Encounter encounter)
+    {
+        if (!RandomizerLogic.Settings.KeepGiantsInGiantArenas) return;
+
+        var giantsAllowed = encounter.OriginalEnemyCodeNames.Count(IsGiant);
+        var placement = RandomizerLogic.CustomEnemyPlacement;
+        for (int i = 0; i < encounter.Size; i++)
+        {
+            var enemy = encounter.Enemies[i];
+            if (!IsGiant(enemy.CodeName)) continue;
+            if (giantsAllowed > 0)
+            {
+                giantsAllowed--;
+                continue;
+            }
+
+            var replacement = placement.Replace(enemy.CodeName, _giants);
+            if (IsGiant(replacement))
+            {
+                var banned = new HashSet<string>(placement.ExcludedCodeNames);
+                banned.UnionWith(_giants);
+                replacement = Utils.GetRandomWeighted(RandomizerLogic.EnemyFrequenciesWithinArchetype[enemy.Archetype], banned)
+                              ?? placement.GetTrulyRandom(_giants)
+                              ?? replacement;
+            }
+            encounter.Enemies[i] = Controllers.EnemiesController.GetObject(replacement);
+        }
     }
 
     // Enemies whose drops unlock merchants, skills or (without the key item logic) key items. Randomizing their

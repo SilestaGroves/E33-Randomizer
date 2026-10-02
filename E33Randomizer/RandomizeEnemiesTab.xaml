@@ -65,6 +65,12 @@
                                       Margin="20, 0, 0, 0"
                                       FontSize="14"
                                       Visibility="{Binding IsChecked, ElementName=RandomizeEncounterSizesCheckBox, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            <CheckBox Content="Only change the size of enemy packs, keep boss and miniboss fights as they are"
+                                      ToolTip="Fights with a boss or a chromatic boss, and fights with only minibosses, keep their original number of enemies."
+                                      IsChecked="{Binding KeepBossFightSizes}"
+                                      Margin="20, 0, 0, 0"
+                                      FontSize="14"
+                                      Visibility="{Binding IsChecked, ElementName=RandomizeEncounterSizesCheckBox, Converter={StaticResource BooleanToVisibilityConverter}}" />
                         </StackPanel>
 
                         <CheckBox Name="RandomizeMerchantFightsCheckBox"
@@ -173,6 +179,11 @@
                         <CheckBox Content="Keep scripted story battles and tutorials (Gustave vs Renoir, the final duel, tutorial fights)"
                                   ToolTip="Randomizing them can break the scripted outcome or leave a tutorial waiting for an action the new enemy doesn't have."
                                   IsChecked="{Binding KeepStoryBattlesAndTutorials}"
+                                  Margin="0,0,0,0"
+                                  FontSize="14" />
+                        <CheckBox Content="Only put giant enemies into fights that had a giant (Gargant, Glissando, the Paintress...)"
+                                  ToolTip="Giants (the Giant Enemies/Bosses category) don't fit small arenas. They only appear in fights whose arena held a giant in the original game, one per fight."
+                                  IsChecked="{Binding KeepGiantsInGiantArenas}"
                                   Margin="0,0,0,0"
                                   FontSize="14" />
                         <CheckBox Content="Keep fights whose enemies drop progression items (merchant unlocks, Maelle's painter skills)"

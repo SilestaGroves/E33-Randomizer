@@ -204,6 +204,11 @@ public class EnemiesController: Controller<EnemyData>
             var encounterRandomized = encounter.Enemies.Any(e => !RandomizerLogic.CustomEnemyPlacement.NotRandomizedCodeNames.Contains(e.CodeName));
             newEncounterSize = encounterRandomized ? newEncounterSize : oldEncounterSize;
         }
+
+        if (RandomizerLogic.Settings.KeepBossFightSizes && SpecialRules.IsBossFight(encounter))
+        {
+            newEncounterSize = oldEncounterSize;
+        }
         
         if (RandomizerLogic.Settings.EnableEnemyOnslaught)
         {
@@ -240,6 +245,7 @@ public class EnemiesController: Controller<EnemyData>
         }
         
         SpecialRules.ApplySpecialRulesToEncounter(encounter);
+        SpecialRules.LimitGiants(encounter);
     }
 
     public void PackEncounters(UAsset asset, List<Encounter> encounters)

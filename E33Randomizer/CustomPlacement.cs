@@ -239,12 +239,24 @@ public abstract class CustomPlacement
         DefaultFrequencies = DefaultFrequencies.Where(kv => kv.Value > 0.0001).ToDictionary();
     }
 
-    public string GetTrulyRandom()
+    private ICollection<string> GetBanned(ICollection<string> alsoBanned)
     {
-        return Utils.GetRandomWeighted(DefaultFrequencies, ExcludedCodeNames);
+        if (alsoBanned == null || alsoBanned.Count == 0) return ExcludedCodeNames;
+        var banned = new HashSet<string>(ExcludedCodeNames);
+        banned.UnionWith(alsoBanned);
+        return banned;
     }
 
-    public string Replace(string originalCodeName)
+    public string GetTrulyRandom(ICollection<string> alsoBanned = null)
+    {
+        return Utils.GetRandomWeighted(DefaultFrequencies, GetBanned(alsoBanned));
+    }
+
+    /// <summary>
+    /// Picks a replacement for the object according to the custom placement rules. Objects in alsoBanned are
+    /// excluded on top of the excluded ones. Returns the original object if nothing can replace it.
+    /// </summary>
+    public string Replace(string originalCodeName, ICollection<string> alsoBanned = null)
     {
         if (NotRandomizedCodeNames.Contains(originalCodeName))
         {
@@ -252,11 +264,11 @@ public abstract class CustomPlacement
         }
 
         if (!FinalReplacementFrequencies.TryGetValue(originalCodeName, out var frequency))
-            return GetTrulyRandom() ?? originalCodeName;
+            return GetTrulyRandom(alsoBanned) ?? originalCodeName;
         
         var newItem = Utils.GetRandomWeighted(
             frequency,
-            ExcludedCodeNames
+            GetBanned(alsoBanned)
         );
         
         return newItem != null ? newItem : originalCodeName;

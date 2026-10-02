@@ -347,6 +347,8 @@ public class SettingsViewModel : INotifyPropertyChanged
     public bool ReduceBossRepetition { get; set; } = false;
     public bool ScaleEnemyLevelsToEncounter { get; set; } = false;
     public bool KeepProgressionDropFights { get; set; } = true;
+    public bool KeepGiantsInGiantArenas { get; set; } = true;
+    public bool KeepBossFightSizes { get; set; } = true;
     public bool KeepStoryBattlesAndTutorials { get; set; } = true;
     // public bool TieDropsToEncounters { get; set; } = false; 
 
