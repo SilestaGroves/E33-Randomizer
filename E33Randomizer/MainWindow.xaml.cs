@@ -299,11 +299,13 @@ public class SettingsViewModel : INotifyPropertyChanged
     public bool EnsureBossesInBossEncounters { get; set; } = false;
     public bool ReduceBossRepetition { get; set; } = false;
     public bool ScaleEnemyLevelsToEncounter { get; set; } = false;
+    public bool KeepProgressionDropFights { get; set; } = true;
     // public bool TieDropsToEncounters { get; set; } = false; 
 
     public bool ChangeSizesOfNonRandomizedChecks { get; set; } = false;
     
     public bool ReduceKeyItemRepetition { get; set; } = true;
+    public bool GuaranteeKeyItemAccess { get; set; } = true;
     
     public bool ChangeMerchantInventorySize { get; set; } = false;
     public int MerchantInventorySizeMax { get; set; } = 20;

@@ -27,6 +27,8 @@ public class CheckRule
     public bool? Eligible;
     public bool? Missable;
     public int? Act;
+    /// <summary>Merchant stock: only unlocked items may be replaced by progression items.</summary>
+    public bool UnlockedSlotsOnly;
     public List<string> Requires = [];
     public string Reason = "";
     public string Note = "";
@@ -50,6 +52,7 @@ public class CheckLogic
     public bool Missable;
     /// <summary>Whether progression items may be placed here.</summary>
     public bool Eligible;
+    public bool UnlockedSlotsOnly;
     public List<string> Requires;
 }
 
@@ -90,6 +93,7 @@ public class ProgressionLogicData
             Act = rule.Act ?? region?.Act ?? -1,
             Missable = missable,
             Eligible = !missable && region != null && (rule.Eligible ?? true),
+            UnlockedSlotsOnly = rule.UnlockedSlotsOnly,
             Requires = rule.Requires,
         };
     }

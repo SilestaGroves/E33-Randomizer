@@ -236,6 +236,11 @@ public class ItemsController: Controller<ItemData>
         RandomizerLogic.CustomItemPlacement.Update();
         var randomizableSources = ItemsSources.Where(SpecialRules.Randomizable).ToList();
         randomizableSources.ForEach(i => i.Randomize());
+        if (ProgressionLogic.IsActive)
+        {
+            // Before the special rules, so that e.g. the prologue gear rule also applies to filler items
+            ProgressionLogic.PlaceKeyItems();
+        }
         ItemsSources.ForEach(i => i.Checks.ForEach(SpecialRules.ApplySpecialRulesToCheck));
         if (!RandomizerLogic.Settings.IncludeCutContentItems && !cutContentAlreadyExcluded)
         {

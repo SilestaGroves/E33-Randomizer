@@ -170,6 +170,11 @@
                                   FontSize="14"
                                   Grid.Row="8" />
 
+                        <CheckBox Content="Keep fights whose enemies drop progression items (merchant unlocks, Maelle's painter skills)"
+                                  ToolTip="Drops belong to the enemy, so randomizing these fights would make the drops impossible to get."
+                                  IsChecked="{Binding KeepProgressionDropFights}"
+                                  Margin="0,0,0,0"
+                                  FontSize="14" />
                         <CheckBox Name="ScaleEnemyLevelsCheckBox"
                                   Content="Scale enemy levels to the original encounter level"
                                   ToolTip="Encounters that get new enemies are fought at the level of the original encounter (its level override, or its strongest original enemy), so a late game boss in Spring Meadows is fought at a Spring Meadows level and vice versa."

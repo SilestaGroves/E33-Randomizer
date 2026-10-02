@@ -27,6 +27,7 @@ public static class SpoilerLog
 
         AppendSettings(log);
         if (RandomizerLogic.Settings.RandomizeEnemies) AppendEnemies(log);
+        if (RandomizerLogic.Settings.RandomizeItems) AppendKeyItems(log);
         if (RandomizerLogic.Settings.RandomizeItems) AppendItems(log);
         if (RandomizerLogic.Settings.RandomizeSkills) AppendSkills(log);
         return log.ToString();
@@ -148,6 +149,34 @@ public static class SpoilerLog
                            string.Concat(controller.StartingEquipment.Select(e => $"  {e}\n")) + "\n");
         }
         log.Append(body);
+        log.AppendLine();
+    }
+
+    private static void AppendKeyItems(StringBuilder log)
+    {
+        var controller = Controllers.ItemsController;
+        controller.ApplyViewModel();
+        var checkNames = controller.CheckTypes.Values.SelectMany(c => c)
+            .GroupBy(c => ProgressionLogicData.GetCheckId(c.ItemSource.FileName, c.Key))
+            .ToDictionary(g => g.Key, g => g.First().CustomName);
+
+        var unreachable = ProgressionLogic.FindUnreachableItems();
+        AppendHeader(log, unreachable.Count == 0
+            ? "KEY ITEMS (all key items can be obtained)"
+            : $"KEY ITEMS (WARNING: not guaranteed to be obtainable: {string.Join(", ", unreachable.Select(i => controller.GetObject(i).CustomName))})");
+
+        foreach (var (item, slot) in ProgressionLogic.FindPlacedItems().OrderBy(p => p.slot.Check?.Act ?? 99))
+        {
+            var check = slot.Check;
+            var checkId = check?.CheckId ?? ProgressionLogicData.GetCheckId(slot.Source.FileName, slot.Key);
+            var where = checkNames.GetValueOrDefault(checkId, checkId);
+            var region = check?.Region != null ? $"{check.Region}, act {check.Act}" : "no fixed location";
+            var requires = check?.Requires.Count > 0
+                ? $"; needs {string.Join(", ", check.Requires.Select(r => controller.GetObject(r).CustomName))}"
+                : "";
+            log.AppendLine($"  {controller.GetObject(item).CustomName}");
+            log.AppendLine($"      at: {where} ({region}{requires})");
+        }
         log.AppendLine();
     }
 

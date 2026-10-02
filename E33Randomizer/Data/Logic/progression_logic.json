@@ -44,22 +44,22 @@
       "note": ""
     },
     "Forgotten Battlefield": {
-      "act": 1,
-      "missable": false,
-      "confidence": "high",
-      "note": ""
-    },
-    "Monoco's Station": {
-      "act": 1,
-      "missable": false,
-      "confidence": "high",
-      "note": ""
-    },
-    "Old Lumiere": {
-      "act": 1,
+      "act": 2,
       "missable": false,
       "confidence": "medium",
-      "note": "End of Act I; assumed to be revisitable from the world map"
+      "note": "Act II: mandatory fights here come after Gustave's last fight"
+    },
+    "Monoco's Station": {
+      "act": 2,
+      "missable": false,
+      "confidence": "medium",
+      "note": "Act II: mandatory fights here come after Gustave's last fight"
+    },
+    "Old Lumiere": {
+      "act": 2,
+      "missable": true,
+      "confidence": "medium",
+      "note": "End of Act II; treated as missable until confirmed to be revisitable"
     },
     "Camp": {
       "act": 1,
@@ -123,9 +123,9 @@
     },
     "The Monolith": {
       "act": 2,
-      "missable": true,
-      "confidence": "low",
-      "note": "End of Act II; treated as missable until confirmed to be revisitable"
+      "missable": false,
+      "confidence": "high",
+      "note": "Can be revisited after Act II"
     },
     "Frozen Hearts": {
       "act": 2,
@@ -408,50 +408,44 @@
     "Quest_BourgeonSkin": {
       "group": "Key Item",
       "randomize": true,
-      "confidence": "medium",
-      "reason": "Originally an enemy drop (lost with enemy randomization); consumer is outside the randomized data"
+      "confidence": "high",
+      "reason": "Originally a Bourgeon drop; given to the small Bourgeon for the The Small Bourgeon chest"
     },
     "Quest_EternalIce": {
       "group": "Key Item",
       "randomize": true,
-      "confidence": "medium",
-      "reason": "Originally an enemy drop (lost with enemy randomization); consumer is outside the randomized data"
+      "confidence": "high",
+      "reason": "Originally a Gargant drop; given to Grandis at Monoco's Station to unlock the locked stock"
     },
     "Quest_CleaWorkshop_Part1": {
       "group": "Key Item",
       "randomize": true,
-      "confidence": "low",
-      "reason": "Consumer unknown"
+      "confidence": "high",
+      "reason": "Put into the statue that opens the Lampmaster fight (no randomized reward)"
     },
     "Quest_CleaWorkshop_Part2": {
       "group": "Key Item",
       "randomize": true,
-      "confidence": "low",
-      "reason": "Consumer unknown"
+      "confidence": "high",
+      "reason": "Put into the statue that opens the Lampmaster fight (no randomized reward)"
     },
     "Quest_CleaWorkshop_Part3": {
       "group": "Key Item",
       "randomize": true,
-      "confidence": "low",
-      "reason": "Consumer unknown"
-    },
-    "Quest_WoodenStick": {
-      "group": "Key Item",
-      "randomize": true,
-      "confidence": "low",
-      "reason": "Consumer unknown"
+      "confidence": "high",
+      "reason": "Put into the statue that opens the Lampmaster fight (no randomized reward)"
     },
     "Quest_OldKey": {
       "group": "Key Item",
       "randomize": true,
-      "confidence": "low",
-      "reason": "Received in Act I Lumiere, consumer unknown: if it is used in Act I Lumiere it must stay where it is"
+      "confidence": "medium",
+      "reason": "Received in Act I Lumiere and used after it"
     },
     "Quest_ApprenticesJournal": {
       "group": "Key Item",
       "randomize": true,
-      "confidence": "low",
-      "reason": "Received in Act I Lumiere, consumer unknown: if it is used in Act I Lumiere it must stay where it is"
+      "confidence": "medium",
+      "reason": "Received in Act I Lumiere and used after it"
     }
   },
   "checkRules": [
@@ -474,140 +468,141 @@
     {
       "match": "DT_Merchant_CleaIsland#*",
       "region": "Flying Manor",
-      "eligible": false,
-      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+      "unlockedSlotsOnly": true,
+      "reason": "Merchant stock: key items only replace unlocked items"
     },
     {
       "match": "DT_Merchant_CoastalCave_*#*",
       "region": "Coastal Cave",
-      "eligible": false,
-      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+      "unlockedSlotsOnly": true,
+      "reason": "Merchant stock: key items only replace unlocked items"
     },
     {
       "match": "DT_Merchant_FH_Custo_Danseuse#*",
       "region": "Frozen Hearts",
-      "eligible": false,
-      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+      "unlockedSlotsOnly": true,
+      "reason": "Merchant stock: key items only replace unlocked items"
     },
     {
       "match": "DT_Merchant_ForgottenBattlefield#*",
       "region": "Forgotten Battlefield",
-      "eligible": false,
-      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+      "unlockedSlotsOnly": true,
+      "reason": "Merchant stock: key items only replace unlocked items"
     },
     {
       "match": "DT_Merchant_GV_1_CustoSuits_*#*",
       "region": "Gestral Village",
-      "eligible": false,
-      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+      "unlockedSlotsOnly": true,
+      "reason": "Merchant stock: key items only replace unlocked items"
     },
     {
       "match": "DT_Merchant_GestralVillage1#*",
       "region": "Gestral Village",
-      "eligible": false,
-      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+      "unlockedSlotsOnly": true,
+      "reason": "Merchant stock: key items only replace unlocked items"
     },
     {
       "match": "DT_Merchant_GestralVillage2#*",
       "region": "Gestral Village",
-      "eligible": false,
-      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+      "unlockedSlotsOnly": true,
+      "reason": "Merchant stock: key items only replace unlocked items"
     },
     {
       "match": "DT_Merchant_GestralVillage3#*",
       "region": "Sacred River",
-      "eligible": false,
-      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+      "unlockedSlotsOnly": true,
+      "reason": "Merchant stock: key items only replace unlocked items"
     },
     {
       "match": "DT_Merchant_GoblusLair#*",
       "region": "Flying Waters",
-      "eligible": false,
-      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+      "unlockedSlotsOnly": true,
+      "reason": "Merchant stock: key items only replace unlocked items"
     },
     {
       "match": "DT_Merchant_GrandisStation#*",
       "region": "Monoco's Station",
-      "eligible": false,
-      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+      "unlockedSlotsOnly": true,
+      "reason": "Merchant stock: key items only replace unlocked items",
+      "note": "Locked stock is unlocked by giving Eternal Ice to Grandis"
     },
     {
       "match": "DT_Merchant_Lumiere#*",
       "region": "Lumiere - Act 3",
-      "eligible": false,
-      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+      "unlockedSlotsOnly": true,
+      "reason": "Merchant stock: key items only replace unlocked items"
     },
     {
       "match": "DT_Merchant_MonocosMountain#*",
       "region": "Frozen Hearts",
-      "eligible": false,
-      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+      "unlockedSlotsOnly": true,
+      "reason": "Merchant stock: key items only replace unlocked items"
     },
     {
       "match": "DT_Merchant_Monolith#*",
       "region": "The Monolith",
-      "eligible": false,
-      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+      "unlockedSlotsOnly": true,
+      "reason": "Merchant stock: key items only replace unlocked items"
     },
     {
       "match": "DT_Merchant_OldLumiere#*",
       "region": "Old Lumiere",
-      "eligible": false,
-      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+      "unlockedSlotsOnly": true,
+      "reason": "Merchant stock: key items only replace unlocked items"
     },
     {
       "match": "DT_Merchant_Optional3#*",
       "region": "Renoir's Drafts",
-      "eligible": false,
-      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+      "unlockedSlotsOnly": true,
+      "reason": "Merchant stock: key items only replace unlocked items"
     },
     {
       "match": "DT_Merchant_OrangeForest#*",
       "region": "Falling Leaves",
-      "eligible": false,
-      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+      "unlockedSlotsOnly": true,
+      "reason": "Merchant stock: key items only replace unlocked items"
     },
     {
       "match": "DT_Merchant_Reacher#*",
       "region": "The Reacher",
-      "eligible": false,
-      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+      "unlockedSlotsOnly": true,
+      "reason": "Merchant stock: key items only replace unlocked items"
     },
     {
       "match": "DT_Merchant_SeaCliff#*",
       "region": "Stone Wave Cliffs",
-      "eligible": false,
-      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+      "unlockedSlotsOnly": true,
+      "reason": "Merchant stock: key items only replace unlocked items"
     },
     {
       "match": "DT_Merchant_Sirene#*",
       "region": "Sirene",
-      "eligible": false,
-      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+      "unlockedSlotsOnly": true,
+      "reason": "Merchant stock: key items only replace unlocked items"
     },
     {
       "match": "DT_Merchant_TwilightSanctuary#*",
       "region": "Endless Night Sanctuary",
-      "eligible": false,
-      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+      "unlockedSlotsOnly": true,
+      "reason": "Merchant stock: key items only replace unlocked items"
     },
     {
       "match": "DT_Merchant_Visages#*",
       "region": "Visages",
-      "eligible": false,
-      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+      "unlockedSlotsOnly": true,
+      "reason": "Merchant stock: key items only replace unlocked items"
     },
     {
       "match": "DT_Merchant_YellowForest#*",
       "region": "Yellow Harvest",
-      "eligible": false,
-      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+      "unlockedSlotsOnly": true,
+      "reason": "Merchant stock: key items only replace unlocked items"
     },
     {
       "match": "DT_Merchant_WM_*#*",
       "region": "World Map",
-      "eligible": false,
-      "reason": "Merchant stock (draft decision: key items are not sold; locked stock also needs the merchant unlock)"
+      "unlockedSlotsOnly": true,
+      "reason": "Merchant stock: key items only replace unlocked items"
     },
     {
       "match": "DT_ChestsContent#Chest_Generic_*",
@@ -625,7 +620,11 @@
     },
     {
       "match": "DT_ChestsContent#Chest_SmallLevel_GoblusLair_02_*",
-      "region": "The Small Bourgeon"
+      "region": "The Small Bourgeon",
+      "requires": [
+        "Quest_BourgeonSkin"
+      ],
+      "note": "Appears after giving Bourgeon Skin to the small Bourgeon"
     },
     {
       "match": "DT_ChestsContent#Chest_StonewaveCliffsCave_*",
@@ -1037,7 +1036,7 @@
     {
       "match": "BP_Dialogue_CleaWorkshop_*#*",
       "region": "Painting Workshop",
-      "note": "Unknown whether path 2/3 require the key item of the previous path"
+      "note": "Paths are independent"
     },
     {
       "match": "BP_Dialogue_DarkGestralArena_Pots#*",
@@ -1053,11 +1052,6 @@
       "requires": [
         "Quest_Mushroom"
       ]
-    },
-    {
-      "match": "BP_Dialogue_GV_GestralBazar9#*",
-      "region": "Gestral Village",
-      "note": "Excalibur quest; unknown whether it needs an item"
     },
     {
       "match": "BP_Dialogue_GV_*#*",
@@ -1124,8 +1118,7 @@
     },
     {
       "match": "BP_Dialogue_TroubadourCantPlay#*",
-      "region": "Stone Quarry",
-      "note": "Unknown whether it needs an item"
+      "region": "Stone Quarry"
     },
     {
       "match": "BP_Dialog_DanseuseDanceClass#*",
@@ -1174,8 +1167,7 @@
     },
     {
       "match": "BP_Dialog_WeaponlessChalier1#*",
-      "region": "Flying Cemetery",
-      "note": "Unknown whether it needs an item"
+      "region": "Flying Cemetery"
     },
     {
       "match": "DA_GA_GRADIENT_*#*",

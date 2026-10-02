@@ -71,7 +71,36 @@ public static class SpecialRules
     {
         ResetBossPool();
         ResetKeyItemPool();
+        ResetProgressionDropEnemies();
     }
+
+    // Enemies whose drops unlock merchants, skills or (without the key item logic) key items. Randomizing their
+    // fights would make these drops unobtainable, since drops belong to the enemy type.
+    private static HashSet<string> _progressionDropEnemies = [];
+
+    private static void ResetProgressionDropEnemies()
+    {
+        var placement = RandomizerLogic.CustomItemPlacement;
+        var protectedItems = new HashSet<string>();
+        foreach (var category in new[] { "Merchant Unlock", "Skill Unlock" })
+        {
+            protectedItems.UnionWith(placement.PlainNameToCodeNames.GetValueOrDefault(category, []));
+        }
+        if (!ProgressionLogic.IsActive)
+        {
+            protectedItems.UnionWith(ProgressionLogic.Data.ProgressionItems.Keys);
+        }
+
+        var lootSource = Controllers.ItemsController.ItemsSources.OfType<EnemyLootDropsItemSource>().FirstOrDefault();
+        _progressionDropEnemies = lootSource == null
+            ? []
+            : lootSource.SourceSections.Keys
+                .Where(enemy => Controllers.ItemsController.GetOriginalSection(lootSource, enemy)
+                    .Any(p => protectedItems.Contains(p.Item.CodeName)))
+                .ToHashSet();
+    }
+
+    public static bool HasProgressionDrops(string enemyCodeName) => _progressionDropEnemies.Contains(enemyCodeName);
     
     private static void ResetBossPool()
     {
@@ -256,7 +285,8 @@ public static class SpecialRules
             check.ItemSource.SourceSections["Chest_Generic_Chroma"].Add(new ItemSourceParticle(randomWeapon));
         }
 
-        if (RandomizerLogic.Settings.ReduceKeyItemRepetition)
+        // The key item logic places every key item exactly once, so it replaces this rule
+        if (RandomizerLogic.Settings.ReduceKeyItemRepetition && !ProgressionLogic.IsActive)
         {
             foreach (var itemParticle in check.ItemSource.SourceSections[check.Key])
             {
@@ -285,6 +315,10 @@ public static class SpecialRules
     public static bool Randomizable(Encounter encounter)
     {
         if (!RandomizerLogic.Settings.RandomizeMerchantFights && encounter.Name.Contains("Merchant"))
+        {
+            return false;
+        }
+        if (RandomizerLogic.Settings.KeepProgressionDropFights && encounter.OriginalEnemyCodeNames.Any(HasProgressionDrops))
         {
             return false;
         }

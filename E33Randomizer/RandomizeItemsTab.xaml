@@ -66,6 +66,11 @@
                                   IsChecked="{Binding ChangeSizesOfNonRandomizedChecks}"
                                   Margin="0,6,0,0"
                                   FontSize="14" />
+                        <CheckBox Content="Guarantee that all key items can be obtained (key item logic)"
+                                  ToolTip="Each key item is placed once, never in places that can't be revisited, and never behind a check that needs it. Overrides key item repetition."
+                                  IsChecked="{Binding GuaranteeKeyItemAccess}"
+                                  Margin="0,6,0,0"
+                                  FontSize="14" />
                         <CheckBox Content="Reduce key item repetition"
                                   IsChecked="{Binding ReduceKeyItemRepetition}"
                                   Margin="0,6,0,0"
