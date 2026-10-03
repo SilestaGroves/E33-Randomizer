@@ -52,6 +52,23 @@ public class ToolsTests(GameDataFixture fixture)
         Assert.Contains("DT_jRPG_Encounters", listing);
         Assert.Contains("DT_ChestsContent", listing);
 
+        // Item files the generation didn't change stay out of the mod, so the game keeps its own version
+        var listed = listing.Split('\n').Select(l => Path.GetFileNameWithoutExtension(l.Trim())).ToHashSet();
+        var sources = Controllers.ItemsController.ItemsSources;
+        var unchanged = sources.Where(Controllers.ItemsController.HasOriginalContents).Select(s => s.FileName).ToList();
+        Assert.NotEmpty(unchanged);
+        Assert.Empty(unchanged.Where(listed.Contains));
+        Assert.All(sources.Select(s => s.FileName).Except(unchanged), name => Assert.Contains(name, listed));
+
+        var log = File.ReadAllText(Path.Combine(export, "generation_log.txt"));
+        Assert.Contains($"game version {RandomizerLogic.GameDataVersion}", log);
+        Assert.Contains("Seed: 77", log);
+        Assert.Contains("Wrote /Game/jRPGTemplate/Datatables/DT_jRPG_Encounters", log);
+        Assert.Contains("Left " + unchanged.Count + " unchanged item files out of the mod", log);
+        Assert.Contains("Packed rand_77/randomizer_P.utoc", log);
+        Assert.Contains("Copied randomizer_P.pak", log);
+        Assert.Contains("Generation finished", log);
+
         var mods = GameInstallation.GetModsDirectory(game);
         Assert.Equal(mods, RandomizerLogic.LastInstalledModsDirectory);
         foreach (var extension in GameInstallation.ModFileExtensions)

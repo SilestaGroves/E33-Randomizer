@@ -24,6 +24,7 @@
     <ItemGroup>
         <None Update="Data\**\*" CopyToOutputDirectory="PreserveNewest" />
         <None Include="..\tools\*.exe" Link="%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+        <None Include="..\ScriptsAndHelpers\enable_game_crash_dumps.ps1" Link="enable_game_crash_dumps.ps1" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 
 </Project>

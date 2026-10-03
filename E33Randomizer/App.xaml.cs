@@ -14,6 +14,9 @@ public partial class App : Application
     {
         // Generated mods, settings and logs go next to the exe, wherever it was started from
         Directory.SetCurrentDirectory(AppContext.BaseDirectory);
+        Log.Info($"Started v{Updater.CurrentVersion.ToString(3)} from {AppContext.BaseDirectory}");
+        DispatcherUnhandledException += (_, args) => Log.Error("Unhandled error", args.Exception);
+        AppDomain.CurrentDomain.UnhandledException += (_, args) => Log.Error("Unhandled error", args.ExceptionObject as Exception);
         base.OnStartup(e);
     }
 }

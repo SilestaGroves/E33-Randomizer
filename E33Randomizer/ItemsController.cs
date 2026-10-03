@@ -61,7 +61,7 @@ public class ItemsController: Controller<ItemData>
     
     public void ProcessFile(string fileName)
     {
-        if (fileName.Contains("BP_GameAction") || fileName.Contains("BP_PDT_GameAction") || fileName.Contains("S_ItemOperationData") || fileName.Contains("E_GestralFightClub_Fighters"))
+        if (fileName.Contains("BP_GameAction") || fileName.Contains("BP_PDT_GameAction") || fileName.Contains("S_ItemOperationData") || fileName.Contains("S_TriggerCinematicVariables") || fileName.Contains("E_GestralFightClub_Fighters"))
         {
             return;
         }
@@ -213,11 +213,24 @@ public class ItemsController: Controller<ItemData>
     {
         ApplyViewModel();
         RandomizeStartingEquipment();
+        var unchanged = new List<string>();
         foreach (var itemsSource in ItemsSources)
         {
+            // Files the mod doesn't change are left out, so the game keeps using its own (possibly newer) version
+            if (HasOriginalContents(itemsSource))
+            {
+                unchanged.Add(itemsSource.FileName);
+                continue;
+            }
             var itemsSourceAsset = itemsSource.SaveToAsset();
             Utils.WriteAsset(itemsSourceAsset);
+            if (itemsSource.LockedSlots.Count > 0)
+            {
+                Log.Info($"  kept items the game also puts on a character: " +
+                         string.Join(", ", itemsSource.LockedSlots.Select(s => itemsSource.SourceSections[s.key][s.index].Item.CodeName)));
+            }
         }
+        Log.Info($"Left {unchanged.Count} unchanged item files out of the mod: {string.Join(", ", unchanged)}");
 
         if (RandomizerLogic.Settings.MakeEveryItemVisible)
         {
@@ -291,6 +304,16 @@ public class ItemsController: Controller<ItemData>
             .ToDictionary(
                 pair => $"{pair.source.FileName}#{pair.section.Key}",
                 pair => pair.section.Value.Select(ItemSourceParticle.Clone).ToList());
+    }
+
+    /// <summary>Whether every check of the source still has exactly the contents of the original game file.</summary>
+    public bool HasOriginalContents(ItemSource source)
+    {
+        var prefix = $"{source.FileName}#";
+        if (_originalSections.Keys.Count(k => k.StartsWith(prefix)) != source.SourceSections.Count) return false;
+        return source.SourceSections.All(section =>
+            _originalSections.TryGetValue(prefix + section.Key, out var original) &&
+            original.Select(p => p.ToString()).SequenceEqual(section.Value.Select(p => p.ToString())));
     }
 
     /// <summary>The items a check contained in the original game files.</summary>

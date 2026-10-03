@@ -55,6 +55,8 @@ public static class Utils
             Directory.CreateDirectory(directoryPath);
         }
         asset.Write(filePath);
+        var source = Path.GetRelativePath(RandomizerLogic.DataDirectory, asset.FilePath ?? "");
+        Log.Info($"Wrote {asset.FolderName.Value} ({new FileInfo(filePath).Length + new FileInfo(Path.ChangeExtension(filePath, ".uexp")).Length} bytes, from Data/{source.Replace('\\', '/')})");
     }
 
     public static int Between(int min, int max)

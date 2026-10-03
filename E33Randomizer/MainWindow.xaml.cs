@@ -38,6 +38,7 @@ public partial class MainWindow
             MessageBox.Show($"Error starting: {ex.Message}",
                 "Loading Error", MessageBoxButton.OK, MessageBoxImage.Error);
             File.WriteAllText("startup_crash_log.txt", ex.ToString(), Encoding.UTF8);
+            Log.Error("startup crash", ex);
         }
         if (File.Exists("default_settings.json"))
         {
@@ -153,6 +154,7 @@ public partial class MainWindow
             _updateInProgress = false;
             MessageBox.Show($"Update failed: {ex.Message}", "Update", MessageBoxButton.OK, MessageBoxImage.Error);
             File.WriteAllText("update_error_log.txt", ex.ToString(), Encoding.UTF8);
+            Log.Error("update error", ex);
         }
     }
 
@@ -296,16 +298,17 @@ public partial class MainWindow
         try
         {
             RandomizerLogic.Randomize();
-            MessageBox.Show($"Generation done! You can find the mod and spoiler_log.txt in the {RandomizerLogic.LastExportPath} folder.\n\n" +
+            MessageBox.Show($"Generation done! You can find the mod, spoiler_log.txt and generation_log.txt in the {RandomizerLogic.LastExportPath} folder.\n\n" +
                             GetInstallSummary() +
                             $"Used Seed: {RandomizerLogic.usedSeed}\n",
                 "Generation Summary", MessageBoxButton.OK, MessageBoxImage.Information);
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Error generating: {ex.Message}",
+            MessageBox.Show($"Error generating: {ex.Message}\n\nDetails are in {Log.AppLogPath}",
                 "Generating Error", MessageBoxButton.OK, MessageBoxImage.Error);
             File.WriteAllText("generation_error_log.txt", ex.ToString(), Encoding.UTF8);
+            Log.Error("generation error", ex);
         }
     }
 
@@ -356,6 +359,7 @@ public partial class MainWindow
                 MessageBox.Show($"Error patching: {ex.Message}",
                     "Patching Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 File.WriteAllText("save_patch_error_log.txt", ex.ToString(), Encoding.UTF8);
+                Log.Error("save patch error", ex);
             }
         }
     }
@@ -427,6 +431,7 @@ public partial class MainWindow
             MessageBox.Show($"Error loading: {ex.Message}",
                 "Loading Error", MessageBoxButton.OK, MessageBoxImage.Error);
             File.WriteAllText("preset_crash_log.txt", ex.ToString(), Encoding.UTF8);
+            Log.Error("preset crash", ex);
         }
     }
 
@@ -443,6 +448,7 @@ public partial class MainWindow
             MessageBox.Show($"Error saving: {ex.Message}",
                 "Saving Error", MessageBoxButton.OK, MessageBoxImage.Error);
             File.WriteAllText("preset_crash_log.txt", ex.ToString(), Encoding.UTF8);
+            Log.Error("preset crash", ex);
         }
     }
 }

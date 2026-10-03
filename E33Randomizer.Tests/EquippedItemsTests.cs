@@ -59,15 +59,26 @@ public class EquippedItemsTests(GameDataFixture fixture)
     [Fact]
     public void TheWrittenGommageStillGivesGustavesExpeditionOutfit()
     {
-        GameDataFixture.ResetSettings(3);
-        RandomizerLogic.CustomItemPlacement.ApplyOopsAll("Anything");
         var output = Path.Combine(fixture.WorkDirectory, "randomizer");
-        if (Directory.Exists(output)) Directory.Delete(output, true);
-        RandomizerLogic.Randomize(saveData: false);
-        Controllers.WriteAssets();
-        RandomizerLogic.CustomItemPlacement.LoadDefaultPreset();
+        string Generate(bool addRewards)
+        {
+            GameDataFixture.ResetSettings(3);
+            RandomizerLogic.Settings.ChangeNumberOfActionRewards = addRewards;
+            RandomizerLogic.Settings.ActionRewardsNumberMin = 4;
+            RandomizerLogic.Settings.ActionRewardsNumberMax = 5;
+            RandomizerLogic.CustomItemPlacement.ApplyOopsAll("Anything");
+            if (Directory.Exists(output)) Directory.Delete(output, true);
+            RandomizerLogic.Randomize(saveData: false);
+            Controllers.WriteAssets();
+            RandomizerLogic.CustomItemPlacement.LoadDefaultPreset();
+            return Directory.GetFiles(output, "DA_GA_SQT_TheGommage.uasset", SearchOption.AllDirectories).SingleOrDefault();
+        }
 
-        var path = Directory.GetFiles(output, "DA_GA_SQT_TheGommage.uasset", SearchOption.AllDirectories).Single();
+        // Nothing in it can change, so the game's own file is used
+        Assert.Null(Generate(addRewards: false));
+
+        var path = Generate(addRewards: true);
+        Assert.NotNull(path);
         var asset = new UAsset(path, EngineVersion.VER_UE5_4, RandomizerLogic.mappings);
         var given = asset.Exports.OfType<NormalExport>()
             .Where(e => e.ObjectName.ToString().Contains("AddItemToInventory"))

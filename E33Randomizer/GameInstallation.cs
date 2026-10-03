@@ -108,6 +108,57 @@ public static class GameInstallation
         return libraries.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
     }
 
+    /// <summary>The Steam build id and update date of the installed game, or null if it isn't a Steam installation.</summary>
+    public static string FindSteamBuild(string gameDirectory)
+    {
+        try
+        {
+            // <library>\steamapps\common\<game> -> <library>\steamapps\appmanifest_<id>.acf
+            var steamapps = Directory.GetParent(gameDirectory)?.Parent;
+            var manifest = steamapps == null ? null : Path.Combine(steamapps.FullName, $"appmanifest_{SteamAppId}.acf");
+            if (manifest == null || !File.Exists(manifest)) return null;
+
+            var text = File.ReadAllText(manifest);
+            var build = Regex.Match(text, "\"buildid\"\\s+\"(\\d+)\"");
+            var updated = Regex.Match(text, "\"LastUpdated\"\\s+\"(\\d+)\"");
+            if (!build.Success) return null;
+            var date = updated.Success
+                ? DateTimeOffset.FromUnixTimeSeconds(long.Parse(updated.Groups[1].Value)).ToLocalTime().ToString("yyyy-MM-dd")
+                : "unknown";
+            return $"build {build.Groups[1].Value}, updated {date}";
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or FormatException)
+        {
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Describes the installed mods (pak mods and UE4SS), since other mods that change the same files are a common
+    /// cause of crashes.
+    /// </summary>
+    public static List<string> DescribeInstalledMods(string gameDirectory)
+    {
+        var lines = new List<string>();
+        var paks = Path.Combine([gameDirectory, .. PaksPath]);
+        foreach (var folder in new[] { "~mods", "LogicMods" })
+        {
+            var directory = Path.Combine(paks, folder);
+            if (!Directory.Exists(directory)) continue;
+            var files = Directory.GetFiles(directory, "*", SearchOption.AllDirectories);
+            lines.Add($"{folder}: {files.Length} files");
+            lines.AddRange(files.Select(f => new FileInfo(f))
+                .Select(f => $"  {Path.GetRelativePath(directory, f.FullName)}  {f.Length} bytes  {f.LastWriteTime:yyyy-MM-dd HH:mm}"));
+        }
+        var binaries = Path.Combine(gameDirectory, "Sandfall", "Binaries");
+        if (Directory.Exists(binaries) &&
+            Directory.EnumerateDirectories(binaries, "ue4ss", SearchOption.AllDirectories).Any())
+        {
+            lines.Add("UE4SS is installed");
+        }
+        return lines;
+    }
+
     /// <summary>
     /// Copies the packed mod files from the export folder into the game's ~mods folder, replacing the previous
     /// randomizer files there. Returns the ~mods folder.
@@ -133,6 +184,7 @@ public static class GameInstallation
             foreach (var file in modFiles)
             {
                 File.Copy(file, Path.Combine(modsDirectory, Path.GetFileName(file)), true);
+                Log.Info($"Copied {Path.GetFileName(file)} ({new FileInfo(file).Length} bytes) into {modsDirectory}");
             }
         }
         catch (IOException e)

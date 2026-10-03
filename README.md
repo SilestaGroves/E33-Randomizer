@@ -21,9 +21,18 @@ Running the randomizer:
 - A human-readable spoiler_log.txt is written next to the mod
 - Start the game and enjoy the chaos
 
+If the game crashes:
+- Generate the mod again with the latest version of the randomizer, and make sure the game is up to date: the randomizer only works with the game version its Data folder was taken from (shown at the top of generation_log.txt), because the mod replaces whole game files
+- Remove other mods from ~mods and LogicMods to rule them out (generation_log.txt lists everything that was installed)
+- Send these files with the crash report:
+  - **generation_log.txt** from the rand_&lt;seed&gt; folder: randomizer and game versions, settings, other installed mods, and every game file the mod replaces
+  - **logs\randomizer.log** next to E33Randomizer.exe: errors of the randomizer itself
+  - The "Application Error" entry for SandFall-Win64-Shipping.exe in the Windows Event Viewer (Windows Logs → Application)
+  - A crash dump: the game keeps no logs of its own, but Windows can save a dump on every crash. Run `enable_game_crash_dumps.ps1` (next to E33Randomizer.exe) once in PowerShell as administrator, crash again, and send the .dmp file from %LOCALAPPDATA%\CrashDumps\Expedition33
+
 
 <br>
-For other modders - enemy rando overrides DT_jRPG_Encounters, DT_jRPG_Encounters_CleaTower, DT_Encounters_Composite, and DT_WorldMap_Encounters files, as well as DT_jRPG_Enemies if the option "Tie loot drops to encounters instead of enemies" is on. For the full list of files that get overridden by the item rando, look in the Data/ItemsData directory.
+For other modders - enemy rando overrides DT_jRPG_Encounters, DT_jRPG_Encounters_CleaTower, DT_Encounters_Composite, and DT_WorldMap_Encounters files, as well as DT_jRPG_Enemies if the option "Tie loot drops to encounters instead of enemies" is on. The item rando can override the files in the Data/ItemData directory, but only puts the ones it actually changed into the mod; generation_log.txt lists them.
 <br>
 <br>
 <br>

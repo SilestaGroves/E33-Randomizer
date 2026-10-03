@@ -76,6 +76,7 @@ namespace E33Randomizer
                 MessageBox.Show($"Error generating: {ex.Message}", 
                     "Reroll Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 File.WriteAllText("reroll_error_log.txt", ex.ToString(), Encoding.UTF8);
+                Log.Error("reroll error", ex);
             }
         }
         
@@ -86,7 +87,7 @@ namespace E33Randomizer
             try
             {
                 RandomizerLogic.PackAndConvertData();
-                MessageBox.Show($"Generation done! You can find the mod and spoiler_log.txt in the {RandomizerLogic.LastExportPath} folder.\n\n" +
+                MessageBox.Show($"Generation done! You can find the mod, spoiler_log.txt and generation_log.txt in the {RandomizerLogic.LastExportPath} folder.\n\n" +
                                 MainWindow.GetInstallSummary() +
                                 $"Used Seed: {RandomizerLogic.usedSeed}\n",
                     "Generation Summary", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -96,6 +97,7 @@ namespace E33Randomizer
                 MessageBox.Show($"Error packing: {ex.Message}", 
                     "Packing Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 File.WriteAllText("data_packing_error_log.txt", ex.ToString(), Encoding.UTF8);
+                Log.Error("data packing error", ex);
             }
         }
 
@@ -119,6 +121,7 @@ namespace E33Randomizer
                     MessageBox.Show($"Error loading TXT: {ex.Message}", 
                         "Load Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     File.WriteAllText("txt_loading_error_log.txt", ex.ToString(), Encoding.UTF8);
+                    Log.Error("txt loading error", ex);
                 }
             }
         }
@@ -146,6 +149,7 @@ namespace E33Randomizer
                     MessageBox.Show($"Error saving TXT: {ex.Message}", 
                         "Save Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     File.WriteAllText("txt_saving_error_log.txt", ex.ToString(), Encoding.UTF8);
+                    Log.Error("txt saving error", ex);
                 }
             }
         }
