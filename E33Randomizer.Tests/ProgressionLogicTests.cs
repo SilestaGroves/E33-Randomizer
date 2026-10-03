@@ -162,21 +162,24 @@ public class ProgressionLogicTests(GameDataFixture fixture)
     }
 
     [Fact]
-    public void StoryBattlesAndTutorialsAreKept()
+    public void StoryBattlesAreKeptAndTutorialsRandomized()
     {
         GameDataFixture.ResetSettings(13);
         RandomizerLogic.Settings.RandomizeEncounterSizes = true;
         RandomizerLogic.Settings.EncounterSizeThree = true;
         RandomizerLogic.Randomize(saveData: false);
 
-        var kept = Controllers.EnemiesController.Encounters.Where(e => e.IsNarrativeBattle || SpecialRules.IsTutorial(e)).ToList();
-        foreach (var name in new[] { "SC_MirrorRenoir_GustaveEnd", "FinalBossVerso", "FB_Chalier_GradientCounterTutorial*1",
-                     "MM_Stalact_GradientAttackTutorial*1", "SM_Eveque_ShieldTutorial*1", "SM_Volester_TutoFlying*1",
-                     "SM_FirstLancelier*1", "SM_FirstPortier_NoTuto*1", "LU_Act1_PunchingBall" })
+        var encounters = Controllers.EnemiesController.Encounters;
+        var kept = encounters.Where(e => e.IsNarrativeBattle).ToList();
+        foreach (var name in new[] { "SC_MirrorRenoir_GustaveEnd", "FinalBossVerso" })
             Assert.Contains(kept, e => e.Name == name);
         Assert.DoesNotContain(kept, e => e.Name == "OL_MirrorRenoir_FirstFight");
         foreach (var encounter in kept)
             Assert.Equal(encounter.OriginalEnemyCodeNames, encounter.Enemies.Select(e => e.CodeName).ToList());
+
+        var tutorials = encounters.Where(e => !e.IsNarrativeBattle && SpecialRules.IsTutorial(e)).ToList();
+        Assert.True(tutorials.Count(e => e.HasNewEnemies) > tutorials.Count / 2,
+            $"only {tutorials.Count(e => e.HasNewEnemies)} of {tutorials.Count} tutorial fights were randomized");
     }
 
     [Fact]

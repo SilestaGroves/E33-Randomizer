@@ -176,9 +176,14 @@
                                   FontSize="14"
                                   Grid.Row="8" />
 
-                        <CheckBox Content="Keep scripted story battles and tutorials (Gustave vs Renoir, the final duel, tutorial fights)"
-                                  ToolTip="Randomizing them can break the scripted outcome or leave a tutorial waiting for an action the new enemy doesn't have."
-                                  IsChecked="{Binding KeepStoryBattlesAndTutorials}"
+                        <CheckBox Content="Keep scripted story battles (Gustave vs Renoir, the final duel)"
+                                  ToolTip="Randomizing them can break the scripted outcome. Tutorial fights are randomized."
+                                  IsChecked="{Binding KeepStoryBattles}"
+                                  Margin="0,0,0,0"
+                                  FontSize="14" />
+                        <CheckBox Content="Replacements take the strength of the enemy they replace (a chromatic in place of a chromatic, an elite in place of an elite)"
+                                  ToolTip="A replacement gets the archetype of the enemy it replaces, so its stats match: enemy stats come from the archetype and the fight's level."
+                                  IsChecked="{Binding MatchReplacedEnemyArchetype}"
                                   Margin="0,0,0,0"
                                   FontSize="14" />
                         <CheckBox Content="Only put giant enemies into fights that had a giant (Gargant, Glissando, the Paintress...)"

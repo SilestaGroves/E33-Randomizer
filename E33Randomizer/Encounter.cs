@@ -114,6 +114,7 @@ public class Encounter
             {
                 enemyCodeName = LootEnemy.CodeName;
             }
+            enemyCodeName = ArchetypeMatching.Resolve(this, i, enemyCodeName);
             enemyName.Value.Value = FString.FromString(enemyCodeName);
             enemiesField.Value.Add(dummyEnemyKey, dummyEnemy);
         }

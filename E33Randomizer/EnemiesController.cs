@@ -87,18 +87,31 @@ public class EnemiesController: Controller<EnemyData>
     {
         var asset = new UAsset(assetPath, EngineVersion.VER_UE5_4, RandomizerLogic.mappings);
         PackEncounters(asset, Encounters);
+        // New enemy names (e.g. archetype copies) must be in the table's name map
+        foreach (var row in (asset.Exports[0] as DataTableExport).Table.Data)
+        {
+            if (row.Value[0] is not UAssetAPI.PropertyTypes.Objects.MapPropertyData enemies) continue;
+            foreach (var enemy in enemies.Value.Values.OfType<UAssetAPI.PropertyTypes.Structs.StructPropertyData>())
+            {
+                if (enemy.Value[1] is UAssetAPI.PropertyTypes.Objects.NamePropertyData { Value: { } name })
+                    asset.AddNameReference(name.Value);
+            }
+        }
         Utils.WriteAsset(asset);
     }
 
     public override void WriteAssets()
     {
         ApplyViewModel();
+        ArchetypeMatching.Begin();
         Directory.CreateDirectory("randomizer/Sandfall/Content/jRPGTemplate/Datatables");
         Directory.CreateDirectory("randomizer/Sandfall/Content/jRPGTemplate/Datatables/Encounters_Datatables");
         WriteEncounterAsset($"{RandomizerLogic.DataDirectory}/Originals/DT_jRPG_Encounters.uasset");
         WriteEncounterAsset($"{RandomizerLogic.DataDirectory}/Originals/DT_jRPG_Encounters_CleaTower.uasset");
         WriteEncounterAsset($"{RandomizerLogic.DataDirectory}/Originals/DT_Encounters_Composite.uasset");
         WriteEncounterAsset($"{RandomizerLogic.DataDirectory}/Originals/DT_WorldMap_Encounters.uasset");
+        // After the item randomizer, so the copies are added to its version of the enemy table (with its loot)
+        ArchetypeMatching.WriteCopies();
     }
     
     /// <summary>

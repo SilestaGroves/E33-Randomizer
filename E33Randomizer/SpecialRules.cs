@@ -381,7 +381,8 @@ public static class SpecialRules
         {
             return false;
         }
-        if (RandomizerLogic.Settings.KeepStoryBattlesAndTutorials && (encounter.IsNarrativeBattle || IsTutorial(encounter)))
+        // Tutorial fights are randomized too; only the scripted story battles (GustaveEnd, the final duel) are kept
+        if (RandomizerLogic.Settings.KeepStoryBattles && encounter.IsNarrativeBattle)
         {
             return false;
         }

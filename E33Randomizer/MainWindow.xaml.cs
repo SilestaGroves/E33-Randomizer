@@ -490,7 +490,8 @@ public class SettingsViewModel : INotifyPropertyChanged
     public bool KeepProgressionDropFights { get; set; } = true;
     public bool KeepGiantsInGiantArenas { get; set; } = true;
     public bool KeepBossFightSizes { get; set; } = true;
-    public bool KeepStoryBattlesAndTutorials { get; set; } = true;
+    public bool KeepStoryBattles { get; set; } = true;
+    public bool MatchReplacedEnemyArchetype { get; set; } = true;
     // public bool TieDropsToEncounters { get; set; } = false; 
 
     public bool ChangeSizesOfNonRandomizedChecks { get; set; } = false;
