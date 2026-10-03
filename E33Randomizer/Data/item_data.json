@@ -5590,5 +5590,41 @@
         "CodeName": "MusicRecord_33",
         "Type": "Key",
         "HasQuantities": false
+    },
+    {
+        "CustomName": "Anniversary (Gustave Haircut)",
+        "CodeName": "FaceGustave_Anniversary",
+        "Type": "CharacterCustomization",
+        "HasQuantities": false
+    },
+    {
+        "CustomName": "Anniversary (Maelle Haircut)",
+        "CodeName": "FaceMaelle_Anniversary",
+        "Type": "CharacterCustomization",
+        "HasQuantities": false
+    },
+    {
+        "CustomName": "Anniversary (Lune Haircut)",
+        "CodeName": "FaceLune_Anniversary",
+        "Type": "CharacterCustomization",
+        "HasQuantities": false
+    },
+    {
+        "CustomName": "Anniversary (Sciel Haircut)",
+        "CodeName": "FaceSciel_Anniversary",
+        "Type": "CharacterCustomization",
+        "HasQuantities": false
+    },
+    {
+        "CustomName": "Anniversary (Verso Haircut)",
+        "CodeName": "FaceVerso_Anniversary",
+        "Type": "CharacterCustomization",
+        "HasQuantities": false
+    },
+    {
+        "CustomName": "Anniversary (Monoco Haircut)",
+        "CodeName": "FaceMonoco_Anniversary",
+        "Type": "CharacterCustomization",
+        "HasQuantities": false
     }
 ]

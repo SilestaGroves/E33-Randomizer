@@ -886,7 +886,13 @@
         "SkinGustave_Visage",
         "SkinMonoco_Baguette",
         "FaceMonoco_Simon",
-        "FaceMonoco_Baguette"
+        "FaceMonoco_Baguette",
+        "FaceGustave_Anniversary",
+        "FaceMaelle_Anniversary",
+        "FaceLune_Anniversary",
+        "FaceSciel_Anniversary",
+        "FaceVerso_Anniversary",
+        "FaceMonoco_Anniversary"
     ],
     "Upgrade Material": [
         "UpgradeMaterial_Level1",
