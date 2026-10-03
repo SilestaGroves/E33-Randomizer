@@ -115,7 +115,9 @@ public class Encounter
                 enemyCodeName = LootEnemy.CodeName;
             }
             enemyCodeName = ArchetypeMatching.Resolve(this, i, enemyCodeName);
-            enemyName.Value.Value = FString.FromString(enemyCodeName);
+            // Like the engine, a trailing "_<number>" is the name's number, not part of its text; writing the whole
+            // text with number 0 would name another enemy than the table's row
+            enemyName.Value = FName.FromString(enemyName.Value.Asset, enemyCodeName);
             enemiesField.Value.Add(dummyEnemyKey, dummyEnemy);
         }
 

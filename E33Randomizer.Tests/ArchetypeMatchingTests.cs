@@ -36,6 +36,30 @@ public class ArchetypeMatchingTests(GameDataFixture fixture)
         ((MapPropertyData)encounter.Value[0]).Value.Values.Cast<StructPropertyData>()
             .Select(e => ((NamePropertyData)e.Value[1]).Value.ToString()).ToList();
 
+    // Names as the engine compares them: the text and the number separately ("X_120" is "X" with number 121)
+    private static string Identity(FName name) => $"{name.Value}#{name.Number}";
+
+    [Fact]
+    public void EveryEnemyAFightNamesIsARowOfTheEnemyTable()
+    {
+        var output = Generate(match: true, seed: 1919786359);
+        var enemiesPath = Directory.GetFiles(output, "DT_jRPG_Enemies.uasset", SearchOption.AllDirectories).Single();
+        var rows = ((DataTableExport)Read(enemiesPath).Exports[0]).Table.Data.Select(r => Identity(r.Name)).ToHashSet();
+        var missing = new List<string>();
+        foreach (var file in Directory.GetFiles(output, "*Encounters*.uasset", SearchOption.AllDirectories))
+        {
+            foreach (var row in ((DataTableExport)Read(file).Exports[0]).Table.Data)
+            {
+                foreach (var enemy in ((MapPropertyData)row.Value[0]).Value.Values.Cast<StructPropertyData>())
+                {
+                    var name = ((NamePropertyData)enemy.Value[1]).Value;
+                    if (!rows.Contains(Identity(name))) missing.Add($"{row.Name}: {Identity(name)}");
+                }
+            }
+        }
+        Assert.True(missing.Count == 0, $"{missing.Count} enemies aren't rows of the enemy table, e.g.\n" + string.Join("\n", missing.Take(10)));
+    }
+
     [Fact]
     public void ReplacementsFightWithTheArchetypeOfTheEnemyTheyReplace()
     {

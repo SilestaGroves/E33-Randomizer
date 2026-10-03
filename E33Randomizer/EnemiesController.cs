@@ -87,7 +87,7 @@ public class EnemiesController: Controller<EnemyData>
     {
         var asset = new UAsset(assetPath, EngineVersion.VER_UE5_4, RandomizerLogic.mappings);
         PackEncounters(asset, Encounters);
-        // New enemy names (e.g. archetype copies) must be in the table's name map
+        // New enemy names (e.g. archetype copies) must be in the table's name map (their text without the number)
         foreach (var row in (asset.Exports[0] as DataTableExport).Table.Data)
         {
             if (row.Value[0] is not UAssetAPI.PropertyTypes.Objects.MapPropertyData enemies) continue;

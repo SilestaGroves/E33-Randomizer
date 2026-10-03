@@ -52,7 +52,8 @@ public static class ArchetypeMatching
         var signature = Signature(replacedRow);
         if (signature == Signature(replacementRow)) return replacement;
 
-        var copy = $"{replacement}_RandoAs_{signature}";
+        // Must not end with "_<number>": the engine would read that part as the name's number
+        var copy = $"{replacement}_RandoAs_{signature}_Copy";
         Copies[copy] = (replacement, replaced);
         return copy;
     }
