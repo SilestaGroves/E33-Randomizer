@@ -62,7 +62,6 @@ public static class SpoilerLog
     {
         var controller = Controllers.EnemiesController;
         controller.ApplyViewModel();
-        var scaleLevels = RandomizerLogic.Settings.ScaleEnemyLevelsToEncounter;
 
         // Some encounters are listed under several locations; count them once
         var changedEncounters = new HashSet<string>();
@@ -77,8 +76,8 @@ public static class SpoilerLog
                 if (newEnemies.SequenceEqual(encounter.OriginalEnemyCodeNames)) continue;
 
                 changedEncounters.Add(encounter.Name);
-                var level = encounter.GetLevelOverrideToWrite(scaleLevels);
-                var levelNote = level > 0 ? $"  [fought at level {level}]" : "";
+                // Encounters without a level override are fought at the level of their map
+                var levelNote = encounter.LevelOverride > 0 ? $"  [fought at level {encounter.LevelOverride}]" : "  [fought at the area's level]";
                 locationLines.AppendLine($"  {encounter.Name}{levelNote}");
                 locationLines.AppendLine($"      was: {string.Join(", ", encounter.OriginalEnemyCodeNames.Select(EnemyName))}");
                 locationLines.AppendLine($"      now: {string.Join(", ", newEnemies.Select(EnemyName))}");

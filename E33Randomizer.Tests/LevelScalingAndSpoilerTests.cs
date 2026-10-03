@@ -28,53 +28,23 @@ public class LevelScalingAndSpoilerTests(GameDataFixture fixture)
             row => (row.Value[2] as IntPropertyData).Value);
     }
 
+    // Without an override the game fights an encounter at the level of its map (e.g. 3 in Spring Meadows, 30 in
+    // the Abbest cave), whatever enemies it has; a fixed level would make replacements too weak or too strong
     [Fact]
-    public void ChangedEncountersAreWrittenWithTheOriginalEncounterLevel()
+    public void TheOriginalLevelOverridesAreKept()
     {
         GameDataFixture.ResetSettings(21);
-        RandomizerLogic.Settings.ScaleEnemyLevelsToEncounter = true;
         Generate();
 
         var written = ReadWrittenLevelOverrides();
         var encounters = Controllers.EnemiesController.Encounters.Where(e => written.ContainsKey(e.Name)).ToList();
-        var scaled = encounters.Where(e => e.HasNewEnemies && e.OriginalLevel > 0).ToList();
-        Assert.True(scaled.Count > 100, $"Only {scaled.Count} encounters were scaled");
-
+        Assert.Contains(encounters, e => e.HasNewEnemies && e.LevelOverride == 0);
         foreach (var encounter in encounters)
-        {
-            var expected = encounter.HasNewEnemies && encounter.OriginalLevel > 0 ? encounter.OriginalLevel : encounter.LevelOverride;
-            Assert.Equal(expected, written[encounter.Name]);
-        }
-
-        // An early game encounter keeps an early game level whatever enemies it got
-        var firstLancelier = encounters.Single(e => e.Name == "SM_Lancelier*1");
-        Assert.InRange(written[firstLancelier.Name], 1, 5);
-    }
-
-    [Fact]
-    public void EncountersKnowTheLevelOfTheirOriginalEnemies()
-    {
-        var encounters = Controllers.EnemiesController.Encounters.ToDictionary(e => e.Name);
-        Assert.Equal(3, encounters["SM_Lancelier_Alpha"].OriginalLevel);
-        Assert.Equal(13, encounters["AS_PotatoBag_Boss"].OriginalLevel);
-
-        // Levels come from the game's enemy table, not a default of 1
-        var levels = encounters.Values.Select(e => e.OriginalLevel).ToList();
-        Assert.True(levels.Count(l => l <= 1) < levels.Count / 10, $"{levels.Count(l => l <= 1)} encounters at level 1");
-        Assert.True(levels.Distinct().Count() > 30);
-    }
-
-    [Fact]
-    public void WithoutScalingTheOriginalLevelOverridesAreKept()
-    {
-        GameDataFixture.ResetSettings(21);
-        Generate();
-
-        var written = ReadWrittenLevelOverrides();
-        foreach (var encounter in Controllers.EnemiesController.Encounters.Where(e => written.ContainsKey(e.Name)))
         {
             Assert.Equal(encounter.LevelOverride, written[encounter.Name]);
         }
+        Assert.Equal(0, written["SM_Mime*1"]);
+        Assert.Equal(0, written["SM_Abbest_Alpha*1"]);
     }
 
     [Fact]
@@ -83,7 +53,6 @@ public class LevelScalingAndSpoilerTests(GameDataFixture fixture)
         GameDataFixture.ResetSettings(5);
         RandomizerLogic.Settings.RandomizeMerchantFights = false;
         RandomizerLogic.Settings.RandomizeStartingWeapons = true;
-        RandomizerLogic.Settings.ScaleEnemyLevelsToEncounter = true;
         Generate();
 
         var log = SpoilerLog.Build();
@@ -96,7 +65,9 @@ public class LevelScalingAndSpoilerTests(GameDataFixture fixture)
         var example = changed.First(e => e.Name == "SM_Lancelier*1");
         var newNames = string.Join(", ", example.Enemies.Select(e => e.CustomName));
         Assert.Contains($"now: {newNames}", log);
-        Assert.Contains($"SM_Lancelier*1  [fought at level {example.OriginalLevel}]", log);
+        Assert.Contains("SM_Lancelier*1  [fought at the area's level]", log);
+        var withOverride = changed.First(e => e.LevelOverride > 0);
+        Assert.Contains($"{withOverride.Name}  [fought at level {withOverride.LevelOverride}]", log);
 
         // Merchant fights were not randomized, so they must not show up as changed
         Assert.DoesNotContain(changed, e => e.Name.Contains("Merchant"));
