@@ -1,5 +1,4 @@
-﻿using System.Windows.Controls;
-using System.Windows.Data;
+using System.IO;
 using UAssetAPI;
 using UAssetAPI.ExportTypes;
 using UAssetAPI.PropertyTypes.Objects;
@@ -8,9 +7,13 @@ using UAssetAPI.UnrealTypes;
 
 namespace E33Randomizer;
 
-public class Node
+/// <summary>
+/// A node of a character's skill tree. The node keeps its place, cost, connections and unlock requirement (a gradient
+/// unlock, a Monoco foot or a quest item); only the skill on it changes.
+/// </summary>
+public class SkillNode
 {
-    private StructPropertyData _structData;
+    private readonly StructPropertyData _structData;
     public string OriginalSkillCodeName;
     public FPackageIndex SkillPackageIndex;
     public SkillData SkillData;
@@ -19,91 +22,83 @@ public class Node
     public string RequiredItem;
     public bool IsSecret;
     public FVector2D Position2D;
-    
-    public Node(string rep, StructPropertyData structData)
+
+    private StructPropertyData NodeData => _structData.Value[0] as StructPropertyData;
+
+    public SkillNode(StructPropertyData structData, UAsset parentAsset)
     {
         _structData = structData;
-        SkillPackageIndex = ((_structData.Value[0] as StructPropertyData).Value[0] as ObjectPropertyData).Value;
-        
-        var stringParts = rep.Split(':');
-        OriginalSkillCodeName = stringParts[0];
-        SkillData = Controllers.SkillsController.GetObject(stringParts[0]);
-        UnlockCost = int.Parse(stringParts[1]);
-        IsStarting = bool.Parse(stringParts[2]);
-        RequiredItem = stringParts[3];
-        IsSecret = bool.Parse(stringParts[4]);
-        Position2D.X = int.Parse(stringParts[5]);
-        Position2D.Y = int.Parse(stringParts[6]);
-    }
-    
-    public Node(StructPropertyData structData, UAsset parentAsset){
-        _structData = structData;
-        SkillPackageIndex = ((_structData.Value[0] as StructPropertyData).Value[0] as ObjectPropertyData).Value;
-        var skillImport = parentAsset.Imports[int.Abs(SkillPackageIndex.Index) - 1];
-        OriginalSkillCodeName = skillImport.ObjectName.ToString();
+        SkillPackageIndex = (NodeData.Value[0] as ObjectPropertyData).Value;
+        OriginalSkillCodeName = parentAsset.Imports[int.Abs(SkillPackageIndex.Index) - 1].ObjectName.ToString();
         SkillData = Controllers.SkillsController.GetObject(OriginalSkillCodeName);
-        
-        UnlockCost = ((_structData.Value[0] as StructPropertyData).Value[1] as IntPropertyData).Value;
-        IsStarting = ((_structData.Value[0] as StructPropertyData).Value[2] as BoolPropertyData).Value;
+        UnlockCost = (NodeData.Value[1] as IntPropertyData).Value;
+        IsStarting = (NodeData.Value[2] as BoolPropertyData).Value;
+        RequiredItem = ((NodeData.Value[3] as StructPropertyData).Value[1] as NamePropertyData).ToString();
+        IsSecret = (NodeData.Value[4] as BoolPropertyData).Value;
+        Position2D = ((_structData.Value[1] as StructPropertyData).Value[0] as Vector2DPropertyData).Value;
+    }
 
-        var requiredItemNameProperty =
-            ((_structData.Value[0] as StructPropertyData).Value[3] as StructPropertyData).Value[1] as NamePropertyData;
-        RequiredItem ??= requiredItemNameProperty.ToString();
-        IsSecret = ((_structData.Value[0] as StructPropertyData).Value[2] as BoolPropertyData).Value;
+    /// <summary>A copy of an original node with the values from a txt line.</summary>
+    public SkillNode(SkillNode original, string rep)
+    {
+        _structData = original.CloneStruct();
+        SkillPackageIndex = original.SkillPackageIndex;
+        OriginalSkillCodeName = original.OriginalSkillCodeName;
+        RequiredItem = original.RequiredItem;
 
-        var positionDataArray = (_structData.Value[1] as StructPropertyData).Value[0] as Vector2DPropertyData;
-        Position2D = positionDataArray.Value;
+        // "Skill:OriginalSkill:Cost:IsStarting:RequiredItem:IsSecret:X:Y", or without OriginalSkill (older txt files)
+        var parts = rep.Split(':');
+        var withOriginal = parts.Length == 8;
+        if (parts.Length != 7 && !withOriginal)
+        {
+            throw new InvalidDataException($"Invalid skill node \"{rep}\"");
+        }
+        if (withOriginal && parts[1] != OriginalSkillCodeName)
+        {
+            throw new InvalidDataException($"Skill node \"{rep}\" is in the place of {OriginalSkillCodeName}");
+        }
+        if (!Controllers.SkillsController.IsObject(parts[0]))
+        {
+            throw new InvalidDataException($"Unknown skill {parts[0]}");
+        }
+        var offset = withOriginal ? 1 : 0;
+        SkillData = Controllers.SkillsController.GetObject(parts[0]);
+        UnlockCost = int.Parse(parts[1 + offset]);
+        IsStarting = bool.Parse(parts[2 + offset]);
+        IsSecret = bool.Parse(parts[4 + offset]);
+        Position2D.X = int.Parse(parts[5 + offset]);
+        Position2D.Y = int.Parse(parts[6 + offset]);
+    }
+
+    private StructPropertyData CloneStruct()
+    {
+        var clone = _structData.Clone() as StructPropertyData;
+        clone.Value[0] = clone.Value[0].Clone() as StructPropertyData;
+        clone.Value[1] = clone.Value[1].Clone() as StructPropertyData;
+        return clone;
     }
 
     public StructPropertyData ToStruct(UAsset parentAsset)
     {
         var importIndex = parentAsset.SearchForImport(FName.FromString(parentAsset, SkillData.CodeName));
-        
         if (importIndex == 0)
         {
-            parentAsset.AddNameReference(FString.FromString(SkillData.ClassPath));
-            parentAsset.AddNameReference(FString.FromString(SkillData.ClassName));
-            var outerImport = new Import("/Script/CoreUObject", "Package", FPackageIndex.FromRawIndex(0), SkillData.ClassPath, false, parentAsset);
-            var outerIndex = parentAsset.AddImport(outerImport);
-            var innerImport = new Import("/Game/Gameplay/SkillTree/BP_DataAsset_Skill", "BP_DataAsset_Skill_C", outerIndex, SkillData.ClassName, false, parentAsset);
-            SkillPackageIndex = parentAsset.AddImport(innerImport);
-            importIndex = SkillPackageIndex.Index;
+            importIndex = Utils.AddImportToUAsset(parentAsset, "BP_DataAsset_Skill_C", SkillData.ClassPath, SkillData.ClassName,
+                "/Game/Gameplay/SkillTree/BP_DataAsset_Skill").Index;
         }
         SkillPackageIndex = FPackageIndex.FromRawIndex(importIndex);
-        ((_structData.Value[0] as StructPropertyData).Value[0] as ObjectPropertyData).Value = FPackageIndex.FromRawIndex(importIndex);
-        
-        ((_structData.Value[0] as StructPropertyData).Value[1] as IntPropertyData).Value = UnlockCost;
-        ((_structData.Value[0] as StructPropertyData).Value[2] as BoolPropertyData).Value = IsStarting;
-
-        
-        if (RequiredItem != "null")
-        {
-            parentAsset.AddNameReference(FString.FromString("DT_jRPG_Items_Composite"));
-            parentAsset.AddNameReference(FString.FromString("/Game/jRPGTemplate/Datatables/DT_jRPG_Items_Composite"));
-            var outerImport = new Import("/Script/CoreUObject", "Package", FPackageIndex.FromRawIndex(0), "/Game/jRPGTemplate/Datatables/DT_jRPG_Items_Composite", false, parentAsset);
-            var outerIndex = parentAsset.AddImport(outerImport);
-            var innerImport = new Import("/Script/Engine", "CompositeDataTable", outerIndex, "DT_jRPG_Items_Composite", false, parentAsset);
-            var itemDataTableIndex = parentAsset.AddImport(innerImport);
-            parentAsset.AddNameReference(FString.FromString(RequiredItem));
-            (((_structData.Value[0] as StructPropertyData).Value[3] as StructPropertyData).Value[1] as NamePropertyData).Value = FName.FromString(parentAsset, RequiredItem);
-            (((_structData.Value[0] as StructPropertyData).Value[3] as StructPropertyData).Value[0] as
-                ObjectPropertyData).Value = itemDataTableIndex;
-        }
-        else
-        {
-            (((_structData.Value[0] as StructPropertyData).Value[3] as StructPropertyData).Value[1] as NamePropertyData).Value = null;
-        }
-        
-        IsSecret = ((_structData.Value[0] as StructPropertyData).Value[2] as BoolPropertyData).Value;
-
+        (NodeData.Value[0] as ObjectPropertyData).Value = SkillPackageIndex;
+        (NodeData.Value[1] as IntPropertyData).Value = UnlockCost;
+        (NodeData.Value[2] as BoolPropertyData).Value = IsStarting;
+        // The unlock requirement (Value[3]) points into a table of the original asset and is kept as it is
+        (NodeData.Value[4] as BoolPropertyData).Value = IsSecret;
         ((_structData.Value[1] as StructPropertyData).Value[0] as Vector2DPropertyData).Value = Position2D;
-        
         return _structData;
     }
 
     public string EncodeTxt()
     {
-        return $"{SkillData.CodeName}:{UnlockCost}:{IsStarting}:{RequiredItem}:{IsSecret}:{(int)Position2D.X}:{(int)Position2D.Y}";
+        return $"{SkillData.CodeName}:{OriginalSkillCodeName}:{UnlockCost}:{IsStarting}:{RequiredItem}:{IsSecret}:{(int)Position2D.X}:{(int)Position2D.Y}";
     }
 
     public override string ToString()
@@ -114,144 +109,112 @@ public class Node
 
 public class SkillGraph
 {
-    private UAsset _asset;
+    private readonly UAsset _asset;
+    private readonly List<SkillNode> _originalNodes;
+    private readonly StructPropertyData _dummyEdgeStructData;
+    private readonly bool _hasEdges;
 
-    private StructPropertyData _dummyStructData;
-    public List<Node> Nodes = new();
-    // Edges in the uasset connect objects, so duplicate skills copy connections
+    public List<SkillNode> Nodes = new();
+    // Edges in the uasset connect skill objects, so a skill that appears twice in a tree shares its connections
     public List<Tuple<int, int>> Edges = new();
     public string CharacterName;
+
+    /// <summary>Overcharge, the node Gustave's tutorial relies on.</summary>
+    private const string OverchargeSkill = "DA_Skill_Gustave_UnleashCharge";
+    private const int OverchargeNode = 7;
 
     public SkillGraph(UAsset asset)
     {
         _asset = asset;
         CharacterName = _asset.FolderName.Value.Split('_')[^1];
         CharacterName = CharacterName == "Noah" ? "Gustave" : CharacterName;
-        var nodesArrayData = (_asset.Exports[0] as NormalExport).Data[0] as ArrayPropertyData;
-        if (nodesArrayData.Value.Length > 0)
-        {
-            _dummyStructData = nodesArrayData.Value[0].Clone() as StructPropertyData;
-            _dummyStructData.Value[0] = _dummyStructData.Value[0].Clone() as StructPropertyData;
-            _dummyStructData.Value[1] = _dummyStructData.Value[1].Clone() as StructPropertyData;
-        }
-        foreach (StructPropertyData nodeStruct in nodesArrayData.Value)
-        {
-            Nodes.Add(new Node(nodeStruct, _asset));
-        }
-        var edgesArrayData = (_asset.Exports[0] as NormalExport).Data[1] as ArrayPropertyData;
-        if (edgesArrayData.Value.Length > 1)
-        {
-            foreach (StructPropertyData edgeStruct in edgesArrayData.Value)
-            {
-                var firstNodeImportIndex = (edgeStruct.Value[0] as ObjectPropertyData).Value.Index;
-                var secondNodeImportIndex = (edgeStruct.Value[1] as ObjectPropertyData).Value.Index;
-                var firstNodeClassName = _asset.Imports[int.Abs(firstNodeImportIndex) - 1].ObjectName.ToString();
-                var secondNodeClassName = _asset.Imports[int.Abs(secondNodeImportIndex) - 1].ObjectName.ToString();
-                
-                var firstNodeIndex = Nodes.FindIndex(n => n.SkillData.CodeName == firstNodeClassName);
-                firstNodeIndex = firstNodeIndex == -1 ? firstNodeImportIndex : firstNodeIndex;
-                var secondNodeIndex = Nodes.FindIndex(n => n.SkillData.CodeName == secondNodeClassName);
-                secondNodeIndex = secondNodeIndex == -1 ? secondNodeImportIndex : secondNodeIndex;
 
-                Edges.Add(new Tuple<int, int>(firstNodeIndex, secondNodeIndex));
-            }
+        foreach (StructPropertyData nodeStruct in GetArray("Nodes").Value)
+        {
+            Nodes.Add(new SkillNode(nodeStruct, _asset));
+        }
+        _originalNodes = Nodes.ToList();
+
+        // Monoco's tree has no edges at all (and no Edges property)
+        var edgesArrayData = GetArray("Edges");
+        _hasEdges = edgesArrayData is { Value.Length: > 0 };
+        if (!_hasEdges) return;
+        _dummyEdgeStructData = edgesArrayData.Value[0].Clone() as StructPropertyData;
+        foreach (StructPropertyData edgeStruct in edgesArrayData.Value)
+        {
+            Edges.Add(new Tuple<int, int>(FindNode(edgeStruct.Value[0]), FindNode(edgeStruct.Value[1])));
         }
     }
 
-    public void Randomize()
+    private ArrayPropertyData GetArray(string name)
     {
+        return (_asset.Exports[0] as NormalExport).Data.FirstOrDefault(p => p.Name.ToString() == name) as ArrayPropertyData;
+    }
+
+    /// <summary>The node an edge end points to, or the raw import index if it isn't one of the nodes.</summary>
+    private int FindNode(PropertyData edgeEnd)
+    {
+        var importIndex = (edgeEnd as ObjectPropertyData).Value.Index;
+        var className = _asset.Imports[int.Abs(importIndex) - 1].ObjectName.ToString();
+        var nodeIndex = Nodes.FindIndex(n => n.SkillData.CodeName == className);
+        return nodeIndex == -1 ? importIndex : nodeIndex;
+    }
+
+    /// <summary>Julie's tree is a copy of Gustave's skills for a scripted fight and isn't randomized.</summary>
+    public bool IsRandomized => CharacterName != "Julie";
+
+    public void Randomize(ICollection<string> banned)
+    {
+        if (!IsRandomized) return;
+
+        var placement = RandomizerLogic.CustomSkillPlacement;
+        var used = new HashSet<string>();
         foreach (var node in Nodes)
         {
-            node.SkillData = Controllers.SkillsController.GetRandomObject();
-            node.UnlockCost = RandomizerLogic.rand.Next(10);
-            node.IsSecret = RandomizerLogic.rand.Next(10) > 5;
-            node.Position2D.X += RandomizerLogic.rand.Next(10) - 5;
-            node.Position2D.Y += RandomizerLogic.rand.Next(10) - 5;
+            var alsoBanned = new HashSet<string>(banned);
+            if (RandomizerLogic.Settings.ReduceSkillRepetition) alsoBanned.UnionWith(used);
+            var newSkill = placement.Replace(node.OriginalSkillCodeName, alsoBanned);
+            node.SkillData = Controllers.SkillsController.GetObject(newSkill);
+            used.Add(newSkill);
         }
 
-        if (Edges.Count > 0)
+        if (RandomizerLogic.Settings.GuaranteeGustaveOvercharge && CharacterName == "Gustave" &&
+            Nodes.Count > OverchargeNode && Nodes[OverchargeNode].OriginalSkillCodeName == OverchargeSkill)
         {
-            Edges.Add(new  Tuple<int, int>(0, 5));
+            var overcharge = Controllers.SkillsController.GetObject(OverchargeSkill);
+            var otherNode = Nodes.Find(n => n.SkillData.CodeName == OverchargeSkill);
+            if (otherNode != null) otherNode.SkillData = Nodes[OverchargeNode].SkillData;
+            Nodes[OverchargeNode].SkillData = overcharge;
         }
     }
 
-    // I'm not gonna add RemoveNode cause it will be a hell of a headache to properly manage
-    // Honestly I don't know if I even should have AddNode
-    public void AddNode(SkillData skillData, int unlockCost, bool isStarting = true, bool isSecret = false, List<int> connectedNodeIndexes = null, Tuple<double, double> position2D = null)
+    /// <summary>
+    /// The skills the character now starts with, in the order of the save state's unlocked and equipped lists:
+    /// each starting skill is replaced by the skill now on its node.
+    /// </summary>
+    public (List<SkillData> unlocked, List<SkillData> equipped) GetStartingSkills(List<string> originalUnlocked, List<string> originalEquipped)
     {
-        var newDummyStructData = _dummyStructData.Clone() as StructPropertyData;
-        newDummyStructData.Value[0] = newDummyStructData.Value[0].Clone() as StructPropertyData;
-        newDummyStructData.Value[1] = newDummyStructData.Value[1].Clone() as StructPropertyData;
-        var newNode = new Node(newDummyStructData, _asset);
-        newNode.SkillData = skillData;
-        newNode.UnlockCost = unlockCost;
-        newNode.IsStarting = isStarting;
-        newNode.IsSecret = isSecret;
-        if (position2D != null)
-        {
-            newNode.Position2D.X = position2D.Item1;
-            newNode.Position2D.Y = position2D.Item2;
-        }
-        else
-        {
-            newNode.Position2D.X = RandomizerLogic.rand.Next(-500, 500);
-            newNode.Position2D.Y = RandomizerLogic.rand.Next(-500, 500);
-        }
-
-        if (connectedNodeIndexes != null)
-        {
-            foreach (var connectedNodeIndex in connectedNodeIndexes)
-            {
-                Edges.Add(new Tuple<int, int>(Nodes.Count, connectedNodeIndex));
-            }
-        }
-        
-        Nodes.Add(newNode);
-    }
-
-    public void SetNode(int i, SkillData skillData, int unlockCost = -1, bool isStarting = true, bool isSecret = false,
-        Tuple<double, double> position2D = null)
-    {
-        Nodes[i].SkillData = skillData;
-        Nodes[i].UnlockCost = unlockCost == -1 ? Nodes[i].UnlockCost : unlockCost;
-        Nodes[i].IsStarting = isStarting;
-        Nodes[i].IsSecret = isSecret;
-        if (position2D == null) return;
-        Nodes[i].Position2D.X = position2D.Item1;
-        Nodes[i].Position2D.Y = position2D.Item2;
-    }
-
-    public void SetNode(int i, SkillData skillData)
-    {
-        Nodes[i].SkillData = skillData;
+        List<SkillData> Map(List<string> nameIds) => nameIds
+            // Names are case-insensitive in the game ("Grimprediction" in the save state is "GrimPrediction")
+            .Select(id => Nodes.FirstOrDefault(n => string.Equals(Controllers.SkillsController.GetObject(n.OriginalSkillCodeName).NameID, id, StringComparison.OrdinalIgnoreCase)))
+            .Select(n => n?.SkillData)
+            .ToList();
+        return (Map(originalUnlocked), Map(originalEquipped));
     }
 
     public UAsset ToAsset()
     {
-        var nodesArrayData = (_asset.Exports[0] as NormalExport).Data[0] as ArrayPropertyData;
-        nodesArrayData.Value = Nodes.Select(n => n.ToStruct(_asset)).ToArray();
+        GetArray("Nodes").Value = Nodes.Select(n => (PropertyData)n.ToStruct(_asset)).ToArray();
 
-        if (Edges.Count == 0)
-        {
-            return _asset;
-        }
-        
-        var edgesArrayData = (_asset.Exports[0] as NormalExport).Data[1] as ArrayPropertyData;
-        var edgeStructDummy = edgesArrayData.Value[0].Clone() as StructPropertyData;
-        edgesArrayData.Value = [];
+        if (!_hasEdges) return _asset;
 
-        List<StructPropertyData> newEdges = new();
-        foreach (var edge in Edges)
+        GetArray("Edges").Value = Edges.Select(edge =>
         {
-            var firstPackageIndex = edge.Item1 < 0 ? FPackageIndex.FromRawIndex(edge.Item1) : Nodes[edge.Item1].SkillPackageIndex;
-            var secondPackageIndex = edge.Item2 < 0 ? FPackageIndex.FromRawIndex(edge.Item2) : Nodes[edge.Item2].SkillPackageIndex;
-            
-            var edgeStruct = edgeStructDummy.Clone() as StructPropertyData;
-            (edgeStruct.Value[0] as ObjectPropertyData).Value = firstPackageIndex;
-            (edgeStruct.Value[1] as ObjectPropertyData).Value = secondPackageIndex;
-            newEdges.Add(edgeStruct);
-        }
-        edgesArrayData.Value = newEdges.ToArray();
+            var edgeStruct = _dummyEdgeStructData.Clone() as StructPropertyData;
+            (edgeStruct.Value[0] as ObjectPropertyData).Value = edge.Item1 < 0 ? FPackageIndex.FromRawIndex(edge.Item1) : Nodes[edge.Item1].SkillPackageIndex;
+            (edgeStruct.Value[1] as ObjectPropertyData).Value = edge.Item2 < 0 ? FPackageIndex.FromRawIndex(edge.Item2) : Nodes[edge.Item2].SkillPackageIndex;
+            return (PropertyData)edgeStruct;
+        }).ToArray();
         return _asset;
     }
 
@@ -263,25 +226,16 @@ public class SkillGraph
         return result;
     }
 
+    /// <summary>Reads the skills of the tree from a txt line. Nodes are matched by position, edges are kept.</summary>
     public void DecodeTxt(string rep)
     {
         var stringParts = rep.Split('|');
-        CharacterName = stringParts[0];
-        // This is so scuffed but whatever 
-        Nodes.Clear();
-        foreach (var nodeRep in stringParts[1].Split(','))
+        var nodeReps = stringParts.Length > 1 && stringParts[1].Length > 0 ? stringParts[1].Split(',') : [];
+        if (nodeReps.Length != _originalNodes.Count)
         {
-            var newDummyStructData = _dummyStructData.Clone() as StructPropertyData;
-            newDummyStructData.Value[0] = newDummyStructData.Value[0].Clone() as StructPropertyData;
-            newDummyStructData.Value[1] = newDummyStructData.Value[1].Clone() as StructPropertyData;
-            Nodes.Add(new Node(nodeRep, newDummyStructData));
+            throw new InvalidDataException($"{CharacterName}'s skill tree has {_originalNodes.Count} nodes, the txt has {nodeReps.Length}");
         }
-        
-        Edges.Clear();
-        foreach (var edgeRep in stringParts[2].Split(','))
-        {
-            Edges.Add(new Tuple<int, int>(int.Parse(edgeRep.Split(':')[0]), int.Parse(edgeRep.Split(':')[1])));
-        }
+        Nodes = _originalNodes.Select((original, i) => new SkillNode(original, nodeReps[i])).ToList();
     }
 
     public override string ToString()

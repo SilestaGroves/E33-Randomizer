@@ -19,12 +19,24 @@
                     </Grid.RowDefinitions>
                     <StackPanel>
                         <CheckBox Content="Randomize skills"
-                                  IsChecked="{Binding RandomizeItems}"
+                                  IsChecked="{Binding RandomizeSkills}"
                                   Margin="0,0,0,0"
                                   FontSize="14" />
                         
                         <CheckBox Content="Reduce skill duplication"
+                                  ToolTip="A skill appears at most once in each character's tree, when there are enough skills to choose from"
                                   IsChecked="{Binding ReduceSkillRepetition}"
+                                  Margin="0,0,0,0"
+                                  FontSize="14" />
+
+                        <CheckBox Content="Keep Gustave's Overcharge"
+                                  ToolTip="Gustave's Overcharge stays on its starting node"
+                                  IsChecked="{Binding GuaranteeGustaveOvercharge}"
+                                  Margin="0,0,0,0"
+                                  FontSize="14" />
+
+                        <CheckBox Content="Include cut content skills"
+                                  IsChecked="{Binding IncludeCutContentSkills}"
                                   Margin="0,0,0,0"
                                   FontSize="14" />
                     </StackPanel>

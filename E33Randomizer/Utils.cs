@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using UAssetAPI;
+using UAssetAPI.UnrealTypes;
 
 namespace E33Randomizer;
 
@@ -57,6 +58,27 @@ public static class Utils
         asset.Write(filePath);
         var source = Path.GetRelativePath(RandomizerLogic.DataDirectory, asset.FilePath ?? "");
         Log.Info($"Wrote {asset.FolderName.Value} ({new FileInfo(filePath).Length + new FileInfo(Path.ChangeExtension(filePath, ".uexp")).Length} bytes, from Data/{source.Replace('\\', '/')})");
+    }
+
+    /// <summary>
+    /// Adds an import of an object (and of the package it is in) to the asset, unless the asset already imports it.
+    /// Returns the import's index.
+    /// </summary>
+    public static FPackageIndex AddImportToUAsset(UAsset asset, string className, string objectPath, string objectName = null,
+        string classPackage = "/Script/Engine")
+    {
+        objectName ??= objectPath.Split('/').Last();
+        var existing = asset.SearchForImport(FName.FromString(asset, objectName));
+        if (existing != 0) return FPackageIndex.FromRawIndex(existing);
+
+        asset.AddNameReference(FString.FromString(objectName));
+        asset.AddNameReference(FString.FromString(objectPath));
+        asset.AddNameReference(FString.FromString(classPackage));
+        asset.AddNameReference(FString.FromString(className));
+        var outerImport = new Import("/Script/CoreUObject", "Package", FPackageIndex.FromRawIndex(0), objectPath, false, asset);
+        var outerIndex = asset.AddImport(outerImport);
+        var innerImport = new Import(classPackage, className, outerIndex, objectName, false, asset);
+        return asset.AddImport(innerImport);
     }
 
     public static int Between(int min, int max)

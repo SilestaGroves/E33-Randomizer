@@ -26,6 +26,7 @@ public static class Controllers
 
     public static void WriteAssets()
     {
+        StartingStateTables.Begin();
         if (RandomizerLogic.Settings.RandomizeSkills)
         {
             SkillsController.WriteAssets();
@@ -38,5 +39,7 @@ public static class Controllers
         {
             EnemiesController.WriteAssets();
         }
+        // Starting weapons and starting skills share this table
+        StartingStateTables.Write();
     }
 }

@@ -28,6 +28,11 @@ public abstract class Controller<T>: BaseController where T: ObjectData, new()
         return ObjectsByName.TryGetValue(objectCodeName, out var obj) ? obj : DefaultObject;
     }
 
+    public bool IsObject(string objectCodeName)
+    {
+        return objectCodeName != null && ObjectsByName.ContainsKey(objectCodeName);
+    }
+
     public List<T> GetObjects(List<string> objectCodeNames)
     {
         return objectCodeNames.Select(GetObject).ToList();

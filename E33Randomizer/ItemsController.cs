@@ -346,7 +346,8 @@ public class ItemsController: Controller<ItemData>
         StartingEquipment.Clear();
         if (RandomizerLogic.Settings.RandomizeStartingWeapons)
         {
-            var tableAsset = new UAsset($"{RandomizerLogic.DataDirectory}/Originals/StartingInfoTables/DT_jRPG_CharacterSaveStates.uasset", EngineVersion.VER_UE5_4, RandomizerLogic.mappings);
+            // Written by Controllers.WriteAssets, together with the starting skills
+            var tableAsset = StartingStateTables.SaveStates;
             var tableData = (tableAsset.Exports[0] as DataTableExport).Table.Data;
 
             foreach (var propertyData in tableData)
@@ -360,7 +361,6 @@ public class ItemsController: Controller<ItemData>
                 nameProperty.Value = FName.FromString(tableAsset, randomWeapon.CodeName);
                 StartingEquipment.Add($"{characterName} weapon: {randomWeapon.CustomName}");
             }
-            Utils.WriteAsset(tableAsset);
         }
         if (RandomizerLogic.Settings.RandomizeStartingCosmetics)
         {
