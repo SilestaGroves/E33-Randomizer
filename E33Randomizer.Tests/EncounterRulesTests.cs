@@ -72,8 +72,10 @@ public class EncounterRulesTests(GameDataFixture fixture)
         foreach (var encounter in bossFights)
             Assert.Equal(encounter.OriginalEnemyCodeNames.Count, encounter.Size);
 
-        // Danseuse clone summons are always set to the clones by a special rule
+        // Danseuse clone summons are always set to the clones by a special rule; DLC enemies are not randomized
+        var notRandomized = RandomizerLogic.CustomEnemyPlacement.NotRandomizedCodeNames;
         var packs = encounters.Where(e => !SpecialRules.IsBossFight(e) && e.OriginalEnemyCodeNames.Count > 0 &&
+                                          !e.OriginalEnemyCodeNames.All(notRandomized.Contains) &&
                                           !e.Name.Contains("Danseuse_Clone") && !e.Name.Contains("DanseuseClone") && !e.Name.Contains("DanseuseAlphaSummon")).ToList();
         Assert.True(packs.Count > 300);
         var wrong = packs.Where(e => e.Size != 3).Select(e => $"{e.Name}={string.Join(",", e.OriginalEnemyCodeNames)}->{string.Join(",", e.Enemies.Select(x => x.CodeName))}").ToList();

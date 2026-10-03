@@ -313,6 +313,12 @@
       "confidence": "low",
       "note": ""
     },
+    "Verso's Drafts": {
+      "act": 2,
+      "missable": false,
+      "confidence": "low",
+      "note": "Free DLC area added by game update 1.5.0"
+    },
     "The Heart of the Canvas": {
       "act": 4,
       "missable": true,
@@ -617,6 +623,18 @@
     {
       "match": "DT_ChestsContent#Chest_Lumiere_ACT1_*",
       "region": "Lumiere - Act 1"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SideLevel_CleasTower_*",
+      "region": "Endless Tower",
+      "eligible": false,
+      "reason": "Added by game update 1.5.0; how it is reached isn't modelled yet"
+    },
+    {
+      "match": "DT_ChestsContent#Chest_SideLevel_VersosDraft_*",
+      "region": "Verso's Drafts",
+      "eligible": false,
+      "reason": "DLC area (game 1.5.0): its access isn't modelled, so no key items there"
     },
     {
       "match": "DT_ChestsContent#Chest_SmallLevel_GoblusLair_02_*",

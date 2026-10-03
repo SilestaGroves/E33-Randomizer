@@ -11,7 +11,7 @@ public class CustomItemPlacement: CustomPlacement
         CatchAllName = "Anything";
         CategoryOrder = new List<string>
         {
-            "Pictos", "Weapon", "Key Item", "Skill Unlock", "Cosmetic", "Upgrade Material", "Consumable", "Merchant Unlock", "Music Record", "Lovely Foot", "Journal", "Cut Content Items", "Anything"
+            "Pictos", "Weapon", "Key Item", "Skill Unlock", "Cosmetic", "Upgrade Material", "Consumable", "Merchant Unlock", "Music Record", "Lovely Foot", "Journal", "DLC Items", "Cut Content Items", "Anything"
         };
         
         PresetFiles = new()
@@ -31,7 +31,7 @@ public class CustomItemPlacement: CustomPlacement
 
     public override void LoadDefaultPreset()
     {
-        SetLists(["Skill Unlock", "Merchant Unlock"], ["Consumable"]);
+        SetLists(["Skill Unlock", "Merchant Unlock", "DLC Items"], ["Consumable", "DLC Items"]);
         CustomPlacementRules = new Dictionary<string, Dictionary<string, float>>
         {
             { "Pictos", new Dictionary<string, float> { { "Pictos", 1 } } },
