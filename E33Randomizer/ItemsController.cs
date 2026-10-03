@@ -304,6 +304,19 @@ public class ItemsController: Controller<ItemData>
         InitFromTxt(_cleanSnapshot);
     }
 
+    /// <summary>
+    /// Starting outfits the story takes away or changes: the Gommage removes Gustave's Lumiere suit, and Verso
+    /// starts without his armband. Starting in another outfit breaks those scripts (a crash after the Gommage).
+    /// </summary>
+    private static readonly HashSet<string> StoryStartingOutfits = ["SkinGustave_LumiereSuit", "SkinVerso_NoArmBand"];
+
+    private ItemData PickCosmetic(string kind)
+    {
+        var all = ObjectsData.Where(i => i.CustomName.Contains(kind)).ToList();
+        var allowed = all.Where(i => !RandomizerLogic.CustomItemPlacement.ExcludedCodeNames.Contains(i.CodeName)).ToList();
+        return Utils.Pick(allowed.Count > 0 ? allowed : all);
+    }
+
     public void RandomizeStartingEquipment()
     {
         List<string> characterNames = ["Gustave", "Lune", "Maelle", "Sciel", "Verso", "Monoco"];
@@ -337,11 +350,12 @@ public class ItemsController: Controller<ItemData>
                 if (!characterNames.Contains(characterName) && characterName != "Frey") continue;
                 characterName = characterName == "Frey" ? "Gustave" : characterName;
                 var cosmeticsStruct = propertyData.Value[21] as StructPropertyData;
-                var characterOutfits = ObjectsData.Where(i => i.CustomName.Contains($"{characterName} Outfit")).ToList();
-                var randomOutfit = Utils.Pick(characterOutfits);
-                var characterHaircuts = ObjectsData.Where(i => i.CustomName.Contains($"{characterName} Haircut")).ToList();
-                var randomHaircut = Utils.Pick(characterHaircuts);
-                
+                var originalOutfit = GetObject((cosmeticsStruct.Value[0] as NamePropertyData).Value.ToString());
+                var randomOutfit = StoryStartingOutfits.Contains(originalOutfit.CodeName)
+                    ? originalOutfit
+                    : PickCosmetic($"{characterName} Outfit");
+                var randomHaircut = PickCosmetic($"{characterName} Haircut");
+
                 tableAsset.AddNameReference(FString.FromString(randomHaircut.CodeName));
                 tableAsset.AddNameReference(FString.FromString(randomOutfit.CodeName));
                 
