@@ -4,3 +4,6 @@ E33Randomizer/obj/
 *.user
 E33Randomizer.Tests/bin/
 E33Randomizer.Tests/obj/
+
+# Oodle library retoc copies from the game when reading its paks (not redistributable)
+oo2core_*.dll

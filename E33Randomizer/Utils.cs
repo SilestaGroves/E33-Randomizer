@@ -46,6 +46,9 @@ public static class Utils
         return from[RandomizerLogic.rand.Next(from.Count)];
     }
 
+    /// <summary>The game files written since Controllers.WriteAssets started, with the files they were made from.</summary>
+    public static List<(string gamePath, string sourcePath)> WrittenAssets = new();
+
     public static void WriteAsset(UAsset asset)
     {
         var filePath = asset.FolderName.Value.Replace("/Game/", "randomizer/Sandfall/Content/") + ".uasset";
@@ -56,6 +59,7 @@ public static class Utils
             Directory.CreateDirectory(directoryPath);
         }
         asset.Write(filePath);
+        WrittenAssets.Add((asset.FolderName.Value, asset.FilePath));
         var source = Path.GetRelativePath(RandomizerLogic.DataDirectory, asset.FilePath ?? "");
         Log.Info($"Wrote {asset.FolderName.Value} ({new FileInfo(filePath).Length + new FileInfo(Path.ChangeExtension(filePath, ".uexp")).Length} bytes, from Data/{source.Replace('\\', '/')})");
     }

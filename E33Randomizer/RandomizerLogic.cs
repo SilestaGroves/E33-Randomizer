@@ -204,6 +204,7 @@ public static class RandomizerLogic
         // }
 
         Log.Time("Writing the changed game files", Controllers.WriteAssets);
+        CheckGameData();
 
         if (writeTxt)
         {
@@ -230,8 +231,33 @@ public static class RandomizerLogic
         }
     }
 
-    /// <summary>Packs the written assets and waits for it, so the packed files exist when this returns.</summary>
-    private static void RunRetoc(string arguments)
+    /// <summary>Warns when the installed game has other versions of the files the mod replaces.</summary>
+    private static void CheckGameData()
+    {
+        GameDataCheck.LastOutdatedFiles = [];
+        if (string.IsNullOrEmpty(Settings.GameDirectory) || !GameInstallation.IsGameDirectory(Settings.GameDirectory)) return;
+        try
+        {
+            var outdated = Log.Time("Comparing the replaced files with the installed game",
+                () => GameDataCheck.FindOutdatedFiles(Settings.GameDirectory, Utils.WrittenAssets));
+            GameDataCheck.LastOutdatedFiles = outdated;
+            if (outdated.Count == 0)
+            {
+                Log.Info("The files the mod replaces match the installed game");
+                return;
+            }
+            Log.Warn($"The installed game has other versions of {outdated.Count} files the mod replaces. The game was " +
+                     "probably updated after this version of the randomizer; the mod may crash it or remove new content:" +
+                     Environment.NewLine + string.Join(Environment.NewLine, outdated.Select(f => "  " + f)));
+        }
+        catch (Exception e)
+        {
+            Log.Warn($"Couldn't compare the replaced files with the installed game: {e.Message}");
+        }
+    }
+
+    /// <summary>Runs retoc and waits for it, so its output files exist when this returns.</summary>
+    public static void RunRetoc(string arguments, bool logOutput = true)
     {
         var startInfo = new ProcessStartInfo("retoc.exe", arguments)
         {
@@ -246,10 +272,10 @@ public static class RandomizerLogic
         if (!process.WaitForExit(TimeSpan.FromMinutes(5)))
         {
             process.Kill();
-            throw new TimeoutException("retoc.exe didn't finish packing the mod in 5 minutes.");
+            throw new TimeoutException("retoc.exe didn't finish in 5 minutes.");
         }
         var retocOutput = $"{output.Result}{errors.Result}".Trim();
-        if (retocOutput.Length > 0) Log.Info("retoc output:" + Environment.NewLine + retocOutput);
+        if (logOutput && retocOutput.Length > 0) Log.Info("retoc output:" + Environment.NewLine + retocOutput);
         if (process.ExitCode != 0)
         {
             throw new InvalidOperationException($"retoc.exe failed with exit code {process.ExitCode}: {errors.Result}{output.Result}".Trim());
@@ -312,7 +338,7 @@ public static class RandomizerLogic
     }
 
     /// <summary>The game version the files in Data were taken from. Mods built from older files crash newer games.</summary>
-    public const string GameDataVersion = "1.5.0";
+    public const string GameDataVersion = "1.5.0 with the anniversary update (Steam build 23765773)";
 
     private static void BeginGenerationLog()
     {

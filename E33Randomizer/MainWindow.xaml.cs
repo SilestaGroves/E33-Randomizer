@@ -213,6 +213,16 @@ public partial class MainWindow
 
     public static string GetInstallSummary()
     {
+        if (GameDataCheck.LastOutdatedFiles.Count > 0)
+            return $"WARNING: your game has newer versions of {GameDataCheck.LastOutdatedFiles.Count} files this mod replaces " +
+                   "(the game was probably updated after this version of the randomizer). The mod may crash the game or " +
+                   "remove new content; check for a randomizer update. The files are listed in generation_log.txt.\n\n" +
+                   GetCopySummary();
+        return GetCopySummary();
+    }
+
+    private static string GetCopySummary()
+    {
         if (RandomizerLogic.LastInstalledModsDirectory != null)
             return $"The mod was copied into {RandomizerLogic.LastInstalledModsDirectory}, just start the game.\n\n";
         if (RandomizerLogic.Settings.CopyModToGame)

@@ -27,6 +27,7 @@ public static class Controllers
     public static void WriteAssets()
     {
         StartingStateTables.Begin();
+        Utils.WrittenAssets.Clear();
         if (RandomizerLogic.Settings.RandomizeSkills)
         {
             SkillsController.WriteAssets();
