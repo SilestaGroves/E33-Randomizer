@@ -52,6 +52,19 @@ public class LevelScalingAndSpoilerTests(GameDataFixture fixture)
     }
 
     [Fact]
+    public void EncountersKnowTheLevelOfTheirOriginalEnemies()
+    {
+        var encounters = Controllers.EnemiesController.Encounters.ToDictionary(e => e.Name);
+        Assert.Equal(3, encounters["SM_Lancelier_Alpha"].OriginalLevel);
+        Assert.Equal(13, encounters["AS_PotatoBag_Boss"].OriginalLevel);
+
+        // Levels come from the game's enemy table, not a default of 1
+        var levels = encounters.Values.Select(e => e.OriginalLevel).ToList();
+        Assert.True(levels.Count(l => l <= 1) < levels.Count / 10, $"{levels.Count(l => l <= 1)} encounters at level 1");
+        Assert.True(levels.Distinct().Count() > 30);
+    }
+
+    [Fact]
     public void WithoutScalingTheOriginalLevelOverridesAreKept()
     {
         GameDataFixture.ResetSettings(21);

@@ -20,10 +20,27 @@ public class EnemiesController: Controller<EnemyData>
         ViewModel.ObjectName = "Enemy";
         ReadObjectsData($"{RandomizerLogic.DataDirectory}/enemy_data.json");
         ObjectsData.ForEach(e => e.IsBroken = RandomizerLogic.BrokenEnemies.Contains(e.CodeName));
+        ReadEnemyLevels($"{RandomizerLogic.DataDirectory}/Originals/DT_jRPG_Enemies.uasset");
         ReadEncounterAssets();
         ConstructEncountersByLocation();
     }
     
+    /// <summary>
+    /// Takes the enemy levels from the game's enemy table (enemy_data.json has no levels). Encounters without a
+    /// level override are fought at the level of their strongest enemy.
+    /// </summary>
+    public void ReadEnemyLevels(string enemiesTablePath)
+    {
+        var asset = new UAsset(enemiesTablePath, EngineVersion.VER_UE5_4, RandomizerLogic.mappings);
+        var levels = (asset.Exports[0] as DataTableExport).Table.Data
+            .Where(row => row.Value[2] is UAssetAPI.PropertyTypes.Objects.IntPropertyData)
+            .ToDictionary(row => row.Name.ToString(), row => ((UAssetAPI.PropertyTypes.Objects.IntPropertyData)row.Value[2]).Value);
+        foreach (var enemy in ObjectsData)
+        {
+            if (levels.TryGetValue(enemy.CodeName, out var level)) enemy.Level = level;
+        }
+    }
+
     public void ReadEncounterAssets()
     {
         Encounters.Clear();
