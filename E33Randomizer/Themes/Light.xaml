@@ -1,0 +1,20 @@
+<!-- The colours the windows used before themes existed, under names the windows refer to -->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <SolidColorBrush x:Key="PanelBackgroundBrush" Color="#F0F0F0" />
+    <SolidColorBrush x:Key="SplitterBrush" Color="#E0E0E0" />
+    <SolidColorBrush x:Key="HeadingTextBrush" Color="#333333" />
+    <SolidColorBrush x:Key="SecondaryTextBrush" Color="#555555" />
+    <SolidColorBrush x:Key="WarningTextBrush" Color="Orange" />
+    <SolidColorBrush x:Key="AccentButtonBrush" Color="Aqua" />
+    <SolidColorBrush x:Key="AccentButtonTextBrush" Color="Black" />
+    <SolidColorBrush x:Key="SuccessButtonBrush" Color="#4CAF50" />
+    <SolidColorBrush x:Key="SuccessButtonTextBrush" Color="White" />
+    <SolidColorBrush x:Key="NeutralButtonBrush" Color="Gray" />
+    <SolidColorBrush x:Key="NeutralButtonTextBrush" Color="White" />
+    <SolidColorBrush x:Key="RemoveButtonBrush" Color="#FFE0E0" />
+    <SolidColorBrush x:Key="RemoveButtonBorderBrush" Color="#FFAAAA" />
+    <SolidColorBrush x:Key="GroupBorderBrush" Color="White" />
+    <SolidColorBrush x:Key="DangerButtonBrush" Color="Red" />
+    <SolidColorBrush x:Key="DangerButtonTextBrush" Color="White" />
+</ResourceDictionary>

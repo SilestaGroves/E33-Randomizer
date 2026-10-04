@@ -48,7 +48,7 @@
                                 FontSize="20"
                                 HorizontalAlignment="Center"
                                 Margin="0,10,0,20"
-                                Background="Aqua"
+                                Background="{DynamicResource AccentButtonBrush}" Foreground="{DynamicResource AccentButtonTextBrush}"
                                 Click="CustomPlacementButton_Click" 
                                 Tag="Skill" />
                         <Button Name="EditGraphsButton"
@@ -58,7 +58,7 @@
                                 FontSize="20"
                                 HorizontalAlignment="Center"
                                 Margin="0,10,0,20"
-                                Background="Aqua"
+                                Background="{DynamicResource AccentButtonBrush}" Foreground="{DynamicResource AccentButtonTextBrush}"
                                 Click="EditButton_Click" 
                                 Tag="Skill" />
                     </StackPanel>

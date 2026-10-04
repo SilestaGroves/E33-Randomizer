@@ -307,10 +307,10 @@ namespace E33Randomizer
                 Width = 30,
                 Height = 30,
                 Margin = new Thickness(0, 0, 5, 0),
-                Background = System.Windows.Media.Brushes.Red,
-                Foreground = System.Windows.Media.Brushes.White,
                 FontWeight = FontWeights.Bold
             };
+            removeButton.SetResourceReference(BackgroundProperty, "DangerButtonBrush");
+            removeButton.SetResourceReference(ForegroundProperty, "DangerButtonTextBrush");
             removeButton.Click += (_, _) =>
             {
                 var objectName = (string)(objectCombo.SelectedItem as ComboBoxItem)?.Content;
@@ -474,10 +474,10 @@ namespace E33Randomizer
                 Width = 30,
                 Height = 30,
                 Margin = new Thickness(0, 0, 5, 0),
-                Background = System.Windows.Media.Brushes.Red,
-                Foreground = System.Windows.Media.Brushes.White,
                 FontWeight = FontWeights.Bold
             };
+            removeButton.SetResourceReference(BackgroundProperty, "DangerButtonBrush");
+            removeButton.SetResourceReference(ForegroundProperty, "DangerButtonTextBrush");
             removeButton.Click += (_, _) => RemoveCustomPlacementRow((string)(objectNameCombo.SelectedItem as ComboBoxItem)?.Content, row);
 
             float frequency = 1;

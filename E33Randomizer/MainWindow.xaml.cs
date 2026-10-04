@@ -28,6 +28,7 @@ public partial class MainWindow
     public MainWindow()
     {
         InitializeComponent();
+        DarkThemeCheckBox.IsChecked = ThemeManager.IsDark;
         try
         {
             RandomizerLogic.Init();
@@ -58,6 +59,14 @@ public partial class MainWindow
         {
             if (RandomizerLogic.Settings.CheckForUpdatesOnStartup) await CheckForUpdatesAsync(userAsked: false);
         };
+    }
+
+    private void DarkThemeCheckBox_Changed(object sender, RoutedEventArgs e)
+    {
+        var dark = DarkThemeCheckBox.IsChecked == true;
+        if (dark == ThemeManager.IsDark) return;
+        ThemeManager.Apply(dark);
+        ThemeManager.SavePreference(dark);
     }
 
     private bool _updateInProgress;

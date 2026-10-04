@@ -42,7 +42,7 @@
                                       FontSize="14" />
                             <TextBlock
                                 Text="Gustave's weapon will be behind him when he wakes up at the start of Act I"
-                                Foreground="Orange"
+                                Foreground="{DynamicResource WarningTextBrush}"
                                 FontWeight="Bold"
                                 Margin="10,6,0,0"
                                 VerticalAlignment="Center"
@@ -308,7 +308,7 @@
                                 FontSize="20"
                                 HorizontalAlignment="Center"
                                 Margin="0,10,0,20"
-                                Background="Aqua"
+                                Background="{DynamicResource AccentButtonBrush}" Foreground="{DynamicResource AccentButtonTextBrush}"
                                 Click="CustomPlacementButton_Click" 
                                 Tag="Item"/>
                         <Button Name="EditChecksButton"
@@ -318,7 +318,7 @@
                                 FontSize="20"
                                 HorizontalAlignment="Center"
                                 Margin="0,10,0,20"
-                                Background="Aqua"
+                                Background="{DynamicResource AccentButtonBrush}" Foreground="{DynamicResource AccentButtonTextBrush}"
                                 Click="EditButton_Click" 
                                 Tag="Item"/>
                     </StackPanel>

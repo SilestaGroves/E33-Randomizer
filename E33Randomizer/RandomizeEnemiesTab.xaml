@@ -87,7 +87,7 @@
                             <!--           FontSize="14"/> -->
                             <TextBlock
                                 Text="Merchants' special wares unlocks and Maelle's paintress skills are considered loot drops. It is recommended that you only disable this if you are also running an item randomizer."
-                                Foreground="Orange"
+                                Foreground="{DynamicResource WarningTextBrush}"
                                 FontWeight="Bold"
                                 Margin="10,5,0,5"
                                 VerticalAlignment="Center"
@@ -103,7 +103,7 @@
                                       FontSize="14" />
                             <TextBlock
                                 Text="Be careful when parrying cut content enemies, as it can break their AI. You can replace broken enemies in Edit Encounters window."
-                                Foreground="Orange"
+                                Foreground="{DynamicResource WarningTextBrush}"
                                 FontWeight="Bold"
                                 Margin="10,5,0,5"
                                 VerticalAlignment="Center"
@@ -121,7 +121,7 @@
                                     Visibility="{Binding IsChecked, ElementName=EnableEnemyOnslaughtCheckBox, Converter={StaticResource BooleanToVisibilityConverter}}">
                             <TextBlock
                                 Text="The game has full support for 4 enemies, but the 5th and beyond gets lumped into a single spot outside the fighting arena. They will still function properly except that you won't be able to see their attacks or shoot them."
-                                Foreground="Orange"
+                                Foreground="{DynamicResource WarningTextBrush}"
                                 FontWeight="Bold"
                                 Margin="10,0,0,0"
                                 VerticalAlignment="Center"
@@ -230,7 +230,7 @@
                                 FontSize="20"
                                 HorizontalAlignment="Center"
                                 Margin="0,10,0,20"
-                                Background="Aqua"
+                                Background="{DynamicResource AccentButtonBrush}" Foreground="{DynamicResource AccentButtonTextBrush}"
                                 Click="CustomPlacementButton_Click"
                                 Tag="Enemy" />
                         <Button Name="EditEncountersButton"
@@ -240,7 +240,7 @@
                                 FontSize="20"
                                 HorizontalAlignment="Center"
                                 Margin="0,10,0,20"
-                                Background="Aqua"
+                                Background="{DynamicResource AccentButtonBrush}" Foreground="{DynamicResource AccentButtonTextBrush}"
                                 Click="EditButton_Click"
                                 Tag="Enemy" />
                     </StackPanel>

@@ -77,7 +77,7 @@
         </TabControl>
 
         <!-- Bottom Section -->
-        <Border Grid.Row="1" Background="#F0F0F0" Padding="20">
+        <Border Grid.Row="1" Background="{DynamicResource PanelBackgroundBrush}" Padding="20">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -115,8 +115,8 @@
                         Width="150"
                         Height="35"
                         Click="SavePresetButton_Click"
-                        Background="Gray"
-                        Foreground="White"
+                        Background="{DynamicResource NeutralButtonBrush}"
+                        Foreground="{DynamicResource NeutralButtonTextBrush}"
                         FontWeight="Bold" />
                 
                 <Button Name="LoadPresetButton"
@@ -125,19 +125,19 @@
                         Width="150"
                         Height="35"
                         Click="LoadPresetButton_Click"
-                        Background="Gray"
-                        Foreground="White"
+                        Background="{DynamicResource NeutralButtonBrush}"
+                        Foreground="{DynamicResource NeutralButtonTextBrush}"
                         FontWeight="Bold" />
                 
                 <!-- Generate Button -->
                 <Button Name="GenerateButton"
                         Grid.Column="3"
                         Content="Generate and pack mod"
-                        Width="150"
+                        Width="170"
                         Height="35"
                         Click="GenerateButton_Click"
-                        Background="#4CAF50"
-                        Foreground="White"
+                        Background="{DynamicResource SuccessButtonBrush}"
+                        Foreground="{DynamicResource SuccessButtonTextBrush}"
                         FontWeight="Bold" />
 
                 <!-- Game folder the mod is copied into -->
@@ -176,6 +176,12 @@
                             Width="140"
                             Height="25"
                             Click="CheckForUpdatesButton_Click" />
+                    <CheckBox Name="DarkThemeCheckBox"
+                              Content="Dark theme"
+                              VerticalAlignment="Center"
+                              Margin="30,0,0,0"
+                              Checked="DarkThemeCheckBox_Changed"
+                              Unchecked="DarkThemeCheckBox_Changed" />
                 </StackPanel>
 
             </Grid>

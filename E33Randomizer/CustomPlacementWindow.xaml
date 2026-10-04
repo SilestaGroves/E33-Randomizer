@@ -38,7 +38,7 @@
                     <Button Name="RemoveNotRandomizedObjectButton"
                             Content="Remove" 
                             Width="100" 
-                            Height="25" 
+                            Height="28" 
                             HorizontalAlignment="Center"
                             Margin="0,5,0,0"
                             Click="RemoveNotRandomizedObjectButton_Click"
@@ -59,7 +59,7 @@
                     <Button Name="RemoveExcludedObjectButton"
                             Content="Remove" 
                             Width="100" 
-                            Height="25" 
+                            Height="28" 
                             HorizontalAlignment="Center"
                             Margin="0,5,0,0"
                             Click="RemoveExcludedObjectButton_Click"
@@ -157,7 +157,7 @@
                         Content="+ Add Placement Row" 
                         Height="35" Margin="0,10,0,0" 
                         Click="AddCustomPlacementRowButton_Click"
-                        Background="#4CAF50" Foreground="White" FontWeight="Bold"
+                        Background="{DynamicResource SuccessButtonBrush}" Foreground="{DynamicResource SuccessButtonTextBrush}" FontWeight="Bold"
                         IsEnabled="False"/>
             </Grid>
         </GroupBox>
@@ -178,7 +178,7 @@
                 <!-- Add Row Button -->
                 <Button Grid.Row="1" Name="AddFrequencyRowButton" Content="+ Add Frequency Row" 
                         Height="35" Margin="0,10,0,0" Click="AddFrequencyRowButton_Click"
-                        Background="#4CAF50" Foreground="White" FontWeight="Bold"/>
+                        Background="{DynamicResource SuccessButtonBrush}" Foreground="{DynamicResource SuccessButtonTextBrush}" FontWeight="Bold"/>
             </Grid>
         </GroupBox>
         <GroupBox Grid.Row="2" Grid.Column="1" Header="Preset JSON" Margin="5, 0, 10, 0" MaxHeight="180" MinHeight="180">
@@ -193,7 +193,7 @@
                 Height="150" 
                 Margin="5"/>
         </GroupBox>
-        <GroupBox Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2" BorderBrush="White">
+        <GroupBox Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2" BorderBrush="{DynamicResource GroupBorderBrush}">
         <!-- Close Button -->
         <Grid Margin="5">
             <Grid.ColumnDefinitions>
@@ -204,7 +204,7 @@
             <Button Grid.Column="0"
                     Name="LoadPresetButton" 
                     Content="Load Preset JSON" 
-                    Width="100" 
+                    Width="130" 
                     Height="35" 
                     HorizontalAlignment="Center"
                     Margin="0,10,20,10"
@@ -213,7 +213,7 @@
         <Button Grid.Column="1"
                 Name="SavePresetButton" 
                 Content="Save Preset JSON" 
-                Width="100" 
+                Width="130" 
                 Height="35" 
                 HorizontalAlignment="Center"
                 Margin="0,10,20,10"
