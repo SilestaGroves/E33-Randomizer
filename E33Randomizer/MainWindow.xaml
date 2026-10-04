@@ -16,56 +16,47 @@
 
         <!-- Main Tab Control -->
         <TabControl Grid.Row="0" Margin="0">
-            <TabItem Header="Enemy Randomizer">
+            <TabItem Header="{e33Randomizer:Tr Main_TabEnemies}">
                 <e33Randomizer:RandomizeEnemiesTab x:Name="EnemyRandomizerTab"/>
             </TabItem>
-            <TabItem Header="Item Randomizer">
+            <TabItem Header="{e33Randomizer:Tr Main_TabItems}">
                 <e33Randomizer:RandomizeItemsTab x:Name="ItemRandomizerTab"/>
             </TabItem>
-            <TabItem Header="Skill Randomizer">
+            <TabItem Header="{e33Randomizer:Tr Main_TabSkills}">
                 <e33Randomizer:RandomizeSkillsTab x:Name="SkillRandomizerTab"/>
             </TabItem>
-            <TabItem Header="Misc">
+            <TabItem Header="{e33Randomizer:Tr Main_TabMisc}">
                 <Grid>
-                    <GroupBox Grid.Row="0" Header="Save File Patching" Margin="10, 10, 5, 0"
+                    <GroupBox Grid.Row="0" Header="{e33Randomizer:Tr Misc_SaveGroup}" Margin="10, 10, 5, 0"
                               VerticalAlignment="Top">
                         <StackPanel>
                         <TextBlock
+                            Text="{e33Randomizer:Tr Misc_CountersText}"
                             Margin="10,10,0,0"
                             VerticalAlignment="Top"
                             TextWrapping="Wrap"
                             TextAlignment="Left"
-                            MaxWidth="800">
-                            It is recommended that you patch your save file to gain access to Jump and Gradient Counters if you don't have those already.
-                            <LineBreak/><LineBreak/>
-                            They are located in %USERPROFILE%/AppData/Local/Sandfall/Saved/SavedGames/[numbers]/ and are named "EXPEDITION_[save slot id]".
-                            <LineBreak />
-                            There's also a Backup folder that contains all of your "Load Previous Saves" saves.
-                            Simply press the button and choose the save file that you want to patch.
-                        </TextBlock>
+                            MaxWidth="800" />
                         <Button Grid.Row="1"
                                 Tag="AddCounters"
-                                Content="Add counters to save file"
-                                Width="180"
+                                Content="{e33Randomizer:Tr Misc_AddCounters}"
+                                Width="200"
                                 Height="35"
                                 HorizontalAlignment="Center"
                                 Margin="0,10,20,10"
                                 Click="EnableCountersInSaveButton_OnClick" />
                         <Separator></Separator>
                         <TextBlock
+                            Text="{e33Randomizer:Tr Misc_CurtainText}"
                             Margin="10,10,0,0"
                             VerticalAlignment="Top"
                             TextWrapping="Wrap"
                             TextAlignment="Left"
-                            MaxWidth="800">
-                            If you have triggered the second phase of Act III Renoir, then the curtain in Lumiere's Opera House will be closed, preventing you from finishing the game. 
-                            <LineBreak/>
-                            Use this button to fix that.
-                        </TextBlock>
+                            MaxWidth="800" />
                         <Button Grid.Row="1"
                                 Tag="FixCurtain"
-                                Content="Fix curtains in save file"
-                                Width="180"
+                                Content="{e33Randomizer:Tr Misc_FixCurtain}"
+                                Width="200"
                                 Height="35"
                                 HorizontalAlignment="Center"
                                 Margin="0,10,20,10"
@@ -93,10 +84,12 @@
 
                 <!-- Seed Input -->
                 <StackPanel Grid.Column="0" Orientation="Horizontal">
-                    <Label Content="Seed:" VerticalAlignment="Center" FontWeight="Bold" />
+                    <Label Content="{e33Randomizer:Tr Main_Seed}" ToolTip="{e33Randomizer:TrTip Main_SeedTip}"
+                           VerticalAlignment="Center" FontWeight="Bold" />
                     <xctk:IntegerUpDown Name="SeedTextBox"
                                         Grid.Column="1"
                                         Text="{Binding Seed}"
+                                        ToolTip="{e33Randomizer:TrTip Main_SeedTip}"
                                         ShowButtonSpinner="False"
                                         Margin="10,0,20,0"
                                         VerticalAlignment="Center"
@@ -107,32 +100,35 @@
                                         Width="100"
                                         MaxLength="10" />
                 </StackPanel>
-                
-                
+
+
                 <Button Name="SavePresetButton"
                         Grid.Column="1"
-                        Content="Save settings JSON"
-                        Width="150"
+                        Content="{e33Randomizer:Tr Main_SaveSettings}"
+                        ToolTip="{e33Randomizer:TrTip Main_SaveSettingsTip}"
+                        Width="160"
                         Height="35"
                         Click="SavePresetButton_Click"
                         Background="{DynamicResource NeutralButtonBrush}"
                         Foreground="{DynamicResource NeutralButtonTextBrush}"
                         FontWeight="Bold" />
-                
+
                 <Button Name="LoadPresetButton"
                         Grid.Column="2"
-                        Content="Load settings JSON"
-                        Width="150"
+                        Content="{e33Randomizer:Tr Main_LoadSettings}"
+                        ToolTip="{e33Randomizer:TrTip Main_LoadSettingsTip}"
+                        Width="160"
                         Height="35"
                         Click="LoadPresetButton_Click"
                         Background="{DynamicResource NeutralButtonBrush}"
                         Foreground="{DynamicResource NeutralButtonTextBrush}"
                         FontWeight="Bold" />
-                
+
                 <!-- Generate Button -->
                 <Button Name="GenerateButton"
                         Grid.Column="3"
-                        Content="Generate and pack mod"
+                        Content="{e33Randomizer:Tr Main_Generate}"
+                        ToolTip="{e33Randomizer:TrTip Main_GenerateTip}"
                         Width="170"
                         Height="35"
                         Click="GenerateButton_Click"
@@ -143,18 +139,29 @@
                 <!-- Game folder the mod is copied into -->
                 <DockPanel Grid.Row="1" Grid.ColumnSpan="4" Margin="0,15,0,0" LastChildFill="True">
                     <CheckBox DockPanel.Dock="Left"
-                              Content="Copy the mod into the game folder:"
+                              Content="{e33Randomizer:Tr Main_CopyMod}"
+                              ToolTip="{e33Randomizer:TrTip Main_CopyModTip}"
                               IsChecked="{Binding CopyModToGame}"
                               VerticalAlignment="Center"
                               Margin="0,0,10,0" />
                     <Button DockPanel.Dock="Right"
-                            Content="Find Steam install"
+                            Content="{e33Randomizer:Tr Main_RemoveMod}"
+                            ToolTip="{e33Randomizer:TrTip Main_RemoveModTip}"
+                            MinWidth="140"
+                            Padding="8,0"
+                            Height="25"
+                            Margin="5,0,0,0"
+                            Click="RemoveModButton_Click" />
+                    <Button DockPanel.Dock="Right"
+                            Content="{e33Randomizer:Tr Main_FindSteam}"
+                            ToolTip="{e33Randomizer:TrTip Main_FindSteamTip}"
                             Width="120"
                             Height="25"
                             Margin="5,0,0,0"
                             Click="DetectGameDirectoryButton_Click" />
                     <Button DockPanel.Dock="Right"
-                            Content="Browse..."
+                            Content="{e33Randomizer:Tr Main_Browse}"
+                            ToolTip="{e33Randomizer:TrTip Main_BrowseTip}"
                             Width="80"
                             Height="25"
                             Margin="5,0,0,0"
@@ -163,25 +170,35 @@
                              IsReadOnly="True"
                              Height="25"
                              VerticalContentAlignment="Center"
-                             ToolTip="The mod is copied into Sandfall\Content\Paks\~mods inside this folder" />
+                             ToolTip="{e33Randomizer:TrTip Main_GameFolderTip}" />
                 </DockPanel>
 
-                <!-- Updates -->
+                <!-- Updates and appearance -->
                 <StackPanel Grid.Row="2" Grid.ColumnSpan="4" Orientation="Horizontal" Margin="0,10,0,0">
-                    <CheckBox Content="Check for updates on startup"
+                    <CheckBox Content="{e33Randomizer:Tr Main_CheckUpdatesOnStartup}"
                               IsChecked="{Binding CheckForUpdatesOnStartup}"
                               VerticalAlignment="Center"
                               Margin="0,0,15,0" />
-                    <Button Content="Check for updates"
-                            Width="140"
+                    <Button Content="{e33Randomizer:Tr Main_CheckUpdates}"
+                            ToolTip="{e33Randomizer:TrTip Main_CheckUpdatesTip}"
+                            MinWidth="140"
+                            Padding="8,0"
                             Height="25"
                             Click="CheckForUpdatesButton_Click" />
                     <CheckBox Name="DarkThemeCheckBox"
-                              Content="Dark theme"
+                              Content="{e33Randomizer:Tr Main_DarkTheme}"
                               VerticalAlignment="Center"
                               Margin="30,0,0,0"
                               Checked="DarkThemeCheckBox_Changed"
                               Unchecked="DarkThemeCheckBox_Changed" />
+                    <Label Content="{e33Randomizer:Tr Main_Language}"
+                           VerticalAlignment="Center"
+                           Margin="25,0,0,0" />
+                    <ComboBox Name="LanguageComboBox"
+                              Width="100"
+                              VerticalAlignment="Center"
+                              DisplayMemberPath="Name"
+                              SelectionChanged="LanguageComboBox_SelectionChanged" />
                 </StackPanel>
 
             </Grid>

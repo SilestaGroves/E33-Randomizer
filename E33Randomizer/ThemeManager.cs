@@ -55,6 +55,7 @@ public static class ThemeManager
         {
             Source = new Uri($"pack://application:,,,/E33Randomizer;component/Themes/{(dark ? "Dark" : "Light")}.xaml")
         };
+        if (dark) AddCompactCheckBoxStyle(application, _palette);
         // Last, so the palette overrides the theme's own brushes
         dictionaries.Add(_palette);
 
@@ -68,6 +69,21 @@ public static class ThemeManager
     }
 
     private static bool _windowHandlerRegistered;
+
+    /// <summary>
+    /// Fluent check boxes are at least 32 px high and 120 px wide, which pushes the buttons at the bottom of the
+    /// enemy tab out of the window. Its sizes are fixed in the style itself, so the palette can't override them as
+    /// resources; a style based on it can.
+    /// </summary>
+    private static void AddCompactCheckBoxStyle(Application application, ResourceDictionary palette)
+    {
+        if (application.TryFindResource(typeof(CheckBox)) is not Style fluentStyle) return;
+        var style = new Style(typeof(CheckBox), fluentStyle);
+        style.Setters.Add(new Setter(FrameworkElement.MinHeightProperty, 22.0));
+        style.Setters.Add(new Setter(FrameworkElement.MinWidthProperty, 0.0));
+        style.Setters.Add(new Setter(Control.PaddingProperty, new Thickness(6, 2, 0, 0)));
+        palette[typeof(CheckBox)] = style;
+    }
 
     /// <summary>
     /// Gives a window the theme's solid background (instead of the Fluent backdrop, which shows the desktop through

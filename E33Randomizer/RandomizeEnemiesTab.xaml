@@ -10,6 +10,7 @@
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </UserControl.Resources>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <Grid Margin="20">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -18,7 +19,7 @@
                     </Grid.RowDefinitions>
                     <!-- Randomize Encounter Sizes -->
                     <StackPanel Orientation="Vertical" Margin="0">
-                        <CheckBox Content="Randomize enemies"
+                        <CheckBox Content="{local:Tr En_Randomize}" ToolTip="{local:TrTip En_RandomizeTip}"
                                   IsChecked="{Binding RandomizeEnemies}"
                                   Margin="0,0,0,0"
                                   FontSize="14" />
@@ -30,27 +31,27 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <CheckBox Grid.Column="0" Name="RandomizeEncounterSizesCheckBox"
-                                      Content="Randomize encounter sizes"
+                                      Content="{local:Tr En_Sizes}" ToolTip="{local:TrTip En_SizesTip}"
                                       IsChecked="{Binding RandomizeEncounterSizes}"
                                       Margin="0,0,0,0"
                                       FontSize="14" />
                             <CheckBox Grid.Column="1" Name="EncounterSize1CheckBox"
                                       Tag="1"
-                                      Content="1"
+                                      Content="1" ToolTip="{local:TrTip En_SizeOptionTip}"
                                       IsChecked="{Binding EncounterSizeOne}"
                                       Margin="10,0,0,0"
                                       FontSize="14"
                                       Visibility="{Binding IsChecked, ElementName=RandomizeEncounterSizesCheckBox, Converter={StaticResource BooleanToVisibilityConverter}}" />
                             <CheckBox Grid.Column="2" Name="EncounterSize2CheckBox"
                                       Tag="2"
-                                      Content="2"
+                                      Content="2" ToolTip="{local:TrTip En_SizeOptionTip}"
                                       IsChecked="{Binding EncounterSizeTwo}"
                                       Margin="0,0,0,0"
                                       FontSize="14"
                                       Visibility="{Binding IsChecked, ElementName=RandomizeEncounterSizesCheckBox, Converter={StaticResource BooleanToVisibilityConverter}}" />
                             <CheckBox Grid.Column="3" Name="EncounterSize3CheckBox"
                                       Tag="3"
-                                      Content="3"
+                                      Content="3" ToolTip="{local:TrTip En_SizeOptionTip}"
                                       IsChecked="{Binding EncounterSizeThree}"
                                       Margin="0,0,0,0"
                                       FontSize="14"
@@ -60,13 +61,13 @@
                         <!-- Randomize Merchant Fights -->
                         <StackPanel Orientation="Vertical" Margin="0">
                             <CheckBox Name="ChangeSizeOfNonRandomEncountersCheckBox"
-                                      Content="Randomize size of encounters that don't contain randomized enemies"
+                                      Content="{local:Tr En_SizesNonRandom}" ToolTip="{local:TrTip En_SizesNonRandomTip}"
                                       IsChecked="{Binding ChangeSizeOfNonRandomizedEncounters}"
                                       Margin="20, 0, 0, 0"
                                       FontSize="14"
                                       Visibility="{Binding IsChecked, ElementName=RandomizeEncounterSizesCheckBox, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                            <CheckBox Content="Only change the size of enemy packs, keep boss and miniboss fights as they are"
-                                      ToolTip="Fights with a boss or a chromatic boss, and fights with only minibosses, keep their original number of enemies."
+                            <CheckBox Content="{local:Tr En_KeepBossSizes}"
+                                      ToolTip="{local:TrTip En_KeepBossSizesTip}"
                                       IsChecked="{Binding KeepBossFightSizes}"
                                       Margin="20, 0, 0, 0"
                                       FontSize="14"
@@ -74,7 +75,7 @@
                         </StackPanel>
 
                         <CheckBox Name="RandomizeMerchantFightsCheckBox"
-                                  Content="Randomize merchant fights"
+                                  Content="{local:Tr En_Merchants}" ToolTip="{local:TrTip En_MerchantsTip}"
                                   IsChecked="{Binding RandomizeMerchantFights}"
                                   Margin="0"
                                   FontSize="14" />
@@ -86,7 +87,7 @@
                             <!--           Margin="0" -->
                             <!--           FontSize="14"/> -->
                             <TextBlock
-                                Text="Merchants' special wares unlocks and Maelle's paintress skills are considered loot drops. It is recommended that you only disable this if you are also running an item randomizer."
+                                Text="{local:Tr En_LootWarning}"
                                 Foreground="{DynamicResource WarningTextBrush}"
                                 FontWeight="Bold"
                                 Margin="10,5,0,5"
@@ -98,21 +99,23 @@
                         <StackPanel Orientation="Vertical" Margin="0"
                                     Grid.Row="3">
                             <CheckBox Name="IncludeCutContentCheckBox"
-                                      Content="Include cut content (gets overriden by custom placement)"
+                                      Content="{local:Tr En_CutContent}" ToolTip="{local:TrTip En_CutContentTip}"
                                       IsChecked="{Binding IncludeCutContentEnemies}"
                                       FontSize="14" />
                             <TextBlock
-                                Text="Be careful when parrying cut content enemies, as it can break their AI. You can replace broken enemies in Edit Encounters window."
+                                Text="{local:Tr En_CutContentWarning}"
                                 Foreground="{DynamicResource WarningTextBrush}"
                                 FontWeight="Bold"
                                 Margin="10,5,0,5"
                                 VerticalAlignment="Center"
+                                MaxWidth="800"
+                                TextWrapping="Wrap"
                                 Visibility="{Binding IsChecked, ElementName=IncludeCutContentCheckBox, Converter={StaticResource BooleanToVisibilityConverter}}" />
                         </StackPanel>
 
                         <CheckBox Name="EnableEnemyOnslaughtCheckBox"
                                   Grid.Row="4"
-                                  Content="Enable enemy onslaught"
+                                  Content="{local:Tr En_Onslaught}" ToolTip="{local:TrTip En_OnslaughtTip}"
                                   IsChecked="{Binding EnableEnemyOnslaught}"
                                   Margin="0"
                                   FontSize="14" />
@@ -120,7 +123,7 @@
                                     Grid.Row="5"
                                     Visibility="{Binding IsChecked, ElementName=EnableEnemyOnslaughtCheckBox, Converter={StaticResource BooleanToVisibilityConverter}}">
                             <TextBlock
-                                Text="The game has full support for 4 enemies, but the 5th and beyond gets lumped into a single spot outside the fighting arena. They will still function properly except that you won't be able to see their attacks or shoot them."
+                                Text="{local:Tr En_OnslaughtWarning}"
                                 Foreground="{DynamicResource WarningTextBrush}"
                                 FontWeight="Bold"
                                 Margin="10,0,0,0"
@@ -128,13 +131,13 @@
                                 TextWrapping="Wrap"
                                 MaxWidth="800" />
                             <CheckBox Name="RandomizeAdditionalEnemiesCheckBox"
-                                      Content="Randomize added enemies"
+                                      Content="{local:Tr En_RandomizeAdded}" ToolTip="{local:TrTip En_RandomizeAddedTip}"
                                       IsChecked="{Binding RandomizeAddedEnemies}"
                                       Margin="20,10,0,0"
                                       FontSize="14"
                                       Grid.Row="6" />
                             <StackPanel Orientation="Horizontal" Margin="15,0,0,0">
-                                <Label Content="Number of additional enemies:"
+                                <Label Content="{local:Tr En_AdditionalCount}"
                                        FontSize="14" />
                                 <xctk:IntegerUpDown Name="NumberOfAdditionalEnemiesTextBox"
                                                     Text="{Binding EnemyOnslaughtAdditionalEnemies}"
@@ -148,7 +151,7 @@
                                                     MaxLength="2" />
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="15,0,0,0">
-                                <Label Content="Cap encounter size at:"
+                                <Label Content="{local:Tr En_Cap}" ToolTip="{local:TrTip En_CapTip}"
                                        FontSize="14" />
                                 <xctk:IntegerUpDown Name="EnemyNumberCapTextBox"
                                                     Text="{Binding EnemyOnslaughtEnemyCap}"
@@ -164,45 +167,45 @@
 
                         </StackPanel>
                         <CheckBox Name="EnsureBossesInBossEncountersCheckBox"
-                                  Content="Ensure that boss encounters have at least one boss"
+                                  Content="{local:Tr En_EnsureBosses}" ToolTip="{local:TrTip En_EnsureBossesTip}"
                                   IsChecked="{Binding EnsureBossesInBossEncounters}"
                                   Margin="0,0,0,0"
                                   FontSize="14"
                                   Grid.Row="7" />
                         <CheckBox Name="ReduceBossRepetitionCheckBox"
-                                  Content="Reduce boss repetition (ignores frequency adjustments)"
+                                  Content="{local:Tr En_ReduceBossRepetition}" ToolTip="{local:TrTip En_ReduceBossRepetitionTip}"
                                   IsChecked="{Binding ReduceBossRepetition}"
                                   Margin="0,0,0,0"
                                   FontSize="14"
                                   Grid.Row="8" />
 
-                        <CheckBox Content="Keep scripted story battles (Gustave vs Renoir, the final duel)"
-                                  ToolTip="Randomizing them can break the scripted outcome. Tutorial fights are randomized."
+                        <CheckBox Content="{local:Tr En_KeepStory}"
+                                  ToolTip="{local:TrTip En_KeepStoryTip}"
                                   IsChecked="{Binding KeepStoryBattles}"
                                   Margin="0,0,0,0"
                                   FontSize="14" />
-                        <CheckBox Content="Replacements take the strength of the enemy they replace (a chromatic in place of a chromatic, an elite in place of an elite)"
-                                  ToolTip="A replacement gets the archetype of the enemy it replaces, so its stats match: enemy stats come from the archetype and the fight's level."
+                        <CheckBox Content="{local:Tr En_MatchArchetype}"
+                                  ToolTip="{local:TrTip En_MatchArchetypeTip}"
                                   IsChecked="{Binding MatchReplacedEnemyArchetype}"
                                   Margin="0,0,0,0"
                                   FontSize="14" />
-                        <CheckBox Content="Only put giant enemies into fights that had a giant (Gargant, Glissando, the Paintress...)"
-                                  ToolTip="Giants (the Giant Enemies/Bosses category) don't fit small arenas. They only appear in fights whose arena held a giant in the original game, one per fight."
+                        <CheckBox Content="{local:Tr En_Giants}"
+                                  ToolTip="{local:TrTip En_GiantsTip}"
                                   IsChecked="{Binding KeepGiantsInGiantArenas}"
                                   Margin="0,0,0,0"
                                   FontSize="14" />
-                        <CheckBox Content="Keep fights whose enemies drop progression items (merchant unlocks, Maelle's painter skills)"
-                                  ToolTip="Drops belong to the enemy, so randomizing these fights would make the drops impossible to get."
+                        <CheckBox Content="{local:Tr En_KeepDrops}"
+                                  ToolTip="{local:TrTip En_KeepDropsTip}"
                                   IsChecked="{Binding KeepProgressionDropFights}"
                                   Margin="0,0,0,0"
                                   FontSize="14" />
-                        <CheckBox Content="Replace Phase 2 Simon with Phase 1 in mandatory fights until after the Lune tutorial fight"
+                        <CheckBox Content="{local:Tr En_SimonP2}" ToolTip="{local:TrTip En_SimonP2Tip}"
                                   IsChecked="{Binding NoSimonP2BeforeLune}"
                                   Margin="0,0,0,0"
                                   FontSize="14" />
                         <!-- Phase 2 Simon Dropdown -->
                         <StackPanel Orientation="Horizontal" Margin="0,10,0,20"
-                                    Grid.Row="9" Visibility="Hidden">
+                                    Grid.Row="9" Visibility="Collapsed">
                             <Label Content="Replace Phase 2 Simon with Phase 1 in mandatory fights until after:"
                                    FontSize="15" />
                             <ComboBox Name="Phase2SimonComboBox"
@@ -224,7 +227,7 @@
                     </StackPanel>
                     <StackPanel Grid.Row="2">
                         <Button Name="CustomEnemyPlacementButton"
-                                Content="Customize Enemy Placements"
+                                Content="{local:Tr En_CustomizePlacement}" ToolTip="{local:TrTip En_CustomizePlacementTip}"
                                 Width="500"
                                 Height="50"
                                 FontSize="20"
@@ -234,7 +237,7 @@
                                 Click="CustomPlacementButton_Click"
                                 Tag="Enemy" />
                         <Button Name="EditEncountersButton"
-                                Content="Edit Individual Encounters"
+                                Content="{local:Tr En_EditEncounters}" ToolTip="{local:TrTip En_EditEncountersTip}"
                                 Width="500"
                                 Height="50"
                                 FontSize="20"
@@ -245,4 +248,5 @@
                                 Tag="Enemy" />
                     </StackPanel>
                 </Grid>
+    </ScrollViewer>
 </UserControl>

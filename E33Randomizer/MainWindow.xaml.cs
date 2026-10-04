@@ -21,7 +21,7 @@ public partial class MainWindow
 
     private CustomPlacementWindow _customItemPlacementWindow;
     private EditIndividualContainersWindow _editIndividualChecksWindow;
-    
+
     private Dictionary<string, EditIndividualContainersWindow> _editIndividualContainersWindows = new ();
     private Dictionary<string, CustomPlacementWindow> _customPlacementWindows = new ();
 
@@ -29,6 +29,8 @@ public partial class MainWindow
     {
         InitializeComponent();
         DarkThemeCheckBox.IsChecked = ThemeManager.IsDark;
+        LanguageComboBox.ItemsSource = Loc.Languages;
+        LanguageComboBox.SelectedItem = Loc.Languages.First(l => l.Code == Loc.Current);
         try
         {
             RandomizerLogic.Init();
@@ -36,8 +38,8 @@ public partial class MainWindow
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Error starting: {ex.Message}",
-                "Loading Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(Loc.Format("Msg_StartError", ex.Message),
+                Loc.Get("Msg_LoadingErrorTitle"), MessageBoxButton.OK, MessageBoxImage.Error);
             File.WriteAllText("startup_crash_log.txt", ex.ToString(), Encoding.UTF8);
             Log.Error("startup crash", ex);
         }
@@ -69,6 +71,13 @@ public partial class MainWindow
         ThemeManager.SavePreference(dark);
     }
 
+    private void LanguageComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (LanguageComboBox.SelectedItem is not LanguageOption language || language.Code == Loc.Current) return;
+        Loc.Apply(language.Code);
+        Loc.SavePreference(language.Code);
+    }
+
     private bool _updateInProgress;
 
     private void ShowLastUpdateResult()
@@ -77,13 +86,13 @@ public partial class MainWindow
         if (result == null) return;
         if (result == "OK")
         {
-            MessageBox.Show($"The randomizer was updated to v{Updater.CurrentVersion.ToString(3)}.",
-                "Update complete", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(Loc.Format("Upd_Done", Updater.CurrentVersion.ToString(3)),
+                Loc.Get("Upd_DoneTitle"), MessageBoxButton.OK, MessageBoxImage.Information);
         }
         else
         {
-            MessageBox.Show($"The update couldn't be installed: {result}\n\nYou can download it from https://github.com/{Updater.Repository}/releases/latest",
-                "Update failed", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(Loc.Format("Upd_InstallFailed", result, $"https://github.com/{Updater.Repository}/releases/latest"),
+                Loc.Get("Upd_InstallFailedTitle"), MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
@@ -103,8 +112,8 @@ public partial class MainWindow
         if (Updater.IsDevelopmentBuild)
         {
             if (userAsked)
-                MessageBox.Show("This is a development build, it isn't updated automatically. Update it with git pull.",
-                    "Updates", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(Loc.Get("Upd_DevBuild"),
+                    Loc.Get("Upd_Title"), MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
 
@@ -116,27 +125,27 @@ public partial class MainWindow
         catch (Exception ex)
         {
             if (userAsked)
-                MessageBox.Show($"Couldn't check for updates: {ex.Message}", "Updates", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(Loc.Format("Upd_CheckFailed", ex.Message), Loc.Get("Upd_Title"), MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 
         if (!Updater.IsNewer(release))
         {
             if (userAsked)
-                MessageBox.Show($"You have the latest version (v{current}).", "Updates", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(Loc.Format("Upd_Latest", current), Loc.Get("Upd_Title"), MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
 
         var notes = release.Notes.Length > 1500 ? release.Notes[..1500] + "..." : release.Notes;
         var answer = MessageBox.Show(
-            $"Version {release.Tag} is available (you have v{current}).\n\n{notes}\n\nDownload and install it now? The randomizer will restart.",
-            "Update available", MessageBoxButton.YesNo, MessageBoxImage.Information);
+            Loc.Format("Upd_Available", release.Tag, current, notes),
+            Loc.Get("Upd_AvailableTitle"), MessageBoxButton.YesNo, MessageBoxImage.Information);
         if (answer != MessageBoxResult.Yes) return;
 
         if (!Updater.CanWriteInstallFolder())
         {
-            MessageBox.Show($"The randomizer can't replace its files in {AppContext.BaseDirectory}. Move it to a folder you can write to, or download the update from {release.PageUrl}",
-                "Update", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show(Loc.Format("Upd_CantWrite", AppContext.BaseDirectory, release.PageUrl),
+                Loc.Get("Upd_Title"), MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 
@@ -149,10 +158,10 @@ public partial class MainWindow
             var progress = new Progress<double>(p =>
             {
                 progressBar.Value = p;
-                progressText.Text = $"Downloading {release.Tag}... {p:P0}";
+                progressText.Text = Loc.Format("Upd_DownloadingProgress", release.Tag, p);
             });
             var newFiles = await Updater.DownloadAsync(release, Updater.IsSelfContained, progress);
-            progressText.Text = "Installing, the randomizer will restart...";
+            progressText.Text = Loc.Get("Upd_Installing");
             Process.Start(Updater.CreateInstallProcess(newFiles, AppContext.BaseDirectory, Environment.ProcessId, Environment.ProcessPath));
             Application.Current.Shutdown();
         }
@@ -161,7 +170,7 @@ public partial class MainWindow
             progressWindow.Close();
             IsEnabled = true;
             _updateInProgress = false;
-            MessageBox.Show($"Update failed: {ex.Message}", "Update", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(Loc.Format("Upd_Failed", ex.Message), Loc.Get("Upd_Title"), MessageBoxButton.OK, MessageBoxImage.Error);
             File.WriteAllText("update_error_log.txt", ex.ToString(), Encoding.UTF8);
             Log.Error("update error", ex);
         }
@@ -169,14 +178,14 @@ public partial class MainWindow
 
     private (Window window, ProgressBar bar, TextBlock text) CreateProgressWindow(string tag)
     {
-        var text = new TextBlock { Text = $"Downloading {tag}...", Margin = new Thickness(0, 0, 0, 10) };
+        var text = new TextBlock { Text = Loc.Format("Upd_Downloading", tag), Margin = new Thickness(0, 0, 0, 10) };
         var bar = new ProgressBar { Height = 20, Minimum = 0, Maximum = 1 };
         var panel = new StackPanel { Margin = new Thickness(20) };
         panel.Children.Add(text);
         panel.Children.Add(bar);
         var window = new Window
         {
-            Title = "Updating E33 Randomizer",
+            Title = Loc.Get("Upd_WindowTitle"),
             Content = panel,
             Width = 420,
             SizeToContent = SizeToContent.Height,
@@ -191,7 +200,7 @@ public partial class MainWindow
     {
         var dialog = new OpenFolderDialog
         {
-            Title = "Select the Expedition 33 game folder",
+            Title = Loc.Get("Msg_SelectGameFolder"),
             InitialDirectory = RandomizerLogic.Settings.GameDirectory ?? "",
         };
         if (dialog.ShowDialog() != true) return;
@@ -199,8 +208,8 @@ public partial class MainWindow
         var gameDirectory = GameInstallation.NormalizeGameDirectory(dialog.FolderName);
         if (gameDirectory == null)
         {
-            MessageBox.Show("This isn't the Expedition 33 game folder: it has no Sandfall\\Content\\Paks inside.",
-                "Wrong folder", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show(Loc.Get("Msg_WrongFolder"),
+                Loc.Get("Msg_WrongFolderTitle"), MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
         RandomizerLogic.Settings.GameDirectory = gameDirectory;
@@ -212,30 +221,64 @@ public partial class MainWindow
         var gameDirectory = GameInstallation.FindSteamGameDirectory();
         if (gameDirectory == null)
         {
-            MessageBox.Show("Couldn't find a Steam installation of Expedition 33. Use Browse to select the game folder.",
-                "Game not found", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(Loc.Get("Msg_GameNotFound"),
+                Loc.Get("Msg_GameNotFoundTitle"), MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
         RandomizerLogic.Settings.GameDirectory = gameDirectory;
         GameInstallation.SaveGameDirectory(gameDirectory);
     }
 
+    private void RemoveModButton_Click(object sender, RoutedEventArgs e)
+    {
+        var title = Loc.Get("Msg_RemoveModTitle");
+        var gameDirectory = RandomizerLogic.Settings.GameDirectory;
+        if (!GameInstallation.IsGameDirectory(gameDirectory))
+        {
+            MessageBox.Show(Loc.Get("Msg_RemoveNoFolder"), title, MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        var modsDirectory = GameInstallation.GetModsDirectory(gameDirectory);
+        if (GameInstallation.FindInstalledModFiles(gameDirectory).Count == 0)
+        {
+            MessageBox.Show(Loc.Format("Msg_RemoveNothing", modsDirectory), title, MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+        if (MessageBox.Show(Loc.Format("Msg_RemoveConfirm", modsDirectory), title,
+                MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
+
+        try
+        {
+            GameInstallation.UninstallMod(gameDirectory);
+            MessageBox.Show(Loc.Get("Msg_RemoveDone"), title, MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            Log.Error("mod removal error", ex);
+            MessageBox.Show(Loc.Format("Msg_RemoveFailed", ex.Message), title, MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    /// <summary>The message shown after the mod was generated and packed.</summary>
+    public static string GetGenerationSummary()
+    {
+        return Loc.Format("Msg_GenerationDone", RandomizerLogic.LastExportPath, GetInstallSummary(), RandomizerLogic.usedSeed);
+    }
+
     public static string GetInstallSummary()
     {
         if (GameDataCheck.LastOutdatedFiles.Count > 0)
-            return $"WARNING: your game has newer versions of {GameDataCheck.LastOutdatedFiles.Count} files this mod replaces " +
-                   "(the game was probably updated after this version of the randomizer). The mod may crash the game or " +
-                   "remove new content; check for a randomizer update. The files are listed in generation_log.txt.\n\n" +
-                   GetCopySummary();
+            return Loc.Format("Msg_OutdatedGameFiles", GameDataCheck.LastOutdatedFiles.Count) + GetCopySummary();
         return GetCopySummary();
     }
 
     private static string GetCopySummary()
     {
         if (RandomizerLogic.LastInstalledModsDirectory != null)
-            return $"The mod was copied into {RandomizerLogic.LastInstalledModsDirectory}, just start the game.\n\n";
+            return Loc.Format("Msg_ModCopied", RandomizerLogic.LastInstalledModsDirectory);
         if (RandomizerLogic.Settings.CopyModToGame)
-            return "The game folder isn't set, so the mod wasn't copied into the game. Set it at the bottom of the main window.\n\n";
+            return Loc.Get("Msg_NoGameFolder");
         return "";
     }
 
@@ -313,19 +356,16 @@ public partial class MainWindow
 
     private void GenerateButton_Click(object sender, RoutedEventArgs e)
     {
-        
+
         try
         {
             RandomizerLogic.Randomize();
-            MessageBox.Show($"Generation done! You can find the mod, spoiler_log.txt and generation_log.txt in the {RandomizerLogic.LastExportPath} folder.\n\n" +
-                            GetInstallSummary() +
-                            $"Used Seed: {RandomizerLogic.usedSeed}\n",
-                "Generation Summary", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(GetGenerationSummary(), Loc.Get("Msg_GenerationDoneTitle"), MessageBoxButton.OK, MessageBoxImage.Information);
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Error generating: {ex.Message}\n\nDetails are in {Log.AppLogPath}",
-                "Generating Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(Loc.Format("Msg_GenerationError", ex.Message, Log.AppLogPath),
+                Loc.Get("Msg_GenerationErrorTitle"), MessageBoxButton.OK, MessageBoxImage.Error);
             File.WriteAllText("generation_error_log.txt", ex.ToString(), Encoding.UTF8);
             Log.Error("generation error", ex);
         }
@@ -351,8 +391,8 @@ public partial class MainWindow
         OpenFileDialog openFileDialog = new OpenFileDialog
         {
             InitialDirectory = targetFolder,
-            Title = "Select save file",
-            Filter = "SAV files (*.sav)|*.sav|All files (*.*)|*.*",
+            Title = Loc.Get("Msg_SelectSaveFile"),
+            Filter = Loc.Get("Msg_SaveFilter"),
             FilterIndex = 1
         };
 
@@ -369,26 +409,26 @@ public partial class MainWindow
                         SaveFilePatcher.FixCurtain(openFileDialog.FileName);
                         break;
                 }
-                
-                MessageBox.Show($"Save File Patched! The original save was kept as {Path.GetFileName(openFileDialog.FileName)}.bak",
-                    "Patched", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                MessageBox.Show(Loc.Format("Msg_SavePatched", Path.GetFileName(openFileDialog.FileName)),
+                    Loc.Get("Msg_SavePatchedTitle"), MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error patching: {ex.Message}",
-                    "Patching Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(Loc.Format("Msg_SavePatchError", ex.Message),
+                    Loc.Get("Msg_SavePatchErrorTitle"), MessageBoxButton.OK, MessageBoxImage.Error);
                 File.WriteAllText("save_patch_error_log.txt", ex.ToString(), Encoding.UTF8);
                 Log.Error("save patch error", ex);
             }
         }
     }
-    
+
     private void LoadPresetButton_Click(object sender, RoutedEventArgs e)
     {
         OpenFileDialog openFileDialog = new OpenFileDialog
         {
-            Title = "Load Preset",
-            Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*",
+            Title = Loc.Get("Msg_LoadPresetTitle"),
+            Filter = Loc.Get("Msg_JsonFilter"),
             FilterIndex = 1
         };
 
@@ -400,8 +440,8 @@ public partial class MainWindow
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading preset: {ex.Message}", 
-                    "Load Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(Loc.Format("Msg_PresetLoadError", ex.Message),
+                    Loc.Get("Msg_LoadErrorTitle"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }
@@ -410,8 +450,8 @@ public partial class MainWindow
     {
         SaveFileDialog saveFileDialog = new SaveFileDialog
         {
-            Title = "Save Preset",
-            Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*",
+            Title = Loc.Get("Msg_SavePresetTitle"),
+            Filter = Loc.Get("Msg_JsonFilter"),
             FilterIndex = 1,
             DefaultExt = "json"
         };
@@ -421,13 +461,13 @@ public partial class MainWindow
             try
             {
                 SaveSettings(saveFileDialog.FileName);
-                MessageBox.Show("Preset saved successfully!", 
-                    "Save Complete", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(Loc.Get("Msg_PresetSaved"),
+                    Loc.Get("Msg_SaveCompleteTitle"), MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error saving preset: {ex.Message}", 
-                    "Save Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(Loc.Format("Msg_PresetSaveError", ex.Message),
+                    Loc.Get("Msg_SaveErrorTitle"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }
@@ -447,8 +487,8 @@ public partial class MainWindow
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Error loading: {ex.Message}",
-                "Loading Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(Loc.Format("Msg_LoadError", ex.Message),
+                Loc.Get("Msg_LoadingErrorTitle"), MessageBoxButton.OK, MessageBoxImage.Error);
             File.WriteAllText("preset_crash_log.txt", ex.ToString(), Encoding.UTF8);
             Log.Error("preset crash", ex);
         }
@@ -464,8 +504,8 @@ public partial class MainWindow
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Error saving: {ex.Message}",
-                "Saving Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(Loc.Format("Msg_SaveError", ex.Message),
+                Loc.Get("Msg_SavingErrorTitle"), MessageBoxButton.OK, MessageBoxImage.Error);
             File.WriteAllText("preset_crash_log.txt", ex.ToString(), Encoding.UTF8);
             Log.Error("preset crash", ex);
         }
@@ -476,10 +516,10 @@ public partial class MainWindow
 public class SettingsViewModel : INotifyPropertyChanged
 {
     public int Seed { get; set; } = -1;
-    
+
     public bool RandomizeItems { get; set; } = true;
     public bool RandomizeEnemies { get; set; } = true;
-    
+
     public bool RandomizeEncounterSizes { get; set; } = false;
     public bool ChangeSizeOfNonRandomizedEncounters { get; set; } = false;
     public bool EncounterSizeOne { get; set; } = false;
@@ -500,49 +540,49 @@ public class SettingsViewModel : INotifyPropertyChanged
     public bool KeepBossFightSizes { get; set; } = true;
     public bool KeepStoryBattles { get; set; } = true;
     public bool MatchReplacedEnemyArchetype { get; set; } = true;
-    // public bool TieDropsToEncounters { get; set; } = false; 
+    // public bool TieDropsToEncounters { get; set; } = false;
 
     public bool ChangeSizesOfNonRandomizedChecks { get; set; } = false;
-    
+
     public bool ReduceKeyItemRepetition { get; set; } = true;
     public bool GuaranteeKeyItemAccess { get; set; } = true;
-    
+
     public bool ChangeMerchantInventorySize { get; set; } = false;
     public int MerchantInventorySizeMax { get; set; } = 20;
     public int MerchantInventorySizeMin { get; set; } = 1;
-    
+
     public bool ChangeItemQuantity { get; set; } = false;
     public int ItemQuantityMax { get; set; } = 20;
     public int ItemQuantityMin { get; set; } = 1;
-    
+
     public bool ChangeMerchantInventoryLocked { get; set; } = false;
     public int MerchantInventoryLockedChancePercent { get; set; } = 10;
-    
+
     public bool ChangeNumberOfLootDrops { get; set; } = false;
     public int LootDropsNumberMax { get; set; } = 5;
     public int LootDropsNumberMin { get; set; } = 1;
-    
+
     public bool ChangeNumberOfTowerRewards { get; set; } = false;
     public int TowerRewardsNumberMax { get; set; } = 5;
     public int TowerRewardsNumberMin { get; set; } = 1;
-    
+
     public bool ChangeNumberOfChestContents { get; set; } = false;
     public int ChestContentsNumberMax { get; set; } = 5;
     public int ChestContentsNumberMin { get; set; } = 1;
-    
+
     public bool ChangeNumberOfActionRewards { get; set; } = false;
     public int ActionRewardsNumberMax { get; set; } = 5;
     public int ActionRewardsNumberMin { get; set; } = 1;
-    
+
     public bool MakeEveryItemVisible { get; set; } = true;
-    
+
     public bool EnsurePaintedPowerFromPaintress { get; set; } = true;
     public bool IncludeGearInPrologue { get; set; } = false;
     public bool RandomizeStartingWeapons { get; set; } = false;
     public bool RandomizeStartingCosmetics { get; set; } = false;
     public bool RandomizeGestralBeachRewards { get; set; } = true;
     public bool IncludeCutContentItems { get; set; } = true;
-    
+
     public bool RandomizeSkills { get; set; } = false;
 
     public bool CopyModToGame { get; set; } = true;
@@ -567,7 +607,7 @@ public class SettingsViewModel : INotifyPropertyChanged
     public bool ReduceSkillRepetition { get; set; } = true;
     public bool IncludeCutContentSkills { get; set; } = false;
     public bool GuaranteeGustaveOvercharge { get; set; } = true;
-    
+
     public event PropertyChangedEventHandler PropertyChanged;
     protected virtual void OnPropertyChanged(string propertyName)
     {

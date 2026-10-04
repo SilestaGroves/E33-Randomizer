@@ -10,6 +10,7 @@
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </UserControl.Resources>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
     <Grid>
         <Grid Margin="20">
                     <Grid.RowDefinitions>
@@ -18,30 +19,30 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <StackPanel>
-                        <CheckBox Content="Randomize items"
+                        <CheckBox Content="{local:Tr It_Randomize}" ToolTip="{local:TrTip It_RandomizeTip}"
                                   IsChecked="{Binding RandomizeItems}"
                                   Margin="0,0,0,0"
                                   FontSize="14" />
-                        <CheckBox Content="Make every item show a pick up notification"
+                        <CheckBox Content="{local:Tr It_Visible}" ToolTip="{local:TrTip It_VisibleTip}"
                                   IsChecked="{Binding MakeEveryItemVisible}"
                                   Margin="0,6,0,0"
                                   FontSize="14" />
-                        <CheckBox Content="Include cut content items"
+                        <CheckBox Content="{local:Tr It_CutContent}" ToolTip="{local:TrTip It_CutContentTip}"
                                   IsChecked="{Binding IncludeCutContentItems}"
                                   Margin="0,6,0,0"
                                   FontSize="14" />
-                        <CheckBox Content="Receive Painted Power at the start of Act III"
+                        <CheckBox Content="{local:Tr It_PaintedPower}" ToolTip="{local:TrTip It_PaintedPowerTip}"
                                   IsChecked="{Binding EnsurePaintedPowerFromPaintress}"
                                   Margin="0,6,0,0"
                                   FontSize="14" />
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
                             <CheckBox Name="RandomizeStartingWeaponsCheckBox"
-                                Content="Randomize starting weapons"
+                                Content="{local:Tr It_StartWeapons}" ToolTip="{local:TrTip It_StartWeaponsTip}"
                                       IsChecked="{Binding RandomizeStartingWeapons}"
                                       Margin="0,6,0,0"
                                       FontSize="14" />
                             <TextBlock
-                                Text="Gustave's weapon will be behind him when he wakes up at the start of Act I"
+                                Text="{local:Tr It_StartWeaponsWarning}"
                                 Foreground="{DynamicResource WarningTextBrush}"
                                 FontWeight="Bold"
                                 Margin="10,6,0,0"
@@ -50,28 +51,28 @@
                                 MaxWidth="800" 
                                 Visibility="{Binding IsChecked, ElementName=RandomizeStartingWeaponsCheckBox, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                         </StackPanel>
-                        <CheckBox Content="Randomize starting cosmetics"
+                        <CheckBox Content="{local:Tr It_StartCosmetics}" ToolTip="{local:TrTip It_StartCosmeticsTip}"
                                   IsChecked="{Binding RandomizeStartingCosmetics}"
                                   Margin="0,6,0,0"
                                   FontSize="14" />
-                        <CheckBox Content="Enable gear rolls in prologue (they will be level 16 and can drastically alter the difficulty)"
+                        <CheckBox Content="{local:Tr It_PrologueGear}" ToolTip="{local:TrTip It_PrologueGearTip}"
                                   IsChecked="{Binding IncludeGearInPrologue}"
                                   Margin="0,6,0,0"
                                   FontSize="14" />
-                        <CheckBox Content="Randomize gestral beach rewards"
+                        <CheckBox Content="{local:Tr It_GestralBeach}" ToolTip="{local:TrTip It_GestralBeachTip}"
                                   IsChecked="{Binding RandomizeGestralBeachRewards}"
                                   Margin="0,6,0,0"
                                   FontSize="14" />
-                        <CheckBox Content="Change number of items in non-randomized checks"
+                        <CheckBox Content="{local:Tr It_ChecksSizeNonRandom}" ToolTip="{local:TrTip It_ChecksSizeNonRandomTip}"
                                   IsChecked="{Binding ChangeSizesOfNonRandomizedChecks}"
                                   Margin="0,6,0,0"
                                   FontSize="14" />
-                        <CheckBox Content="Guarantee that all key items can be obtained (key item logic)"
-                                  ToolTip="Each key item is placed once, never in places that can't be revisited, and never behind a check that needs it. Overrides key item repetition."
+                        <CheckBox Content="{local:Tr It_KeyLogic}"
+                                  ToolTip="{local:TrTip It_KeyLogicTip}"
                                   IsChecked="{Binding GuaranteeKeyItemAccess}"
                                   Margin="0,6,0,0"
                                   FontSize="14" />
-                        <CheckBox Content="Reduce key item repetition"
+                        <CheckBox Content="{local:Tr It_KeyRepetition}" ToolTip="{local:TrTip It_KeyRepetitionTip}"
                                   IsChecked="{Binding ReduceKeyItemRepetition}"
                                   Margin="0,6,0,0"
                                   FontSize="14" />
@@ -79,12 +80,12 @@
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
                                 <CheckBox Name="ChangeMerchantInventoryLockedCheckBox"
                                           Grid.Row="4"
-                                          Content="Make any of the merchant wares locked"
+                                          Content="{local:Tr It_MerchantLocked}" ToolTip="{local:TrTip It_MerchantLockedTip}"
                                           IsChecked="{Binding ChangeMerchantInventoryLocked}"
                                           Margin="0,6,0,0"
                                           FontSize="14" />
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
-                                    <Label Content="with probability"
+                                    <Label VerticalAlignment="Center" Content="{local:Tr It_WithProbability}"
                                            FontSize="14" />
                                     <xctk:IntegerUpDown Name="MerchantInventoryLockedChancePercentTextBox"
                                                         Text="{Binding MerchantInventoryLockedChancePercent}"
@@ -96,20 +97,20 @@
                                                         Width="50"
                                                         FontSize="14"
                                                         MaxLength="3" />
-                                    <Label Content="%"
+                                    <Label VerticalAlignment="Center" Content="%"
                                            FontSize="14" />
                                 </StackPanel>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
                                 <CheckBox Name="ChangeMerchantInventorySizeCheckBox"
                                           Grid.Row="4"
-                                          Content="Randomize merchant inventory sizes"
+                                          Content="{local:Tr It_MerchantSize}"
                                           IsChecked="{Binding ChangeMerchantInventorySize}"
                                           Margin="0,6,0,0"
                                           FontSize="14" />
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,0"
                                             Visibility="{Binding IsChecked, ElementName=ChangeMerchantInventorySizeCheckBox, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                    <Label Content="between"
+                                    <Label VerticalAlignment="Center" Content="{local:Tr It_Between}"
                                            FontSize="14" />
                                     <xctk:IntegerUpDown Name="MerchantInventorySizeMinTextBox"
                                                         Text="{Binding MerchantInventorySizeMin}"
@@ -121,7 +122,7 @@
                                                         Width="50"
                                                         FontSize="14"
                                                         MaxLength="2" />
-                                    <Label Content="and"
+                                    <Label VerticalAlignment="Center" Content="{local:Tr It_And}"
                                            FontSize="14" />
                                     <xctk:IntegerUpDown Name="MerchantInventorySizeMaxTextBox"
                                                         Text="{Binding MerchantInventorySizeMax}"
@@ -138,13 +139,13 @@
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
                                 <CheckBox Name="NumberOfLootDropsSizeCheckBox"
                                           Grid.Row="4"
-                                          Content="Randomize number of loot drops"
+                                          Content="{local:Tr It_LootDrops}"
                                           IsChecked="{Binding ChangeNumberOfLootDrops}"
                                           Margin="0,6,0,0"
                                           FontSize="14" />
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,0"
                                             Visibility="{Binding IsChecked, ElementName=NumberOfLootDropsSizeCheckBox, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                    <Label Content="between"
+                                    <Label VerticalAlignment="Center" Content="{local:Tr It_Between}"
                                            FontSize="14" />
                                     <xctk:IntegerUpDown Name="LootDropsNumberMinTextBox"
                                                         Text="{Binding LootDropsNumberMin}"
@@ -156,7 +157,7 @@
                                                         Width="50"
                                                         FontSize="14"
                                                         MaxLength="2" />
-                                    <Label Content="and"
+                                    <Label VerticalAlignment="Center" Content="{local:Tr It_And}"
                                            FontSize="14" />
                                     <xctk:IntegerUpDown Name="LootDropsNumberMaxTextBox"
                                                         Text="{Binding LootDropsNumberMax}"
@@ -172,13 +173,13 @@
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
                                 <CheckBox Name="ChangeNumberOfTowerRewardsCheckBox"
-                                          Content="Randomize number of the Endless Tower rewards"
+                                          Content="{local:Tr It_Tower}"
                                           IsChecked="{Binding ChangeNumberOfTowerRewards}"
                                           Margin="0,6,0,0"
                                           FontSize="14" />
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,0"
                                             Visibility="{Binding IsChecked, ElementName=ChangeNumberOfTowerRewardsCheckBox, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                    <Label Content="between"
+                                    <Label VerticalAlignment="Center" Content="{local:Tr It_Between}"
                                            FontSize="14" />
                                     <xctk:IntegerUpDown Text="{Binding TowerRewardsNumberMin}"
                                                         Margin="5,0,0,0"
@@ -189,7 +190,7 @@
                                                         Width="50"
                                                         FontSize="14"
                                                         MaxLength="2" />
-                                    <Label Content="and"
+                                    <Label VerticalAlignment="Center" Content="{local:Tr It_And}"
                                            FontSize="14" />
                                     <xctk:IntegerUpDown Text="{Binding TowerRewardsNumberMax}"
                                                         Margin="5,0,0,0"
@@ -204,13 +205,13 @@
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
                                 <CheckBox Name="ChangeNumberOfChestContentsCheckBox"
-                                          Content="Randomize number of items per map pickup"
+                                          Content="{local:Tr It_Chests}"
                                           IsChecked="{Binding ChangeNumberOfChestContents}"
                                           Margin="0,6,0,0"
                                           FontSize="14" />
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,0"
                                             Visibility="{Binding IsChecked, ElementName=ChangeNumberOfChestContentsCheckBox, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                    <Label Content="between"
+                                    <Label VerticalAlignment="Center" Content="{local:Tr It_Between}"
                                            FontSize="14" />
                                     <xctk:IntegerUpDown Text="{Binding ChestContentsNumberMin}"
                                                         Margin="5,0,0,0"
@@ -221,7 +222,7 @@
                                                         Width="50"
                                                         FontSize="14"
                                                         MaxLength="2" />
-                                    <Label Content="and"
+                                    <Label VerticalAlignment="Center" Content="{local:Tr It_And}"
                                            FontSize="14" />
                                     <xctk:IntegerUpDown Text="{Binding ChestContentsNumberMax}"
                                                         Margin="5,0,0,0"
@@ -236,13 +237,13 @@
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
                                 <CheckBox Name="ChangeNumberOfActionRewardsCheckBox"
-                                          Content="Randomize number of cutscene rewards"
+                                          Content="{local:Tr It_Actions}"
                                           IsChecked="{Binding ChangeNumberOfActionRewards}"
                                           Margin="0,6,0,0"
                                           FontSize="14" />
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,0"
                                             Visibility="{Binding IsChecked, ElementName=ChangeNumberOfActionRewardsCheckBox, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                    <Label Content="between"
+                                    <Label VerticalAlignment="Center" Content="{local:Tr It_Between}"
                                            FontSize="14" />
                                     <xctk:IntegerUpDown Text="{Binding ActionRewardsNumberMin}"
                                                         Margin="5,0,0,0"
@@ -253,7 +254,7 @@
                                                         Width="50"
                                                         FontSize="14"
                                                         MaxLength="2" />
-                                    <Label Content="and"
+                                    <Label VerticalAlignment="Center" Content="{local:Tr It_And}"
                                            FontSize="14" />
                                     <xctk:IntegerUpDown Text="{Binding ActionRewardsNumberMax}"
                                                         Margin="5,0,0,0"
@@ -268,13 +269,13 @@
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
                                 <CheckBox Name="ChangeQuantityOfItemsCheckBox"
-                                          Content="Randomize quantities of upgrade materials"
+                                          Content="{local:Tr It_Quantity}"
                                           IsChecked="{Binding ChangeItemQuantity}"
                                           Margin="0,6,0,0"
                                           FontSize="14" />
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,0"
                                             Visibility="{Binding IsChecked, ElementName=ChangeQuantityOfItemsCheckBox, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                    <Label Content="between"
+                                    <Label VerticalAlignment="Center" Content="{local:Tr It_Between}"
                                            FontSize="14" />
                                     <xctk:IntegerUpDown Text="{Binding ItemQuantityMin}"
                                                         Margin="5,0,0,0"
@@ -285,7 +286,7 @@
                                                         Width="50"
                                                         FontSize="14"
                                                         MaxLength="2" />
-                                    <Label Content="and"
+                                    <Label VerticalAlignment="Center" Content="{local:Tr It_And}"
                                            FontSize="14" />
                                     <xctk:IntegerUpDown Text="{Binding ItemQuantityMax}"
                                                         Margin="5,0,0,0"
@@ -302,7 +303,7 @@
                     </StackPanel>
                     <StackPanel Grid.Row="2">
                         <Button Name="CustomItemPlacementButton"
-                                Content="Customize Item Placements"
+                                Content="{local:Tr It_CustomizePlacement}" ToolTip="{local:TrTip It_CustomizePlacementTip}"
                                 Width="500"
                                 Height="50"
                                 FontSize="20"
@@ -312,7 +313,7 @@
                                 Click="CustomPlacementButton_Click" 
                                 Tag="Item"/>
                         <Button Name="EditChecksButton"
-                                Content="Edit Individual Checks"
+                                Content="{local:Tr It_EditChecks}" ToolTip="{local:TrTip It_EditChecksTip}"
                                 Width="500"
                                 Height="50"
                                 FontSize="20"
@@ -324,4 +325,5 @@
                     </StackPanel>
                 </Grid>
     </Grid>
+</ScrollViewer>
 </UserControl>

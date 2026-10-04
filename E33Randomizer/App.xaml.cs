@@ -17,6 +17,8 @@ public partial class App : Application
         Log.Info($"Started v{Updater.CurrentVersion.ToString(3)} from {AppContext.BaseDirectory}");
         DispatcherUnhandledException += (_, args) => Log.Error("Unhandled error", args.Exception);
         ThemeManager.Apply(ThemeManager.LoadSavedPreference());
+        Loc.Apply(Loc.LoadSavedPreference());
+        Loc.KeepToolTipsOpen();
         AppDomain.CurrentDomain.UnhandledException += (_, args) => Log.Error("Unhandled error", args.ExceptionObject as Exception);
         base.OnStartup(e);
     }

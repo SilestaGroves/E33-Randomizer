@@ -12,6 +12,7 @@ public static class GameInstallation
     private const string SteamAppId = "1903340";
     private static readonly string[] PaksPath = ["Sandfall", "Content", "Paks"];
     public static readonly string[] ModFileExtensions = [".pak", ".utoc", ".ucas"];
+    private const string ModName = "randomizer_P";
 
     private const string SavedGameDirectoryFile = "game_path.txt";
 
@@ -170,7 +171,7 @@ public static class GameInstallation
             throw new DirectoryNotFoundException($"\"{gameDirectory}\" is not the game folder (no Sandfall\\Content\\Paks inside).");
         }
 
-        var modFiles = ModFileExtensions.Select(e => Path.Combine(exportPath, "randomizer_P" + e)).ToList();
+        var modFiles = ModFileExtensions.Select(e => Path.Combine(exportPath, ModName + e)).ToList();
         var missing = modFiles.Where(f => !File.Exists(f)).ToList();
         if (missing.Count > 0)
         {
@@ -189,8 +190,30 @@ public static class GameInstallation
         }
         catch (IOException e)
         {
-            throw new IOException($"Couldn't copy the mod into {modsDirectory}. Close the game and try again. ({e.Message})", e);
+            throw new IOException(Loc.Format("Msg_CopyFailed", modsDirectory, e.Message), e);
         }
         return modsDirectory;
+    }
+
+    /// <summary>The randomizer's mod files in the game's ~mods folder.</summary>
+    public static List<string> FindInstalledModFiles(string gameDirectory)
+    {
+        var modsDirectory = GetModsDirectory(gameDirectory);
+        return ModFileExtensions.Select(e => Path.Combine(modsDirectory, ModName + e)).Where(File.Exists).ToList();
+    }
+
+    /// <summary>
+    /// Deletes the randomizer's mod files from the game's ~mods folder, leaving other mods alone. Returns how many
+    /// files were deleted.
+    /// </summary>
+    public static int UninstallMod(string gameDirectory)
+    {
+        var files = FindInstalledModFiles(gameDirectory);
+        foreach (var file in files)
+        {
+            File.Delete(file);
+            Log.Info($"Removed {file}");
+        }
+        return files.Count;
     }
 }

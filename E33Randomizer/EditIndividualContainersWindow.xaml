@@ -108,7 +108,7 @@
                                     Background="{DynamicResource RemoveButtonBrush}" BorderBrush="{DynamicResource RemoveButtonBorderBrush}"
                                     Click="RemoveObject_Click"
                                     Tag="{Binding}"
-                                    ToolTip="Remove"
+                                    ToolTip="{local:Tr Ed_RemoveTip}"
                                     Visibility="{Binding CanDelete, Converter={StaticResource BoolToVisibilityConverter}}"
                                     />
                         </Grid>
@@ -127,16 +127,16 @@
                           SelectionChanged="AddObjectComboBox_SelectionChanged"
                           IsEnabled="{Binding CanAddObjects}"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
-                    <Button x:Name="LoadTextButton" Content="Load encounters from .txt file" Width="180" Height="30"
+                    <Button x:Name="LoadTextButton" ToolTip="{local:TrTip Ed_TxtTip}" Width="200" Height="30"
                             Margin="0,0,10,0" Click="ReadDataFromTxt" />
-                    <Button x:Name="SaveTextButton" Content="Save encounters to .txt file" Width="180" Height="30"
+                    <Button x:Name="SaveTextButton" ToolTip="{local:TrTip Ed_TxtTip}" Width="200" Height="30"
                             Click="SaveDataAsTxt" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
-                    <Button x:Name="RegenerateEncountersButton" Content="Reroll with current settings" Width="180"
+                    <Button x:Name="RegenerateEncountersButton" Content="{local:Tr Ed_Reroll}" ToolTip="{local:TrTip Ed_RerollTip}" Width="200"
                             Height="30"
                             Margin="0,0,10,0" Click="RegenerateData" />
-                    <Button x:Name="PackCurrentEncountersButton" Content="Generate mod files from current" Width="180"
+                    <Button x:Name="PackCurrentEncountersButton" Content="{local:Tr Ed_Pack}" ToolTip="{local:TrTip Ed_PackTip}" Width="200"
                             Height="30"
                             Click="PackCurrentData" />
                 </StackPanel>

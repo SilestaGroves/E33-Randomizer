@@ -61,6 +61,22 @@ public class GameInstallationTests : IDisposable
     }
 
     [Fact]
+    public void UninstallRemovesOnlyTheRandomizerFiles()
+    {
+        var game = MakeGame("Expedition 33");
+        var mods = GameInstallation.InstallMod(MakeExport("mod"), game);
+        var otherMod = Path.Combine(mods, "SomeOtherMod_P.pak");
+        File.WriteAllText(otherMod, "other");
+
+        Assert.Equal(3, GameInstallation.FindInstalledModFiles(game).Count);
+        Assert.Equal(3, GameInstallation.UninstallMod(game));
+
+        Assert.Empty(GameInstallation.FindInstalledModFiles(game));
+        Assert.True(File.Exists(otherMod));
+        Assert.Equal(0, GameInstallation.UninstallMod(game));
+    }
+
+    [Fact]
     public void InstallRejectsWrongFolderAndIncompleteMod()
     {
         var export = MakeExport("x");

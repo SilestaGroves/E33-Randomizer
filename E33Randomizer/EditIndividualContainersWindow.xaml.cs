@@ -30,15 +30,17 @@ namespace E33Randomizer
 
         private void ApplyObjectsType()
         {
-            (FindName("ContainersTextBlock") as TextBlock).Text = ViewModel.ContainerName + "s";
-            (FindName("AddObjectTextBlock") as TextBlock).Text = $"Add {ViewModel.ObjectName.ToLower()}:";
-            (FindName("ObjectsTextBlock") as TextBlock).Text = $"{ViewModel.ObjectName}s in the {ViewModel.ContainerName.ToLower()}".Replace("ys", "ies");
-            (FindName("LoadTextButton") as Button).Content = $"Load {ViewModel.ContainerName.ToLower()}s from .txt file";
-            (FindName("SaveTextButton") as Button).Content = $"Save {ViewModel.ContainerName.ToLower()}s to .txt file";
-            (FindName("SearchLabel") as Label).Content = $"Search by {ViewModel.ContainerName.ToLower()} or {ViewModel.ObjectName.ToLower()} names:";
-            Title = $"Edit individual {ViewModel.ContainerName.ToLower()}s";
+            // Encounter, Check or SkillTree; the texts follow the interface language
+            var prefix = $"Ed_{ViewModel.ContainerName.Replace(" ", "")}_";
+            ContainersTextBlock.SetBinding(TextBlock.TextProperty, Loc.Bind(prefix + "Containers"));
+            AddObjectTextBlock.SetBinding(TextBlock.TextProperty, Loc.Bind(prefix + "Add"));
+            ObjectsTextBlock.SetBinding(TextBlock.TextProperty, Loc.Bind(prefix + "Objects"));
+            LoadTextButton.SetBinding(ContentProperty, Loc.Bind(prefix + "Load"));
+            SaveTextButton.SetBinding(ContentProperty, Loc.Bind(prefix + "Save"));
+            SearchLabel.SetBinding(ContentProperty, Loc.Bind(prefix + "Search"));
+            SetBinding(TitleProperty, Loc.Bind(prefix + "Title"));
         }
-        
+
         private void CategoryTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             if (e.NewValue is ContainerViewModel selectedContainer)
@@ -73,29 +75,27 @@ namespace E33Randomizer
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error generating: {ex.Message}", 
-                    "Reroll Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(Loc.Format("Ed_RerollError", ex.Message),
+                    Loc.Get("Ed_RerollErrorTitle"), MessageBoxButton.OK, MessageBoxImage.Error);
                 File.WriteAllText("reroll_error_log.txt", ex.ToString(), Encoding.UTF8);
                 Log.Error("reroll error", ex);
             }
         }
-        
+
         public void PackCurrentData(object sender, RoutedEventArgs e)
         {
-            RandomizerLogic.usedSeed = RandomizerLogic.Settings.Seed != -1 ? RandomizerLogic.Settings.Seed : Environment.TickCount; 
-            
+            RandomizerLogic.usedSeed = RandomizerLogic.Settings.Seed != -1 ? RandomizerLogic.Settings.Seed : Environment.TickCount;
+
             try
             {
                 RandomizerLogic.PackAndConvertData();
-                MessageBox.Show($"Generation done! You can find the mod, spoiler_log.txt and generation_log.txt in the {RandomizerLogic.LastExportPath} folder.\n\n" +
-                                MainWindow.GetInstallSummary() +
-                                $"Used Seed: {RandomizerLogic.usedSeed}\n",
-                    "Generation Summary", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(MainWindow.GetGenerationSummary(),
+                    Loc.Get("Msg_GenerationDoneTitle"), MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error packing: {ex.Message}", 
-                    "Packing Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(Loc.Format("Ed_PackError", ex.Message),
+                    Loc.Get("Ed_PackErrorTitle"), MessageBoxButton.OK, MessageBoxImage.Error);
                 File.WriteAllText("data_packing_error_log.txt", ex.ToString(), Encoding.UTF8);
                 Log.Error("data packing error", ex);
             }
@@ -105,8 +105,8 @@ namespace E33Randomizer
         {
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
-                Title = "Load TXT",
-                Filter = "TXT files (*.txt)|*.txt|All files (*.*)|*.*",
+                Title = Loc.Get("Ed_LoadTxtTitle"),
+                Filter = Loc.Get("Msg_TxtFilter"),
                 FilterIndex = 1
             };
 
@@ -118,8 +118,8 @@ namespace E33Randomizer
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error loading TXT: {ex.Message}", 
-                        "Load Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(Loc.Format("Ed_TxtLoadError", ex.Message),
+                        Loc.Get("Msg_LoadErrorTitle"), MessageBoxButton.OK, MessageBoxImage.Error);
                     File.WriteAllText("txt_loading_error_log.txt", ex.ToString(), Encoding.UTF8);
                     Log.Error("txt loading error", ex);
                 }
@@ -130,8 +130,8 @@ namespace E33Randomizer
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog
             {
-                Title = "Save TXT",
-                Filter = "TXT files (*.txt)|*.txt|All files (*.*)|*.*",
+                Title = Loc.Get("Ed_SaveTxtTitle"),
+                Filter = Loc.Get("Msg_TxtFilter"),
                 FilterIndex = 1,
                 DefaultExt = "txt"
             };
@@ -141,13 +141,13 @@ namespace E33Randomizer
                 try
                 {
                     Controller.WriteTxt(saveFileDialog.FileName);
-                    MessageBox.Show("TXT saved successfully!", 
-                        "Save Complete", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show(Loc.Get("Ed_TxtSaved"),
+                        Loc.Get("Msg_SaveCompleteTitle"), MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error saving TXT: {ex.Message}", 
-                        "Save Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(Loc.Format("Ed_TxtSaveError", ex.Message),
+                        Loc.Get("Msg_SaveErrorTitle"), MessageBoxButton.OK, MessageBoxImage.Error);
                     File.WriteAllText("txt_saving_error_log.txt", ex.ToString(), Encoding.UTF8);
                     Log.Error("txt saving error", ex);
                 }
@@ -172,7 +172,7 @@ namespace E33Randomizer
         public ContainerViewModel CurrentContainer = null;
         public string SearchTerm = "";
         public bool CanAddObjects { get; set; }  = true;
-        
+
 
         public EditIndividualObjectsWindowViewModel()
         {
@@ -190,7 +190,7 @@ namespace E33Randomizer
             {
                 var newCategory = new CategoryViewModel();
                 newCategory.CategoryName = category.CategoryName;
-                newCategory.Containers = new ObservableCollection<ContainerViewModel>(category.Containers.OrderBy(c => c.Name).Where(c => 
+                newCategory.Containers = new ObservableCollection<ContainerViewModel>(category.Containers.OrderBy(c => c.Name).Where(c =>
                         c.Name.ToLower().Contains(SearchTerm.ToLower()) ||
                         c.CodeName.ToLower().Contains(SearchTerm.ToLower()) ||
                         c.Objects.Any(o => o.CodeName.ToLower().Contains(SearchTerm.ToLower()) || o.Name.ToLower().Contains(SearchTerm.ToLower())
@@ -221,7 +221,7 @@ namespace E33Randomizer
             OnPropertyChanged(nameof(CanAddObjects));
             UpdateDisplayedObjects();
         }
-        
+
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void OnPropertyChanged(string propertyName)
         {
@@ -246,7 +246,7 @@ namespace E33Randomizer
         public bool CanAddObjects { get; set; } = true;
         public string CodeName { get; set; }
         public string Name { get; set; }
-        
+
         public ObservableCollection<ObjectViewModel> Objects { get; set; }
     }
 
@@ -273,7 +273,7 @@ namespace E33Randomizer
         }
         public bool HasBoolPropertyControl { get; set; } = false;
         public bool BoolProperty { get; set; } = false;
-    
+
         public ObjectViewModel SelectedComboBoxValue
         {
             get => _selectedComboBoxValue;
@@ -290,7 +290,7 @@ namespace E33Randomizer
                 IntProperty = !Controllers.ItemsController.ItemsWithQuantities.Contains(CodeName) ? -1 : _lastIntPropertyValue;
             }
         }
-        
+
         public ObjectViewModel(ObjectData objectData)
         {
             CodeName = objectData.CodeName;
@@ -306,7 +306,7 @@ namespace E33Randomizer
             }
             SelectedComboBoxValue = AllObjects.FirstOrDefault(o => o.CodeName == CodeName);
         }
-        
+
         public int Index { get; set; }
         public string CodeName { get; set; }
         public event PropertyChangedEventHandler PropertyChanged;

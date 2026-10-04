@@ -10,6 +10,7 @@
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </UserControl.Resources>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
     <Grid>
         <Grid Margin="20">
                     <Grid.RowDefinitions>
@@ -18,31 +19,31 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <StackPanel>
-                        <CheckBox Content="Randomize skills"
+                        <CheckBox Content="{local:Tr Sk_Randomize}" ToolTip="{local:TrTip Sk_RandomizeTip}"
                                   IsChecked="{Binding RandomizeSkills}"
                                   Margin="0,0,0,0"
                                   FontSize="14" />
                         
-                        <CheckBox Content="Reduce skill duplication"
-                                  ToolTip="A skill appears at most once in each character's tree, when there are enough skills to choose from"
+                        <CheckBox Content="{local:Tr Sk_ReduceRepetition}"
+                                  ToolTip="{local:TrTip Sk_ReduceRepetitionTip}"
                                   IsChecked="{Binding ReduceSkillRepetition}"
                                   Margin="0,0,0,0"
                                   FontSize="14" />
 
-                        <CheckBox Content="Keep Gustave's Overcharge"
-                                  ToolTip="Gustave's Overcharge stays on its starting node"
+                        <CheckBox Content="{local:Tr Sk_Overcharge}"
+                                  ToolTip="{local:TrTip Sk_OverchargeTip}"
                                   IsChecked="{Binding GuaranteeGustaveOvercharge}"
                                   Margin="0,0,0,0"
                                   FontSize="14" />
 
-                        <CheckBox Content="Include cut content skills"
+                        <CheckBox Content="{local:Tr Sk_CutContent}" ToolTip="{local:TrTip Sk_CutContentTip}"
                                   IsChecked="{Binding IncludeCutContentSkills}"
                                   Margin="0,0,0,0"
                                   FontSize="14" />
                     </StackPanel>
                     <StackPanel Grid.Row="2">
                         <Button Name="CustomSkillPlacementButton"
-                                Content="Customize Skill Placements"
+                                Content="{local:Tr Sk_CustomizePlacement}" ToolTip="{local:TrTip Sk_CustomizePlacementTip}"
                                 Width="500"
                                 Height="50"
                                 FontSize="20"
@@ -52,7 +53,7 @@
                                 Click="CustomPlacementButton_Click" 
                                 Tag="Skill" />
                         <Button Name="EditGraphsButton"
-                                Content="Edit Individual Skill Trees"
+                                Content="{local:Tr Sk_EditTrees}" ToolTip="{local:TrTip Sk_EditTreesTip}"
                                 Width="500"
                                 Height="50"
                                 FontSize="20"
@@ -64,4 +65,5 @@
                     </StackPanel>
                 </Grid>
     </Grid>
+</ScrollViewer>
 </UserControl>

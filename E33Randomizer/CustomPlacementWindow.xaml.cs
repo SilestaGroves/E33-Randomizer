@@ -29,7 +29,7 @@ namespace E33Randomizer
             foreach (var presetFile in CustomPlacement.PresetFiles)
             {
                 var presetButton = FindName($"PresetButton{i + 1}") as Button;
-                presetButton.Content = presetFile.Key;
+                presetButton.SetBinding(ContentProperty, Loc.Bind(Loc.KeyFor("Preset_", presetFile.Key)));
                 presetButton.Tag = presetFile.Value;
                 i++;
             }
@@ -49,7 +49,7 @@ namespace E33Randomizer
             string json = JsonConvert.SerializeObject(presetData, Formatting.Indented);
             PresetJsonTextBox.Text = json;
         }
-        
+
         private void UpdateExcludedListBox()
         {
             ExcludedObjectsListBox.Items.Clear();
@@ -77,7 +77,7 @@ namespace E33Randomizer
                 FrequencyRowsContainer.Children.Add(newRow);
             }
         }
-        
+
         private void PopulateObjectComboBox(ComboBox comboBox)
         {
             foreach (string objectPlainName in CustomPlacement.PlainNamesList)
@@ -85,13 +85,13 @@ namespace E33Randomizer
                 comboBox.Items.Add(new ComboBoxItem { Content = objectPlainName });
             }
         }
-        
+
         private void PopulateObjectDropdowns()
         {
             PopulateObjectComboBox(NotRandomizedObjectsSelectionComboBox);
             PopulateObjectComboBox(ExcludedObjectsComboBox);
             PopulateObjectComboBox(OopsAllObjectComboBox);
-            
+
             foreach (string objectPlainName  in CustomPlacement.PlainNamesList)
             {
                 CustomPlacementObjectListBox.Items.Add(new ComboBoxItem { Content = objectPlainName });
@@ -111,13 +111,13 @@ namespace E33Randomizer
             if (NotRandomizedObjectsSelectionComboBox.SelectedItem is ComboBoxItem selectedItem)
             {
                 string objectName = selectedItem.Content.ToString();
-                
+
                 if (!CustomPlacement.NotRandomized.Contains(objectName))
                 {
                     CustomPlacement.AddNotRandomized(objectName);
                     UpdateJsonTextBox();
                 }
-                
+
                 NotRandomizedObjectsSelectionComboBox.SelectedItem = null;
                 UpdateNotRandomizedListBox();
             }
@@ -135,13 +135,13 @@ namespace E33Randomizer
                 string selectedObject = NotRandomizedObjectsListBox.SelectedItem.ToString();
 
                 CustomPlacement.RemoveNotRandomized(selectedObject);
-                
+
                 UpdateNotRandomizedListBox();
                 UpdateJsonTextBox();
                 RemoveNotRandomizedObjectButton.IsEnabled = false;
             }
         }
-        
+
         private void ExcludedObjectsComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (ExcludedObjectsComboBox.SelectedItem != null)
@@ -155,7 +155,7 @@ namespace E33Randomizer
             if (ExcludedObjectsComboBox.SelectedItem is ComboBoxItem selectedItem)
             {
                 string objectName = selectedItem.Content.ToString();
-                
+
                 if (!CustomPlacement.Excluded.Contains(objectName))
                 {
                     CustomPlacement.AddExcluded(objectName);
@@ -164,10 +164,10 @@ namespace E33Randomizer
                 }
                 else
                 {
-                    MessageBox.Show($"{objectName} is already in the selected Objects list.", 
-                                    "Duplicate Object", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show(Loc.Format("Cp_AlreadyInList", objectName),
+                                    Loc.Get("Cp_AlreadyInListTitle"), MessageBoxButton.OK, MessageBoxImage.Information);
                 }
-                
+
                 ExcludedObjectsComboBox.SelectedItem = null;
             }
         }
@@ -195,14 +195,14 @@ namespace E33Randomizer
             {
                 string objectCodeName = selectedItem.Content.ToString();
                 CustomPlacement.ApplyOopsAll(objectCodeName);
-                
+
                 LoadCustomPlacementRows(SelectedObjectForCustomPlacement);
                 Update();
             }
             else
             {
-                MessageBox.Show("Please select an object from the dropdown first.", 
-                               "No Object Selected", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(Loc.Get("Cp_SelectObjectFirst"),
+                               Loc.Get("Msg_NothingSelectedTitle"), MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
@@ -218,8 +218,8 @@ namespace E33Randomizer
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error loading preset: {ex.Message}; Reverting to Default.", 
-                        "Load Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(Loc.Format("Cp_PresetErrorRevert", ex.Message),
+                        Loc.Get("Msg_LoadErrorTitle"), MessageBoxButton.OK, MessageBoxImage.Error);
                     CustomPlacement.LoadDefaultPreset();
                     UpdateJsonTextBox();
                 }
@@ -230,8 +230,8 @@ namespace E33Randomizer
         {
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
-                Title = "Load Custom Preset",
-                Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*",
+                Title = Loc.Get("Cp_LoadDialogTitle"),
+                Filter = Loc.Get("Msg_JsonFilter"),
                 FilterIndex = 1
             };
 
@@ -245,8 +245,8 @@ namespace E33Randomizer
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error loading preset: {ex.Message}", 
-                                   "Load Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(Loc.Format("Msg_PresetLoadError", ex.Message),
+                                   Loc.Get("Msg_LoadErrorTitle"), MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
@@ -255,8 +255,8 @@ namespace E33Randomizer
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog
             {
-                Title = "Save Custom Preset",
-                Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*",
+                Title = Loc.Get("Cp_SaveDialogTitle"),
+                Filter = Loc.Get("Msg_JsonFilter"),
                 FilterIndex = 1,
                 DefaultExt = "json"
             };
@@ -266,13 +266,13 @@ namespace E33Randomizer
                 try
                 {
                     CustomPlacement.SaveToJson(saveFileDialog.FileName);
-                    MessageBox.Show("Preset saved successfully!", 
-                                   "Save Complete", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show(Loc.Get("Msg_PresetSaved"),
+                                   Loc.Get("Msg_SaveCompleteTitle"), MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error saving preset: {ex.Message}", 
-                                   "Save Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(Loc.Format("Msg_PresetSaveError", ex.Message),
+                                   Loc.Get("Msg_SaveErrorTitle"), MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
@@ -300,7 +300,7 @@ namespace E33Randomizer
                 VerticalAlignment = VerticalAlignment.Center
             };
             PopulateObjectComboBox(objectCombo);
-            
+
             Button removeButton = new Button
             {
                 Content = "-",
@@ -372,7 +372,7 @@ namespace E33Randomizer
                 e.Handled = regex.IsMatch(e.Text);
                 UpdateJsonTextBox();
             };
-            
+
             frequencyTextBox.TextChanged += (_, _) => {
                 frequencyTextBox.Text = frequencyTextBox.Text.Replace(" ", "");
                 if (double.TryParse(frequencyTextBox.Text, out double value) && value >= 0)
@@ -386,7 +386,7 @@ namespace E33Randomizer
                     }
                 }
             };
-            
+
             objectCombo.SelectionChanged += (_, _) =>
             {
                 CustomPlacement.FrequencyAdjustments.Clear();
@@ -424,15 +424,15 @@ namespace E33Randomizer
             if (item.Content is string selectedObject)
             {
                 SelectedObjectForCustomPlacement = selectedObject;
-                SelectedObjectDisplay.Text = $"Selected: {selectedObject}";
+                SelectedObjectDisplay.Text = Loc.Format("Cp_SelectedObject", selectedObject);
                 AddCustomPlacementRowButton.IsEnabled = true;
-                
+
                 LoadCustomPlacementRows(selectedObject);
             }
             else
             {
                 SelectedObjectForCustomPlacement = null;
-                SelectedObjectDisplay.Text = "No object selected";
+                SelectedObjectDisplay.SetBinding(TextBlock.TextProperty, Loc.Bind("Cp_NothingSelected"));
                 AddCustomPlacementRowButton.IsEnabled = false;
                 CustomPlacementRowsContainer.Children.Clear();
             }
@@ -467,7 +467,7 @@ namespace E33Randomizer
             {
                 objectNameCombo.SelectedIndex = CustomPlacement.PlainNamesList.IndexOf(objectName);
             }
-            
+
             Button removeButton = new Button
             {
                 Content = "-",
@@ -487,7 +487,7 @@ namespace E33Randomizer
             {
                 frequency = CustomPlacement.CustomPlacementRules[SelectedObjectForCustomPlacement][objectName];
             }
-            
+
             Slider frequencySlider = new Slider
             {
                 Width = 100,
@@ -505,15 +505,15 @@ namespace E33Randomizer
                 Text = (frequency * 100).ToString("F1"),
                 VerticalContentAlignment = VerticalAlignment.Center
             };
-    
-            
+
+
             objectNameCombo.SelectionChanged += (_, _) =>
             {
                 CustomPlacement.SetCustomPlacement(SelectedObjectForCustomPlacement,
-                    (string)(objectNameCombo.SelectedItem as ComboBoxItem).Content, (float)frequencySlider.Value / 100); 
+                    (string)(objectNameCombo.SelectedItem as ComboBoxItem).Content, (float)frequencySlider.Value / 100);
                 UpdateJsonTextBox();
             };
-            
+
             frequencySlider.ValueChanged += (_, e) => {
                 if (!frequencyTextBox.IsFocused)
                 {
@@ -596,7 +596,7 @@ namespace E33Randomizer
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            
+
         }
     }
 }
