@@ -75,7 +75,7 @@ public static class SaveFilePatcher
         return save.ToString(Formatting.Indented);
     }
 
-    private static void RunUesave(string arguments)
+    public static void RunUesave(string arguments)
     {
         var startInfo = new ProcessStartInfo("uesave.exe", arguments)
         {

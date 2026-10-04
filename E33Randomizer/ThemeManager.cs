@@ -91,6 +91,8 @@ public static class ThemeManager
     /// </summary>
     private static void ApplyToWindow(Window window)
     {
+        // The tracker draws itself in the game's style, the same in both themes
+        if (window is TrackerWindow) return;
         if (IsDark)
         {
             window.SetResourceReference(Control.BackgroundProperty, "ApplicationBackgroundBrush");

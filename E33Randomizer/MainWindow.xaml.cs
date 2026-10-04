@@ -229,6 +229,41 @@ public partial class MainWindow
         GameInstallation.SaveGameDirectory(gameDirectory);
     }
 
+    private TrackerWindow _trackerWindow;
+
+    private void OpenTrackerButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_trackerWindow != null)
+        {
+            if (_trackerWindow.WindowState == WindowState.Minimized) _trackerWindow.WindowState = WindowState.Normal;
+            _trackerWindow.Activate();
+            return;
+        }
+
+        var seedFolder = TrackerWindow.FindSeedFolder();
+        if (seedFolder == null)
+        {
+            MessageBox.Show(Loc.Get("Msg_NoTrackerSeed"), Loc.Get("Tr_WindowTitle"), MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+        try
+        {
+            _trackerWindow = new TrackerWindow(seedFolder);
+            _trackerWindow.Closed += (_, _) => _trackerWindow = null;
+            _trackerWindow.Show();
+        }
+        catch (Exception ex)
+        {
+            Log.Error("tracker error", ex);
+            MessageBox.Show(ex.Message, Loc.Get("Tr_WindowTitle"), MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private void EnableTrackerCheckBox_Unchecked(object sender, RoutedEventArgs e)
+    {
+        _trackerWindow?.Close();
+    }
+
     private void RemoveModButton_Click(object sender, RoutedEventArgs e)
     {
         var title = Loc.Get("Msg_RemoveModTitle");
@@ -587,6 +622,7 @@ public class SettingsViewModel : INotifyPropertyChanged
 
     public bool CopyModToGame { get; set; } = true;
     public bool CheckForUpdatesOnStartup { get; set; } = true;
+    public bool EnableTracker { get; set; } = true;
 
     private string _gameDirectory;
 

@@ -9,7 +9,7 @@ namespace E33Randomizer.ItemSources;
 
 public class ChestsContentItemSource: ItemSource
 {
-    private static Dictionary<string, string> LocationNames = new ()
+    public static readonly Dictionary<string, string> LocationNames = new ()
     {
         {"SpringMeadows", "Spring Meadows"},
         {"SeaCliff", "Stone Wave Cliffs"},

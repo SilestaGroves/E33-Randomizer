@@ -210,6 +210,7 @@ public static class RandomizerLogic
         {
             // Written after the assets, since starting equipment is only rolled while writing them
             SpoilerLog.Write(exportPath + "spoiler_log.txt");
+            TrackerData.Build(usedSeed.ToString()).Write(exportPath + TrackerData.FileName);
         }
         
         var retocArgs = $"to-zen --version UE5_4 randomizer \"{exportPath}randomizer_P.utoc\"";

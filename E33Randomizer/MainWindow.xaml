@@ -26,7 +26,7 @@
                 <e33Randomizer:RandomizeSkillsTab x:Name="SkillRandomizerTab"/>
             </TabItem>
             <TabItem Header="{e33Randomizer:Tr Main_TabMisc}">
-                <Grid>
+                <StackPanel>
                     <GroupBox Grid.Row="0" Header="{e33Randomizer:Tr Misc_SaveGroup}" Margin="10, 10, 5, 0"
                               VerticalAlignment="Top">
                         <StackPanel>
@@ -63,7 +63,28 @@
                                 Click="EnableCountersInSaveButton_OnClick" />
                     </StackPanel>
                     </GroupBox>
-                </Grid>
+                    <GroupBox Header="{e33Randomizer:Tr Misc_TrackerGroup}" Margin="10,15,5,0" VerticalAlignment="Top">
+                        <StackPanel>
+                            <TextBlock Text="{e33Randomizer:Tr Misc_TrackerText}"
+                                       Margin="10,10,0,0"
+                                       TextWrapping="Wrap"
+                                       MaxWidth="800"
+                                       HorizontalAlignment="Left" />
+                            <CheckBox Name="EnableTrackerCheckBox"
+                                      Content="{e33Randomizer:Tr Misc_EnableTracker}"
+                                      IsChecked="{Binding EnableTracker}"
+                                      Margin="10,10,0,0"
+                                      Unchecked="EnableTrackerCheckBox_Unchecked" />
+                            <Button Content="{e33Randomizer:Tr Misc_OpenTracker}"
+                                    Width="200"
+                                    Height="35"
+                                    HorizontalAlignment="Center"
+                                    Margin="0,10,20,10"
+                                    IsEnabled="{Binding IsChecked, ElementName=EnableTrackerCheckBox}"
+                                    Click="OpenTrackerButton_Click" />
+                        </StackPanel>
+                    </GroupBox>
+                </StackPanel>
             </TabItem>
         </TabControl>
 

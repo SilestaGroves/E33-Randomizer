@@ -33,8 +33,8 @@ public class LocalizationTests : IDisposable
         var used = new HashSet<string>();
         foreach (var file in SourceFiles("*.xaml"))
         {
-            foreach (Match match in Regex.Matches(File.ReadAllText(file), @"\{\w+:TrTip (\w+)\}|\{\w+:Tr (\w+)\}"))
-                used.Add(match.Groups[1].Success ? match.Groups[1].Value : match.Groups[2].Value);
+            foreach (Match match in Regex.Matches(File.ReadAllText(file), @"\{\w+:TrTip (\w+)\}|\{\w+:Tr (\w+)\}|Binding \[(\w+)\], Source=\{x:Static \w+:Loc\.Instance\}"))
+                used.Add(match.Groups.Values.Skip(1).First(g => g.Success).Value);
         }
         foreach (var file in SourceFiles("*.cs"))
         {
@@ -46,6 +46,11 @@ public class LocalizationTests : IDisposable
         foreach (var type in new[] { "Encounter", "Check", "SkillTree" })
         foreach (var part in new[] { "Title", "Search", "Containers", "Objects", "Add", "Load", "Save" })
             used.Add($"Ed_{type}_{part}");
+
+        // Tracker acts and check types
+        for (int act = 0; act <= 4; act++) used.Add($"Tr_Act{act}");
+        foreach (var type in new[] { "Map pickups", "Merchant inventories", "Dialogue rewards", "Cutscene rewards", "Endless tower rewards" })
+            used.Add("Tr_Type_" + type.Replace(" ", ""));
 
         // Preset buttons, named after the presets' English names
         foreach (var file in new[] { "CustomEnemyPlacement.cs", "CustomItemPlacement.cs", "CustomSkillPlacement.cs" })
