@@ -204,6 +204,56 @@ public class EnemiesController: Controller<EnemyData>
         UpdateViewModel();
     }
 
+    /// <summary>
+    /// A fight with a boss gets a random number of bosses (the "number of bosses" setting) instead of a random size:
+    /// as many boss slots as rolled, standing for the original bosses in turn, then the other original enemies, at
+    /// most 4 enemies in all. Boss slots are filled by the placement rules and get a random boss when the rules
+    /// give something else, so the fight really has that many bosses.
+    /// </summary>
+    private void ModifyBossFight(Encounter encounter)
+    {
+        var settings = RandomizerLogic.Settings;
+        var bosses = encounter.Enemies.Where(e => e.IsBoss).ToList();
+        var others = encounter.Enemies.Where(e => !e.IsBoss).ToList();
+        var min = Math.Clamp(Math.Min(settings.BossCountMin, settings.BossCountMax), 1, MaxEnemiesPerFight);
+        var max = Math.Clamp(Math.Max(settings.BossCountMin, settings.BossCountMax), 1, MaxEnemiesPerFight);
+        var count = Utils.Between(min, max);
+
+        var slots = Enumerable.Range(0, count).Select(i => bosses[i % bosses.Count]).Concat(others).Take(MaxEnemiesPerFight).ToList();
+        encounter.SlotOriginals = slots.Select(s => s.CodeName).ToList();
+        encounter.Enemies = slots.Select(s => GetObject(RandomizerLogic.CustomEnemyPlacement.Replace(s.CodeName))).ToList();
+
+        SpecialRules.ApplySpecialRulesToEncounter(encounter);
+        SpecialRules.LimitGiants(encounter);
+
+        // The rules (or the giant limit) may have put a non-boss into a boss slot
+        var giantsAllowed = encounter.OriginalEnemyCodeNames.Count(SpecialRules.IsGiant) - encounter.Enemies.Count(e => SpecialRules.IsGiant(e.CodeName));
+        for (int i = 0; i < Math.Min(count, encounter.Size); i++)
+        {
+            if (encounter.Enemies[i].IsBoss) continue;
+            var archetype = GetObject(encounter.SlotOriginals[i]).Archetype;
+            for (int attempt = 0; attempt < 20; attempt++)
+            {
+                var boss = RandomizerLogic.GetRandomByArchetype(archetype);
+                if (SpecialRules.IsGiant(boss.CodeName) && giantsAllowed <= 0) continue;
+                if (SpecialRules.IsGiant(boss.CodeName)) giantsAllowed--;
+                encounter.Enemies[i] = boss;
+                break;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Fights with a boss, except the enemies a boss summons or clones mid-fight (their make-up is set by special
+    /// rules or by the fight that summons them).
+    /// </summary>
+    public bool IsBossFightForBossCount(Encounter encounter) =>
+        !encounter.Name.Contains("Summon") && !encounter.Name.Contains("Clone") &&
+        encounter.OriginalEnemyCodeNames.Any(c => GetObject(c).IsBoss);
+
+    /// <summary>The game places 4 enemies in an arena; the 5th and later stand outside it.</summary>
+    private const int MaxEnemiesPerFight = 4;
+
     public override void Reset()
     {
         foreach (var encounter in Encounters)
@@ -216,6 +266,12 @@ public class EnemiesController: Controller<EnemyData>
     {
         if (!SpecialRules.Randomizable(encounter))
         {
+            return;
+        }
+
+        if (RandomizerLogic.Settings.RandomizeBossCount && IsBossFightForBossCount(encounter))
+        {
+            ModifyBossFight(encounter);
             return;
         }
         

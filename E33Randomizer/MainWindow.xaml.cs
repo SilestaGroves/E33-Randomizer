@@ -617,6 +617,9 @@ public class SettingsViewModel : INotifyPropertyChanged
 
     public bool RandomizeEncounterSizes { get; set; } = false;
     public bool ChangeSizeOfNonRandomizedEncounters { get; set; } = false;
+    public bool RandomizeBossCount { get; set; } = false;
+    public int BossCountMin { get; set; } = 1;
+    public int BossCountMax { get; set; } = 3;
     public bool EncounterSizeOne { get; set; } = false;
     public bool EncounterSizeTwo { get; set; } = false;
     public bool EncounterSizeThree { get; set; } = false;

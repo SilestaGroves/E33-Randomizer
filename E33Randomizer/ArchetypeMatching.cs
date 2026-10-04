@@ -43,8 +43,11 @@ public static class ArchetypeMatching
         if (!RandomizerLogic.Settings.MatchReplacedEnemyArchetype || _originalRows == null) return replacement;
         if (!encounter.HasNewEnemies || encounter.OriginalEnemyCodeNames.Count == 0) return replacement;
 
-        // Enemies added by a bigger encounter size take the archetypes of the original enemies in turn
-        var replaced = encounter.OriginalEnemyCodeNames[slot % encounter.OriginalEnemyCodeNames.Count];
+        // Enemies added by a bigger encounter size take the archetypes of the original enemies in turn, the added
+        // bosses of a boss fight the archetype of its boss
+        var replaced = encounter.SlotOriginals != null && slot < encounter.SlotOriginals.Count
+            ? encounter.SlotOriginals[slot]
+            : encounter.OriginalEnemyCodeNames[slot % encounter.OriginalEnemyCodeNames.Count];
         if (replaced == replacement) return replacement;
         if (!_originalRows.TryGetValue(replaced, out var replacedRow) || !_originalRows.TryGetValue(replacement, out var replacementRow))
             return replacement;

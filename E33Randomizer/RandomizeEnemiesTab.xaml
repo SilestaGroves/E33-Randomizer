@@ -74,6 +74,23 @@
                                       Visibility="{Binding IsChecked, ElementName=RandomizeEncounterSizesCheckBox, Converter={StaticResource BooleanToVisibilityConverter}}" />
                         </StackPanel>
 
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox Name="RandomizeBossCountCheckBox"
+                                      Content="{local:Tr En_BossCount}" ToolTip="{local:TrTip En_BossCountTip}"
+                                      IsChecked="{Binding RandomizeBossCount}"
+                                      VerticalAlignment="Center"
+                                      FontSize="14" />
+                            <StackPanel Orientation="Horizontal"
+                                        Visibility="{Binding IsChecked, ElementName=RandomizeBossCountCheckBox, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <Label VerticalAlignment="Center" Content="{local:Tr It_Between}" FontSize="14" />
+                                <xctk:IntegerUpDown Text="{Binding BossCountMin}" Minimum="1" Maximum="4" Width="50" Height="22"
+                                                    VerticalAlignment="Center" FontSize="14" MaxLength="1" />
+                                <Label VerticalAlignment="Center" Content="{local:Tr It_And}" FontSize="14" />
+                                <xctk:IntegerUpDown Text="{Binding BossCountMax}" Minimum="1" Maximum="4" Width="50" Height="22"
+                                                    VerticalAlignment="Center" FontSize="14" MaxLength="1" />
+                            </StackPanel>
+                        </StackPanel>
+
                         <CheckBox Name="RandomizeMerchantFightsCheckBox"
                                   Content="{local:Tr En_Merchants}" ToolTip="{local:TrTip En_MerchantsTip}"
                                   IsChecked="{Binding RandomizeMerchantFights}"

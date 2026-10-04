@@ -27,6 +27,11 @@ public class Encounter
 
     /// <summary>Enemies of the encounter in the original game files.</summary>
     public List<string> OriginalEnemyCodeNames { get; } = [];
+    /// <summary>
+    /// The original enemy each slot stands for, when the randomizer rearranged the fight (more bosses in a boss
+    /// fight); null means slot i stands for original i, and added slots for the originals in turn.
+    /// </summary>
+    public List<string> SlotOriginals;
 
     /// <summary>True if the encounter contains enemies that weren't in the original encounter.</summary>
     public bool HasNewEnemies => Enemies.Any(e => !OriginalEnemyCodeNames.Contains(e.CodeName));
