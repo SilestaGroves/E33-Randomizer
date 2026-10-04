@@ -324,6 +324,8 @@ public static class RandomizerLogic
                 }
             }
             if (Settings.RandomizeSkills) Log.Time("Randomizing skills", Controllers.SkillsController.Randomize);
+            // Needs the final trees and enemies
+            Log.Time("Putting skills into enemy loot", SkillItems.Place);
         }
         catch (Exception e)
         {

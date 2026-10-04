@@ -32,7 +32,8 @@ public static class Controllers
         {
             SkillsController.WriteAssets();
         }
-        if (RandomizerLogic.Settings.RandomizeItems)
+        // Skills dropped by enemies need the enemy loot and the item tables
+        if (RandomizerLogic.Settings.RandomizeItems || SkillItems.Placed.Count > 0)
         {
             ItemsController.WriteAssets();
         }

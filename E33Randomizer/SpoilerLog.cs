@@ -198,5 +198,19 @@ public static class SpoilerLog
             }
             log.AppendLine();
         }
+
+        if (SkillItems.Placed.Count == 0) return;
+        AppendHeader(log, "SKILLS DROPPED BY ENEMIES");
+        log.AppendLine("Each skill is learned the moment its item drops. Enemies:");
+        foreach (var character in SkillItems.Placed.GroupBy(p => p.Key.CharacterName).OrderBy(g => g.Key))
+        {
+            log.AppendLine($"[{character.Key}]");
+            foreach (var (skill, enemies) in character.OrderBy(p => p.Key.CustomName))
+            {
+                var names = enemies.Select(e => Controllers.EnemiesController.GetObject(e).CustomName);
+                log.AppendLine($"  {skill.CustomName.Split(" (")[0]}: {string.Join(", ", names)}");
+            }
+            log.AppendLine();
+        }
     }
 }

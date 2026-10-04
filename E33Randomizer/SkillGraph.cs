@@ -20,8 +20,12 @@ public class SkillNode
     public int UnlockCost;
     public bool IsStarting;
     public string RequiredItem;
+    /// <summary>The unlock requirement of the original node; Value[3] is only rewritten when it changed.</summary>
+    public string OriginalRequiredItem;
     public bool IsSecret;
     public FVector2D Position2D;
+    /// <summary>The original node is free and visible from the start, so the character has it without unlocking.</summary>
+    public bool IsUnlockedByDefault;
 
     private StructPropertyData NodeData => _structData.Value[0] as StructPropertyData;
 
@@ -34,8 +38,11 @@ public class SkillNode
         UnlockCost = (NodeData.Value[1] as IntPropertyData).Value;
         IsStarting = (NodeData.Value[2] as BoolPropertyData).Value;
         RequiredItem = ((NodeData.Value[3] as StructPropertyData).Value[1] as NamePropertyData).ToString();
+        OriginalRequiredItem = RequiredItem;
         IsSecret = (NodeData.Value[4] as BoolPropertyData).Value;
         Position2D = ((_structData.Value[1] as StructPropertyData).Value[0] as Vector2DPropertyData).Value;
+        // Spark is unlocked from the start although its node isn't free
+        IsUnlockedByDefault = UnlockCost == 0 && !IsSecret || OriginalSkillCodeName == "DA_Skill_Maelle_NEW18_Spark";
     }
 
     /// <summary>A copy of an original node with the values from a txt line.</summary>
@@ -44,7 +51,8 @@ public class SkillNode
         _structData = original.CloneStruct();
         SkillPackageIndex = original.SkillPackageIndex;
         OriginalSkillCodeName = original.OriginalSkillCodeName;
-        RequiredItem = original.RequiredItem;
+        OriginalRequiredItem = original.OriginalRequiredItem;
+        IsUnlockedByDefault = original.IsUnlockedByDefault;
 
         // "Skill:OriginalSkill:Cost:IsStarting:RequiredItem:IsSecret:X:Y", or without OriginalSkill (older txt files)
         var parts = rep.Split(':');
@@ -65,6 +73,7 @@ public class SkillNode
         SkillData = Controllers.SkillsController.GetObject(parts[0]);
         UnlockCost = int.Parse(parts[1 + offset]);
         IsStarting = bool.Parse(parts[2 + offset]);
+        RequiredItem = parts[3 + offset];
         IsSecret = bool.Parse(parts[4 + offset]);
         Position2D.X = int.Parse(parts[5 + offset]);
         Position2D.Y = int.Parse(parts[6 + offset]);
@@ -90,10 +99,32 @@ public class SkillNode
         (NodeData.Value[0] as ObjectPropertyData).Value = SkillPackageIndex;
         (NodeData.Value[1] as IntPropertyData).Value = UnlockCost;
         (NodeData.Value[2] as BoolPropertyData).Value = IsStarting;
-        // The unlock requirement (Value[3]) points into a table of the original asset and is kept as it is
+        // The unlock requirement (Value[3]) is a row of an item table; it's only rewritten when it was changed, e.g. to
+        // a skill's own unlock item (see SkillItems)
+        if (RequiredItem != OriginalRequiredItem) WriteRequiredItem(parentAsset);
         (NodeData.Value[4] as BoolPropertyData).Value = IsSecret;
         ((_structData.Value[1] as StructPropertyData).Value[0] as Vector2DPropertyData).Value = Position2D;
         return _structData;
+    }
+
+    /// <summary>Points the requirement at a row of the skill unlock items table (or at nothing).</summary>
+    private void WriteRequiredItem(UAsset parentAsset)
+    {
+        var requirement = NodeData.Value[3] as StructPropertyData;
+        if (RequiredItem is "None" or "null" or "")
+        {
+            (requirement.Value[0] as ObjectPropertyData).Value = FPackageIndex.FromRawIndex(0);
+            (requirement.Value[1] as NamePropertyData).Value = FName.FromString(parentAsset, "None");
+            return;
+        }
+        var table = parentAsset.SearchForImport(FName.FromString(parentAsset, SkillItems.TableName));
+        if (table == 0)
+        {
+            table = Utils.AddImportToUAsset(parentAsset, "DataTable", SkillItems.TablePath).Index;
+        }
+        parentAsset.AddNameReference(FString.FromString(RequiredItem));
+        (requirement.Value[0] as ObjectPropertyData).Value = FPackageIndex.FromRawIndex(table);
+        (requirement.Value[1] as NamePropertyData).Value = FName.FromString(parentAsset, RequiredItem);
     }
 
     public string EncodeTxt()
@@ -236,6 +267,35 @@ public class SkillGraph
             throw new InvalidDataException($"{CharacterName}'s skill tree has {_originalNodes.Count} nodes, the txt has {nodeReps.Length}");
         }
         Nodes = _originalNodes.Select((original, i) => new SkillNode(original, nodeReps[i])).ToList();
+        if (!_hasEdges) return;
+        Edges = stringParts.Length > 2 && stringParts[2].Length > 0
+            ? stringParts[2].Split(',').Select(e => new Tuple<int, int>(int.Parse(e.Split(':')[0]), int.Parse(e.Split(':')[1]))).ToList()
+            : [];
+    }
+
+    /// <summary>
+    /// Makes every skill of the tree come from its own item: the node is free, "starting" and hidden until the
+    /// item is in the inventory, so getting the item unlocks and learns the skill at once. The connections between
+    /// nodes are removed, since any skill can come first. Nodes the character has from the start stay as they are,
+    /// and so does Overcharge when Gustave keeps it (his tutorial relies on it). Returns the skills that need an item.
+    /// (The idea and the node values come from Ihor Chornyi's E33 Randomizer, MIT license.)
+    /// </summary>
+    public List<SkillData> UnlockSkillsWithItems()
+    {
+        var needItems = new List<SkillData>();
+        if (!IsRandomized) return needItems;
+        foreach (var node in Nodes)
+        {
+            if (node.IsUnlockedByDefault) continue;
+            if (RandomizerLogic.Settings.GuaranteeGustaveOvercharge && node.SkillData.CodeName == OverchargeSkill) continue;
+            node.IsStarting = true;
+            node.UnlockCost = 0;
+            node.IsSecret = true;
+            node.RequiredItem = SkillItems.ItemName(node.SkillData);
+            needItems.Add(node.SkillData);
+        }
+        Edges.Clear();
+        return needItems;
     }
 
     public override string ToString()

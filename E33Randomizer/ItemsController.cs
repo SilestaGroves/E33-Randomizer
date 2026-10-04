@@ -187,6 +187,7 @@ public class ItemsController: Controller<ItemData>
         {
             throw new DirectoryNotFoundException("ItemTables directory not found");
         }
+        _skillItemRows.Clear();
         var fileEntries = new List<string> (Directory.GetFiles(tablesDirectory));
         fileEntries = fileEntries.Where(x => Path.GetExtension(x) == ".uasset").ToList();
         foreach (var fileEntry in fileEntries)
@@ -232,10 +233,92 @@ public class ItemsController: Controller<ItemData>
         }
         Log.Info($"Left {unchanged.Count} unchanged item files out of the mod: {string.Join(", ", unchanged)}");
 
-        if (RandomizerLogic.Settings.MakeEveryItemVisible)
+        SyncSkillItemRows();
+        if (RandomizerLogic.Settings.MakeEveryItemVisible || SkillItems.Placed.Count > 0)
         {
             WriteTableAssets();
         }
+    }
+
+    // Rows added to the item tables for the skill items of the current generation
+    private readonly HashSet<string> _skillItemRows = [];
+
+    /// <summary>
+    /// Gives every placed skill item a row in the composite items table (which enemy loot points to) and in the
+    /// gradient unlocks table (which skill nodes point to), and removes the rows of an earlier generation.
+    /// </summary>
+    private void SyncSkillItemRows()
+    {
+        var wanted = SkillItems.Placed.Keys.Select(SkillItems.ItemName).ToHashSet();
+        var tables = new[] { _compositeTableAsset, _itemsDataTables[SkillItems.TableName] };
+        foreach (var stale in _skillItemRows.Except(wanted).ToList())
+        {
+            foreach (var table in tables) (table.Exports[0] as DataTableExport).Table.Data.RemoveAll(r => r.Name.ToString() == stale);
+            _skillItemRows.Remove(stale);
+        }
+        foreach (var skill in SkillItems.Placed.Keys)
+        {
+            var item = SkillItems.GetItem(skill);
+            if (_skillItemRows.Contains(item.CodeName)) continue;
+            foreach (var table in tables) AddItemToTable(table, SkillItems.TemplateRow, item, skill.IconPath, skill.StringPath);
+            _skillItemRows.Add(item.CodeName);
+        }
+    }
+
+    /// <summary>
+    /// Adds a row for a new item to an item table, copied from an existing row, with its own name (from a string
+    /// table, "&lt;table&gt;:&lt;key&gt;", or as plain text) and icon. Ported from Ihor Chornyi's E33 Randomizer (MIT license).
+    /// </summary>
+    public static void AddItemToTable(UAsset tableAsset, string templateRow, ItemData itemData, string iconPath, string stringPath)
+    {
+        var table = (tableAsset.Exports[0] as DataTableExport).Table.Data;
+        var template = table.Find(s => s.Name.ToString() == templateRow)
+                       ?? throw new InvalidDataException($"{tableAsset.FolderName} has no row {templateRow} to copy");
+        tableAsset.AddNameReference(FString.FromString(itemData.CodeName));
+        var newItem = template.Clone() as StructPropertyData;
+        newItem.Name = FName.FromString(tableAsset, itemData.CodeName);
+        (newItem.Value[0] as NamePropertyData).Value = FName.FromString(tableAsset, itemData.CodeName);
+
+        var name = table[0].Value[1].Clone() as TextPropertyData;
+        if (!string.IsNullOrEmpty(stringPath))
+        {
+            var key = stringPath.Split(':').Last();
+            var stringTable = stringPath.Split(':')[0];
+            Utils.AddImportToUAsset(tableAsset, "StringTable", stringTable);
+            tableAsset.AddNameReference(FString.FromString(key));
+            tableAsset.AddNameReference(FString.FromString(stringTable));
+            name.Value = FString.FromString(key);
+            name.TableId = FName.FromString(tableAsset, stringTable);
+            name.Flags = 0;
+            name.HistoryType = TextHistoryType.StringTableEntry;
+        }
+        else
+        {
+            var plain = itemData.CustomName.Split(" (")[0];
+            name.Value = FString.FromString(plain);
+            name.CultureInvariantString = FString.FromString(plain);
+            name.TableId = null;
+            name.Flags = ETextFlag.CultureInvariant;
+            name.HistoryType = TextHistoryType.None;
+        }
+        newItem.Value[1] = name;
+
+        if (!string.IsNullOrEmpty(iconPath))
+        {
+            tableAsset.AddNameReference(FString.FromString(iconPath));
+            tableAsset.AddNameReference(FString.FromString(iconPath.Split('/').Last()));
+            (newItem.Value[5] as SoftObjectPropertyData).FromString([iconPath, iconPath.Split('/').Last(), ""], tableAsset);
+        }
+
+        var description = table[0].Value[6].Clone() as TextPropertyData;
+        description.Value = FString.FromString("");
+        description.CultureInvariantString = FString.FromString("");
+        description.TableId = null;
+        description.Flags = ETextFlag.CultureInvariant;
+        description.HistoryType = TextHistoryType.None;
+        newItem.Value[6] = description;
+
+        table.Add(newItem);
     }
 
     public override void Randomize()

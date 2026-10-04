@@ -702,6 +702,7 @@ public class SettingsViewModel : INotifyPropertyChanged
     public bool ReduceSkillRepetition { get; set; } = true;
     public bool IncludeCutContentSkills { get; set; } = false;
     public bool GuaranteeGustaveOvercharge { get; set; } = true;
+    public bool SkillsFromEnemies { get; set; } = false;
 
     public event PropertyChangedEventHandler PropertyChanged;
     protected virtual void OnPropertyChanged(string propertyName)

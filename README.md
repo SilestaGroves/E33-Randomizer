@@ -50,6 +50,7 @@ This project uses external tools (namely repak, retoc, and uesave), included in 
 
 Credits & Special Thanks:
 
+- Ihor Chornyi: For the original E33 Randomizer this fork is based on, and the "skills drop from enemies" approach (skill unlock items), ported from it
 - truman: For writing repak, retoc, and uesave
 - atenfyr: For writing UAssetAPI
 - TheNaeem: For hosting the Expedition 33 .usmap file

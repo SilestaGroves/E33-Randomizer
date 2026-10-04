@@ -72,6 +72,8 @@ namespace E33Randomizer
             try
             {
                 Controller.Randomize();
+                // Rerolled items lose the skill items, rerolled skills need new ones
+                if (Controller is SkillsController or ItemsController) SkillItems.Place();
             }
             catch (Exception ex)
             {
