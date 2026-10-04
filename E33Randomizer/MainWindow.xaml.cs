@@ -31,6 +31,13 @@ public partial class MainWindow
         DarkThemeCheckBox.IsChecked = ThemeManager.IsDark;
         LanguageComboBox.ItemsSource = Loc.Languages;
         LanguageComboBox.SelectedItem = Loc.Languages.First(l => l.Code == Loc.Current);
+        InitTrackerSettings();
+        SourceInitialized += (_, _) => RegisterTrackerHotkeys();
+        Closed += (_, _) =>
+        {
+            TrackerController.CloseAll();
+            _hotkeys?.Dispose();
+        };
         try
         {
             RandomizerLogic.Init();
@@ -229,39 +236,92 @@ public partial class MainWindow
         GameInstallation.SaveGameDirectory(gameDirectory);
     }
 
-    private TrackerWindow _trackerWindow;
+    private const int ToggleHotkeyId = 1, MiniHotkeyId = 2;
+    private GlobalHotkeys _hotkeys;
+    private bool _trackerSettingsReady;
+
+    private void InitTrackerSettings()
+    {
+        var preferences = TrackerPreferences.Current;
+        EnableTrackerCheckBox.IsChecked = preferences.Enabled;
+        ToggleHotkeyBox.Text = preferences.ToggleHotkey;
+        MiniHotkeyBox.Text = preferences.MiniHotkey;
+        UpdateCornerOptions();
+        Loc.Instance.PropertyChanged += (_, _) => UpdateCornerOptions();
+        _trackerSettingsReady = true;
+    }
+
+    private void UpdateCornerOptions()
+    {
+        var wasReady = _trackerSettingsReady;
+        _trackerSettingsReady = false;
+        var options = TrackerPreferences.Corners.Select(c => new LanguageOption(c, Loc.Get($"Misc_Corner_{c}"))).ToList();
+        MiniCornerComboBox.ItemsSource = options;
+        MiniCornerComboBox.SelectedItem = options.FirstOrDefault(o => o.Code == TrackerPreferences.Current.MiniCorner) ?? options[1];
+        _trackerSettingsReady = wasReady;
+    }
+
+    /// <summary>Registers the tracker hotkeys; tells in the Misc tab which ones another program already uses.</summary>
+    private void RegisterTrackerHotkeys()
+    {
+        _hotkeys ??= new GlobalHotkeys(this);
+        var preferences = TrackerPreferences.Current;
+        var failed = new List<string>();
+        if (preferences.Enabled)
+        {
+            if (!_hotkeys.Register(ToggleHotkeyId, preferences.ToggleHotkey, TrackerController.Toggle)) failed.Add(preferences.ToggleHotkey);
+            if (!_hotkeys.Register(MiniHotkeyId, preferences.MiniHotkey, TrackerController.ToggleMode)) failed.Add(preferences.MiniHotkey);
+        }
+        else
+        {
+            _hotkeys.Unregister(ToggleHotkeyId);
+            _hotkeys.Unregister(MiniHotkeyId);
+        }
+        HotkeyStatusText.Visibility = failed.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+        HotkeyStatusText.Text = failed.Count > 0 ? Loc.Format("Misc_HotkeyBusy", string.Join(", ", failed)) : "";
+    }
 
     private void OpenTrackerButton_Click(object sender, RoutedEventArgs e)
     {
-        if (_trackerWindow != null)
-        {
-            if (_trackerWindow.WindowState == WindowState.Minimized) _trackerWindow.WindowState = WindowState.Normal;
-            _trackerWindow.Activate();
-            return;
-        }
-
-        var seedFolder = TrackerWindow.FindSeedFolder();
-        if (seedFolder == null)
-        {
-            MessageBox.Show(Loc.Get("Msg_NoTrackerSeed"), Loc.Get("Tr_WindowTitle"), MessageBoxButton.OK, MessageBoxImage.Information);
-            return;
-        }
-        try
-        {
-            _trackerWindow = new TrackerWindow(seedFolder);
-            _trackerWindow.Closed += (_, _) => _trackerWindow = null;
-            _trackerWindow.Show();
-        }
-        catch (Exception ex)
-        {
-            Log.Error("tracker error", ex);
-            MessageBox.Show(ex.Message, Loc.Get("Tr_WindowTitle"), MessageBoxButton.OK, MessageBoxImage.Error);
-        }
+        TrackerController.ShowFull();
     }
 
-    private void EnableTrackerCheckBox_Unchecked(object sender, RoutedEventArgs e)
+    private void EnableTrackerCheckBox_Changed(object sender, RoutedEventArgs e)
     {
-        _trackerWindow?.Close();
+        if (!_trackerSettingsReady) return;
+        TrackerPreferences.Current.Enabled = EnableTrackerCheckBox.IsChecked == true;
+        TrackerPreferences.Current.Save();
+        if (!TrackerPreferences.Current.Enabled) TrackerController.CloseAll();
+        RegisterTrackerHotkeys();
+    }
+
+    private void MiniCornerComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (!_trackerSettingsReady || MiniCornerComboBox.SelectedItem is not LanguageOption corner) return;
+        TrackerPreferences.Current.MiniCorner = corner.Code;
+        TrackerPreferences.Current.Save();
+        TrackerController.UpdateMiniCorner();
+    }
+
+    /// <summary>Takes the pressed key combination as the new hotkey.</summary>
+    private void HotkeyBox_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        e.Handled = true;
+        var box = (TextBox)sender;
+        var key = e.Key == Key.System ? e.SystemKey : e.Key;
+        if (GlobalHotkeys.IsModifier(key) || key is Key.Tab or Key.Escape) return;
+        var hotkey = GlobalHotkeys.Format(Keyboard.Modifiers, key);
+        if (!GlobalHotkeys.TryParse(hotkey, out _, out _))
+        {
+            HotkeyStatusText.Text = Loc.Get("Misc_HotkeyNeedsModifier");
+            HotkeyStatusText.Visibility = Visibility.Visible;
+            return;
+        }
+        box.Text = hotkey;
+        if ((string)box.Tag == "Toggle") TrackerPreferences.Current.ToggleHotkey = hotkey;
+        else TrackerPreferences.Current.MiniHotkey = hotkey;
+        TrackerPreferences.Current.Save();
+        RegisterTrackerHotkeys();
     }
 
     private void RemoveModButton_Click(object sender, RoutedEventArgs e)
@@ -622,7 +682,6 @@ public class SettingsViewModel : INotifyPropertyChanged
 
     public bool CopyModToGame { get; set; } = true;
     public bool CheckForUpdatesOnStartup { get; set; } = true;
-    public bool EnableTracker { get; set; } = true;
 
     private string _gameDirectory;
 

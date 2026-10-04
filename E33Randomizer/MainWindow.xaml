@@ -26,7 +26,8 @@
                 <e33Randomizer:RandomizeSkillsTab x:Name="SkillRandomizerTab"/>
             </TabItem>
             <TabItem Header="{e33Randomizer:Tr Main_TabMisc}">
-                <StackPanel>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="0,0,0,10">
                     <GroupBox Grid.Row="0" Header="{e33Randomizer:Tr Misc_SaveGroup}" Margin="10, 10, 5, 0"
                               VerticalAlignment="Top">
                         <StackPanel>
@@ -72,9 +73,40 @@
                                        HorizontalAlignment="Left" />
                             <CheckBox Name="EnableTrackerCheckBox"
                                       Content="{e33Randomizer:Tr Misc_EnableTracker}"
-                                      IsChecked="{Binding EnableTracker}"
                                       Margin="10,10,0,0"
-                                      Unchecked="EnableTrackerCheckBox_Unchecked" />
+                                      Checked="EnableTrackerCheckBox_Changed"
+                                      Unchecked="EnableTrackerCheckBox_Changed" />
+                            <Grid Margin="10,8,0,0"
+                                  IsEnabled="{Binding IsChecked, ElementName=EnableTrackerCheckBox}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Label Grid.Row="0" Grid.Column="0" Content="{e33Randomizer:Tr Misc_ToggleHotkey}" VerticalAlignment="Center" />
+                                <TextBox Grid.Row="0" Grid.Column="1" Name="ToggleHotkeyBox" Width="140" Height="24" Margin="5,2"
+                                         IsReadOnly="True" IsReadOnlyCaretVisible="False" VerticalContentAlignment="Center"
+                                         ToolTip="{e33Randomizer:TrTip Misc_HotkeyTip}"
+                                         PreviewKeyDown="HotkeyBox_PreviewKeyDown" Tag="Toggle" />
+                                <Label Grid.Row="0" Grid.Column="2" Content="{e33Randomizer:Tr Misc_MiniCorner}" VerticalAlignment="Center"
+                                       Margin="20,0,0,0" />
+                                <ComboBox Grid.Row="0" Grid.Column="3" Name="MiniCornerComboBox" Width="150" Margin="5,2"
+                                          DisplayMemberPath="Name" SelectionChanged="MiniCornerComboBox_SelectionChanged" />
+                                <Label Grid.Row="1" Grid.Column="0" Content="{e33Randomizer:Tr Misc_MiniHotkey}" VerticalAlignment="Center" />
+                                <TextBox Grid.Row="1" Grid.Column="1" Name="MiniHotkeyBox" Width="140" Height="24" Margin="5,2"
+                                         IsReadOnly="True" IsReadOnlyCaretVisible="False" VerticalContentAlignment="Center"
+                                         ToolTip="{e33Randomizer:TrTip Misc_HotkeyTip}"
+                                         PreviewKeyDown="HotkeyBox_PreviewKeyDown" Tag="Mini" />
+                            </Grid>
+                            <TextBlock Name="HotkeyStatusText" Margin="10,4,0,0" TextWrapping="Wrap" MaxWidth="800" HorizontalAlignment="Left"
+                                       Foreground="{DynamicResource WarningTextBrush}" Visibility="Collapsed" />
+                            <TextBlock Text="{e33Randomizer:Tr Misc_HotkeyNote}" Margin="10,4,0,0" TextWrapping="Wrap" MaxWidth="800"
+                                       HorizontalAlignment="Left" Foreground="{DynamicResource SecondaryTextBrush}" />
                             <Button Content="{e33Randomizer:Tr Misc_OpenTracker}"
                                     Width="200"
                                     Height="35"
@@ -85,6 +117,7 @@
                         </StackPanel>
                     </GroupBox>
                 </StackPanel>
+                </ScrollViewer>
             </TabItem>
         </TabControl>
 

@@ -78,6 +78,7 @@ public class TrackerTests(GameDataFixture fixture, ITestOutputHelper output)
         Assert.Equal("Flying Waters", LevelRegions.RegionOf("GoblusLair", logic));
         Assert.Equal("The Small Bourgeon", LevelRegions.RegionOf("SmallLevel_GoblusLair_02", logic));
         Assert.Null(LevelRegions.RegionOf("MiniLevel_SomethingUnknown", logic));
+        Assert.Equal("Spring Meadows", LevelRegions.RegionOf("Level_SpringMeadows_Main_V2", logic));
     }
 
     [Fact]
@@ -121,17 +122,63 @@ public class TrackerTests(GameDataFixture fixture, ITestOutputHelper output)
         Assert.Empty(TrackerState.Load(folder).FoundItems);
     }
 
+    [Theory]
+    [InlineData("Ctrl+Shift+T", true)]
+    [InlineData("ctrl+alt+F5", true)]
+    [InlineData("F10", true)]
+    [InlineData("T", false)]
+    [InlineData("Ctrl+Shift", false)]
+    [InlineData("Hyper+T", false)]
+    [InlineData("", false)]
+    public void HotkeysAreReadAndWrittenBack(string text, bool valid)
+    {
+        Assert.Equal(valid, GlobalHotkeys.TryParse(text, out var modifiers, out var key));
+        if (!valid) return;
+        Assert.True(GlobalHotkeys.TryParse(GlobalHotkeys.Format(modifiers, key), out var again, out var againKey));
+        Assert.Equal((modifiers, key), (again, againKey));
+    }
+
+    [Fact]
+    public void TheTrackerFollowsTheRegionTheGameWasSavedIn()
+    {
+        var data = GenerateTrackerData(14);
+        var folder = Path.Combine(fixture.WorkDirectory, "rand_tracker_14");
+        Directory.CreateDirectory(folder);
+        data.Write(Path.Combine(folder, TrackerData.FileName));
+        using var tracker = new TrackerViewModel(folder);
+
+        tracker.ApplySave(new TrackerSaveInfo { Path = "x.sav", CurrentLevel = "GoblusLair" });
+        Assert.Equal("Flying Waters", tracker.SelectedRegion.Name);
+        Assert.Equal(Math.Min(TrackerViewModel.MiniCheckCount, tracker.SelectedRegion.Total), tracker.MiniChecks.Count);
+
+        // The player picked another region; a save from the same place doesn't take it away
+        tracker.SelectedRegion = tracker.Acts.SelectMany(a => a.Regions).First(r => r.Name == "Spring Meadows");
+        tracker.ApplySave(new TrackerSaveInfo { Path = "x.sav", CurrentLevel = "GoblusLair" });
+        Assert.Equal("Spring Meadows", tracker.SelectedRegion.Name);
+
+        foreach (var check in tracker.SelectedRegion.Checks) check.Done = true;
+        Assert.True(tracker.MiniAllDone);
+        Assert.Empty(tracker.MiniChecks);
+    }
+
     [Fact]
     public void TheInventoryAndVisitedLevelsAreReadFromASave()
     {
         const string json = """
             {"root": {"properties": {
               "InventoryItems_0": [{"key": "Quest_HexgaRock", "value": 1}, {"key": "HealingTint_Shard", "value": 5}],
-              "VisitedLevelRowNames_0": ["Lumiere", "SpringMeadows"]
+              "VisitedLevelRowNames_0": ["Lumiere", "SpringMeadows"],
+              "MapToLoad_0": "Level_Side_FrozenHeart",
+              "LastUsedSavePoint_0": {
+                "LevelAssetName_2_0780F87E4145EDF4E6CC1283B62C83A5_0": "Level_Side_FrozenHeart",
+                "SpawnPointTag_5_EB256801433A85DCEDAA4A8255E777B4_0": {"TagName_0": "Level.SpawnPoint.FrozenHearts.TrainStation"}
+              }
             }}}
             """;
         var info = TrackerSave.Parse(json);
         Assert.Contains("Quest_HexgaRock", info.Inventory);
         Assert.Equal(["Lumiere", "SpringMeadows"], info.VisitedLevels);
+        Assert.Equal("FrozenHearts", info.CurrentLevel);
+        Assert.Equal("Frozen Hearts", LevelRegions.RegionOf(info.CurrentLevel, ProgressionLogic.Data));
     }
 }

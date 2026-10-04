@@ -47,6 +47,8 @@ public class LocalizationTests : IDisposable
         foreach (var part in new[] { "Title", "Search", "Containers", "Objects", "Add", "Load", "Save" })
             used.Add($"Ed_{type}_{part}");
 
+        foreach (var corner in TrackerPreferences.Corners) used.Add($"Misc_Corner_{corner}");
+
         // Tracker acts and check types
         for (int act = 0; act <= 4; act++) used.Add($"Tr_Act{act}");
         foreach (var type in new[] { "Map pickups", "Merchant inventories", "Dialogue rewards", "Cutscene rewards", "Endless tower rewards" })

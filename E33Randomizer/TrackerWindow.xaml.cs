@@ -13,16 +13,18 @@ public partial class TrackerWindow : Window
     private TrackerViewModel _viewModel;
     private DispatcherTimer _resetConfirmation;
 
-    public TrackerWindow(string seedFolder)
+    public TrackerWindow(TrackerViewModel viewModel)
     {
         InitializeComponent();
-        Open(seedFolder);
+        SetViewModel(viewModel);
         Loc.Instance.PropertyChanged += OnLanguageChanged;
-        Closed += (_, _) =>
-        {
-            Loc.Instance.PropertyChanged -= OnLanguageChanged;
-            _viewModel?.Dispose();
-        };
+        Closed += (_, _) => Loc.Instance.PropertyChanged -= OnLanguageChanged;
+    }
+
+    public void SetViewModel(TrackerViewModel viewModel)
+    {
+        _viewModel = viewModel;
+        DataContext = viewModel;
     }
 
     /// <summary>
@@ -34,17 +36,6 @@ public partial class TrackerWindow : Window
         var last = RandomizerLogic.LastExportPath;
         if (!string.IsNullOrEmpty(last) && File.Exists(Path.Combine(last, TrackerData.FileName))) return Path.GetFullPath(last);
         return TrackerData.FindLatestSeedFolder(Directory.GetCurrentDirectory());
-    }
-
-    private void Open(string seedFolder)
-    {
-        _viewModel?.Dispose();
-        _viewModel = new TrackerViewModel(seedFolder);
-        DataContext = _viewModel;
-        _viewModel.SelectedRegion = _viewModel.Acts.SelectMany(a => a.Regions).FirstOrDefault(r => r.Visited && !r.Completed)
-                                    ?? _viewModel.Acts.FirstOrDefault()?.Regions.FirstOrDefault();
-        if (_viewModel.AutoTrack) _viewModel.StartWatching();
-        Log.Info($"Tracker opened {seedFolder}");
     }
 
     private void OnLanguageChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -77,7 +68,7 @@ public partial class TrackerWindow : Window
             MessageBox.Show(this, Loc.Get("Tr_NoTrackerData"), Loc.Get("Tr_WindowTitle"), MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
-        Open(dialog.FolderName);
+        TrackerController.OpenSeed(dialog.FolderName);
     }
 
     /// <summary>Resetting needs a second click within a few seconds, so a stray click doesn't wipe the progress.</summary>
@@ -99,6 +90,8 @@ public partial class TrackerWindow : Window
         };
         _resetConfirmation.Start();
     }
+
+    private void MiniModeButton_Click(object sender, RoutedEventArgs e) => TrackerController.ShowMini();
 
     private void MinimizeButton_Click(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
 

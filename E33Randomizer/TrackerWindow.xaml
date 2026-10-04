@@ -530,6 +530,11 @@
                                Foreground="{StaticResource PaperFaint}" VerticalAlignment="Center" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+                    <Button Style="{StaticResource TextButton}" Click="MiniModeButton_Click" ToolTip="{local:TrTip Tr_MiniModeTip}">
+                        <TextBlock Text="{local:Tr Tr_MiniMode}" />
+                    </Button>
+                    <Path Data="{StaticResource Diamond}" Fill="{StaticResource GoldDim}" Width="4" Height="4" Stretch="Fill"
+                          Margin="14,0" VerticalAlignment="Center" />
                     <Button Style="{StaticResource TextButton}" Click="OpenSeedButton_Click" ToolTip="{local:TrTip Tr_OpenSeedTip}">
                         <TextBlock Text="{local:Tr Tr_OpenSeed}" />
                     </Button>

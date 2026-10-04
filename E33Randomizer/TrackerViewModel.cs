@@ -241,9 +241,40 @@ public class TrackerViewModel : TrackerObservable, IDisposable
             if (value != null) value.IsSelected = true;
             Notify(nameof(HasSelection));
             Notify(nameof(RegionSubtitle));
+            NotifyMini();
             ApplyFilter();
         }
     }
+
+    // The mini overlay: the selected region's checks that aren't marked yet, a few at a time
+    public const int MiniCheckCount = 8;
+
+    public List<TrackerCheckViewModel> MiniChecks =>
+        _selectedRegion?.Checks.Where(c => !c.Done).Take(MiniCheckCount).ToList() ?? [];
+
+    public string MiniMoreText
+    {
+        get
+        {
+            var rest = (_selectedRegion?.Checks.Count(c => !c.Done) ?? 0) - MiniCheckCount;
+            return rest > 0 ? Loc.Format("Tr_MiniMore", rest) : "";
+        }
+    }
+
+    public bool MiniAllDone => _selectedRegion is { Completed: true };
+    public string MiniKeyItemsText => Loc.Format("Tr_MiniKeyItems", KeyItemsText);
+    public string MiniBackText => Loc.Format("Tr_MiniBack", TrackerPreferences.Current.MiniHotkey);
+
+    public void NotifyMini()
+    {
+        Notify(nameof(MiniChecks));
+        Notify(nameof(MiniMoreText));
+        Notify(nameof(MiniAllDone));
+        Notify(nameof(MiniKeyItemsText));
+        Notify(nameof(MiniBackText));
+    }
+
+    private string _lastSaveRegion;
 
     public bool HasSelection => _selectedRegion != null;
 
@@ -319,6 +350,7 @@ public class TrackerViewModel : TrackerObservable, IDisposable
         UpdateLocks();
         Notify(nameof(FoundCount));
         Notify(nameof(KeyItemsText));
+        NotifyMini();
     }
 
     internal void OnCheckChanged(TrackerCheckViewModel check)
@@ -329,6 +361,7 @@ public class TrackerViewModel : TrackerObservable, IDisposable
         _regions[check.Check.Region].Refresh();
         Notify(nameof(TotalText));
         Notify(nameof(RegionSubtitle));
+        NotifyMini();
         ApplyFilter();
     }
 
@@ -369,6 +402,7 @@ public class TrackerViewModel : TrackerObservable, IDisposable
         Notify(nameof(KeyItemsText));
         Notify(nameof(TotalText));
         Notify(nameof(RegionSubtitle));
+        NotifyMini();
         ApplyFilter();
     }
 
@@ -394,11 +428,20 @@ public class TrackerViewModel : TrackerObservable, IDisposable
             viewModel.Visited = true;
             State.VisitedRegions.Add(region);
         }
+        // Follow the player: show the region the game was saved in, when it changed since the last save
+        var current = info.CurrentLevel == null ? null : LevelRegions.RegionOf(info.CurrentLevel, ProgressionLogic.Data);
+        if (current != null && current != _lastSaveRegion && _regions.TryGetValue(current, out var currentRegion))
+        {
+            _lastSaveRegion = current;
+            SelectedRegion = currentRegion;
+        }
+
         Save();
         UpdateLocks();
         Notify(nameof(FoundCount));
         Notify(nameof(KeyItemsText));
         Notify(nameof(RegionSubtitle));
+        NotifyMini();
         var inInventory = KeyItems.Count(i => info.Inventory.Contains(i.Item.Code));
         var time = info.Saved.Date == DateTime.Today ? info.Saved.ToString("HH:mm") : info.Saved.ToString("dd.MM HH:mm");
         SaveStatus = Loc.Format("Tr_SaveRead", Path.GetFileNameWithoutExtension(info.Path), time, inInventory);

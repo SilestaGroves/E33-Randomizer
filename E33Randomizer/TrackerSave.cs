@@ -1,4 +1,5 @@
 using System.IO;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 
 namespace E33Randomizer;
@@ -10,6 +11,8 @@ public class TrackerSaveInfo
     public DateTime Saved;
     public HashSet<string> Inventory = [];
     public List<string> VisitedLevels = [];
+    /// <summary>The level the save was made in.</summary>
+    public string CurrentLevel;
 }
 
 /// <summary>
@@ -54,6 +57,24 @@ public static class TrackerSave
         }
     }
 
+    /// <summary>
+    /// The level of the save point the game was saved at: its tag (Level.SpawnPoint.FrozenHearts.TrainStation) names
+    /// the level like the visited levels do, unlike the map's asset name (Level_Side_FrozenHeart).
+    /// </summary>
+    private static string CurrentLevel(JToken properties)
+    {
+        if (properties["LastUsedSavePoint_0"] is JObject savePoint)
+        {
+            foreach (var property in savePoint.Properties())
+            {
+                if (!property.Name.StartsWith("SpawnPointTag")) continue;
+                var parts = property.Value["TagName_0"]?.ToString().Split('.') ?? [];
+                if (parts.Length >= 3 && parts[0] == "Level" && parts[1] == "SpawnPoint") return parts[2];
+            }
+        }
+        return properties["MapToLoad_0"]?.ToString();
+    }
+
     /// <summary>Reads the save converted to JSON by uesave.</summary>
     public static TrackerSaveInfo Parse(string json)
     {
@@ -68,6 +89,7 @@ public static class TrackerSave
                 if (!string.IsNullOrEmpty(code)) info.Inventory.Add(code);
             }
         }
+        info.CurrentLevel = CurrentLevel(properties);
         if (properties["VisitedLevelRowNames_0"] is JArray levels)
         {
             info.VisitedLevels = levels.Select(l => l.ToString()).ToList();
@@ -79,7 +101,7 @@ public static class TrackerSave
 /// <summary>Maps the game's level names (as the save lists visited levels) to the regions of the progression logic.</summary>
 public static class LevelRegions
 {
-    private static readonly string[] Prefixes = ["SmallLevel_", "SideLevel_", "SidelLevel_", "MiniLevel_", "Level_"];
+    private static readonly string[] Prefixes = ["SmallLevel_", "SideLevel_", "SidelLevel_", "MiniLevel_", "Level_Side_", "Level_"];
 
     // Levels whose name differs from the chest names the region rules use
     private static readonly Dictionary<string, string> Aliases = new(StringComparer.OrdinalIgnoreCase)
@@ -114,6 +136,8 @@ public static class LevelRegions
 
     private static string Normalize(string level)
     {
+        // The level the game was saved in is the map's asset name: Level_SpringMeadows_Main_V2
+        level = Regex.Replace(level, @"(_Main)?(_V\d+)?$", "");
         foreach (var prefix in Prefixes)
         {
             if (level.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)) return level[prefix.Length..];

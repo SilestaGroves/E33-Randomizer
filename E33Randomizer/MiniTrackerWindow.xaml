@@ -1,0 +1,104 @@
+<Window x:Class="E33Randomizer.MiniTrackerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:E33Randomizer"
+        Title="{local:Tr Tr_WindowTitle}"
+        Width="340" SizeToContent="Height"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        ResizeMode="NoResize" Topmost="True" ShowInTaskbar="False" ShowActivated="False" Focusable="False"
+        Foreground="#E8E0CF"
+        FontFamily="Palatino Linotype, Book Antiqua, Georgia"
+        FontSize="13"
+        TextOptions.TextFormattingMode="Ideal"
+        UseLayoutRounding="True">
+    <!--
+        The tracker as a small overlay on top of the game. It never takes the focus, never shows the cursor, and
+        mouse clicks go through it (see the code-behind), so it doesn't get in the way of playing.
+    -->
+    <Window.Resources>
+        <SolidColorBrush x:Key="Paper" Color="#E8E0CF" />
+        <SolidColorBrush x:Key="PaperDim" Color="#A69E8D" />
+        <SolidColorBrush x:Key="PaperFaint" Color="#7A7266" />
+        <SolidColorBrush x:Key="Gold" Color="#C9A66B" />
+        <SolidColorBrush x:Key="GoldDim" Color="#7A6646" />
+        <SolidColorBrush x:Key="Line" Color="#3A3329" />
+        <SolidColorBrush x:Key="Blood" Color="#C0574C" />
+        <Geometry x:Key="Diamond">M5,0 L10,5 L5,10 L0,5 Z</Geometry>
+        <BooleanToVisibilityConverter x:Key="Visible" />
+        <local:SpacedCapsConverter x:Key="Caps" />
+        <LinearGradientBrush x:Key="FadeRight" StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Color="#CC7A6646" Offset="0" />
+            <GradientStop Color="#007A6646" Offset="1" />
+        </LinearGradientBrush>
+    </Window.Resources>
+
+    <Border BorderBrush="#997A6646" BorderThickness="1" Padding="16,12,16,12">
+        <Border.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                <GradientStop Color="#E0201C17" Offset="0" />
+                <GradientStop Color="#E00B0A09" Offset="1" />
+            </LinearGradientBrush>
+        </Border.Background>
+        <StackPanel>
+            <!-- Heading -->
+            <Grid>
+                <StackPanel Orientation="Horizontal">
+                    <Path Data="{StaticResource Diamond}" Fill="{StaticResource Gold}" Width="6" Height="6" Stretch="Fill"
+                          VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <TextBlock FontSize="10.5" Foreground="{StaticResource Gold}" VerticalAlignment="Center"
+                               Text="{Binding [Tr_Title], Source={x:Static local:Loc.Instance}, Converter={StaticResource Caps}}" />
+                </StackPanel>
+                <TextBlock Text="{Binding TotalText}" HorizontalAlignment="Right" FontSize="11" Foreground="{StaticResource PaperDim}" />
+            </Grid>
+
+            <!-- The region -->
+            <Grid Margin="0,8,0,0">
+                <TextBlock Text="{Binding SelectedRegion.Name}" FontSize="18" Foreground="{StaticResource Paper}"
+                           TextTrimming="CharacterEllipsis" Margin="0,0,60,0" />
+                <TextBlock Text="{Binding SelectedRegion.ProgressText}" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                           FontSize="12" Foreground="{StaticResource Gold}" Margin="0,0,0,2" />
+            </Grid>
+            <Grid Margin="0,4,0,8" Height="1">
+                <Rectangle Fill="{StaticResource Line}" />
+                <Rectangle Fill="{StaticResource Gold}" RenderTransformOrigin="0,0.5">
+                    <Rectangle.RenderTransform>
+                        <ScaleTransform ScaleX="{Binding SelectedRegion.Progress}" />
+                    </Rectangle.RenderTransform>
+                </Rectangle>
+            </Grid>
+
+            <!-- What's left there -->
+            <ItemsControl ItemsSource="{Binding MiniChecks}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type local:TrackerCheckViewModel}">
+                        <Grid Margin="0,0,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="16" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Path Data="{StaticResource Diamond}" Stroke="{StaticResource GoldDim}" StrokeThickness="1" Width="8" Height="8"
+                                  Stretch="Fill" VerticalAlignment="Top" Margin="0,5,0,0" />
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="{Binding DisplayName}" TextTrimming="CharacterEllipsis" />
+                                <TextBlock Text="{Binding LockText}" FontSize="11.5" FontStyle="Italic" Foreground="{StaticResource Blood}"
+                                           TextTrimming="CharacterEllipsis"
+                                           Visibility="{Binding Locked, Converter={StaticResource Visible}}" />
+                            </StackPanel>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <TextBlock Text="{Binding MiniMoreText}" FontStyle="Italic" FontSize="12" Foreground="{StaticResource PaperFaint}" Margin="16,0,0,0" />
+            <TextBlock Text="{local:Tr Tr_MiniAllDone}" FontStyle="Italic" Foreground="{StaticResource Gold}"
+                       Visibility="{Binding MiniAllDone, Converter={StaticResource Visible}}" />
+
+            <!-- Key items and how to get back -->
+            <Rectangle Height="1" Fill="{StaticResource FadeRight}" Margin="0,8,0,6" />
+            <Grid>
+                <TextBlock Text="{Binding MiniKeyItemsText}" FontSize="11.5" Foreground="{StaticResource PaperDim}" />
+                <TextBlock Text="{Binding MiniBackText}" HorizontalAlignment="Right" FontSize="11" FontStyle="Italic"
+                           Foreground="{StaticResource PaperFaint}" />
+            </Grid>
+        </StackPanel>
+    </Border>
+</Window>
