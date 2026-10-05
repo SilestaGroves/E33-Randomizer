@@ -3,7 +3,7 @@ using E33Randomizer.ItemSources;
 namespace E33Randomizer;
 
 /// <summary>
-/// "Skills drop from enemies": every skill of the randomized trees gets its own item, the skill's node needs that
+/// "Skills drop from enemies": every skill of the trees (randomized or not) gets its own item, the skill's node needs that
 /// item and costs nothing, so the moment the item drops the skill is unlocked and learned. The items are put into
 /// the loot of enemies that are fought in this seed, each into two different enemies, always dropping.
 /// The approach (unlock items as rows of the gradient unlocks table, starting free hidden nodes) comes from Ihor
@@ -18,7 +18,8 @@ public static class SkillItems
     public const string TemplateRow = "Quest_MaellePainterSkillsUnlock";
     private const int EnemiesPerSkill = 2;
 
-    public static bool IsActive => RandomizerLogic.Settings.RandomizeSkills && RandomizerLogic.Settings.SkillsFromEnemies;
+    /// <summary>Works with the original trees too: without skill randomization every skill stays on its node.</summary>
+    public static bool IsActive => RandomizerLogic.Settings.SkillsFromEnemies;
 
     /// <summary>The skills that got an item in the last generation, with the enemies that drop it.</summary>
     public static Dictionary<SkillData, List<string>> Placed { get; } = new();
@@ -62,6 +63,11 @@ public static class SkillItems
             foreach (var section in source.SourceSections.Values) section.RemoveAll(p => IsSkillItem(p.Item.CodeName));
         }
         if (!IsActive) return;
+        if (!RandomizerLogic.Settings.RandomizeSkills)
+        {
+            // The original trees (also undoing a skill roll of an earlier generation in this session)
+            Controllers.SkillsController.Reset();
+        }
 
         var skills = Controllers.SkillsController.SkillGraphs.SelectMany(g => g.UnlockSkillsWithItems()).Distinct().ToList();
         var loot = Controllers.ItemsController.ItemsSources.OfType<EnemyLootDropsItemSource>().FirstOrDefault()

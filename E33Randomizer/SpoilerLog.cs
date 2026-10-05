@@ -29,7 +29,7 @@ public static class SpoilerLog
         if (RandomizerLogic.Settings.RandomizeEnemies) AppendEnemies(log);
         if (RandomizerLogic.Settings.RandomizeItems) AppendKeyItems(log);
         if (RandomizerLogic.Settings.RandomizeItems) AppendItems(log);
-        if (RandomizerLogic.Settings.RandomizeSkills) AppendSkills(log);
+        if (RandomizerLogic.Settings.RandomizeSkills || SkillItems.IsActive) AppendSkills(log);
         return log.ToString();
     }
 

@@ -35,6 +35,8 @@ public partial class MainWindow
         SourceInitialized += (_, _) => RegisterTrackerHotkeys();
         Closed += (_, _) =>
         {
+            // The settings are kept for the next start (and for the restart after an update)
+            SaveSettings("default_settings.json");
             TrackerController.CloseAll();
             _hotkeys?.Dispose();
         };
@@ -169,6 +171,7 @@ public partial class MainWindow
             });
             var newFiles = await Updater.DownloadAsync(release, Updater.IsSelfContained, progress);
             progressText.Text = Loc.Get("Upd_Installing");
+            SaveSettings("default_settings.json");
             Process.Start(Updater.CreateInstallProcess(newFiles, AppContext.BaseDirectory, Environment.ProcessId, Environment.ProcessPath));
             Application.Current.Shutdown();
         }
@@ -454,6 +457,7 @@ public partial class MainWindow
 
         try
         {
+            SaveSettings("default_settings.json");
             RandomizerLogic.Randomize();
             MessageBox.Show(GetGenerationSummary(), Loc.Get("Msg_GenerationDoneTitle"), MessageBoxButton.OK, MessageBoxImage.Information);
         }

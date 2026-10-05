@@ -75,6 +75,28 @@ public class SkillItemsTests(GameDataFixture fixture)
     }
 
     [Fact]
+    public void WorksWithoutSkillRandomizationOnTheOriginalTrees()
+    {
+        Randomize(26, skillsFromEnemies: true);
+        GameDataFixture.ResetSettings(27);
+        RandomizerLogic.Settings.RandomizeSkills = false;
+        RandomizerLogic.Settings.RandomizeItems = true;
+        RandomizerLogic.Settings.SkillsFromEnemies = true;
+        RandomizerLogic.Randomize(saveData: false);
+
+        Assert.NotEmpty(SkillItems.Placed);
+        foreach (var graph in Controllers.SkillsController.SkillGraphs.Where(g => g.IsRandomized))
+        {
+            // Every skill is on its own node, behind its own item
+            Assert.All(graph.Nodes, n => Assert.Equal(n.OriginalSkillCodeName, n.SkillData.CodeName));
+            Assert.All(graph.Nodes.Where(n => !n.IsUnlockedByDefault && n.SkillData.CodeName != "DA_Skill_Gustave_UnleashCharge"),
+                n => Assert.Equal(SkillItems.ItemName(n.SkillData), n.RequiredItem));
+        }
+        var output = Write();
+        Assert.Single(Directory.GetFiles(output, "DA_SkillGraph_Lune.uasset", SearchOption.AllDirectories));
+    }
+
+    [Fact]
     public void TheWrittenFilesPointTheNodesAndTheLootAtTheNewItemRows()
     {
         Randomize(23, skillsFromEnemies: true);
