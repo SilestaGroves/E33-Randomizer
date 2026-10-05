@@ -36,10 +36,16 @@
                                   Margin="0,0,0,0"
                                   FontSize="14" />
 
-                        <CheckBox Content="{local:Tr Sk_FromEnemies}" ToolTip="{local:TrTip Sk_FromEnemiesTip}"
+                        <CheckBox Name="SkillsFromEnemiesCheckBox"
+                                  Content="{local:Tr Sk_FromEnemies}" ToolTip="{local:TrTip Sk_FromEnemiesTip}"
                                   IsChecked="{Binding SkillsFromEnemies}"
                                   Margin="0,0,0,0"
                                   FontSize="14" />
+                        <CheckBox Content="{local:Tr Sk_DuplicateDrops}" ToolTip="{local:TrTip Sk_DuplicateDropsTip}"
+                                  IsChecked="{Binding DuplicateSkillDrops}"
+                                  Margin="20,0,0,0"
+                                  FontSize="14"
+                                  Visibility="{Binding IsChecked, ElementName=SkillsFromEnemiesCheckBox, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
                         <CheckBox Content="{local:Tr Sk_CutContent}" ToolTip="{local:TrTip Sk_CutContentTip}"
                                   IsChecked="{Binding IncludeCutContentSkills}"

@@ -75,6 +75,24 @@ public class SkillItemsTests(GameDataFixture fixture)
     }
 
     [Fact]
+    public void WithoutDuplicatesEverySkillDropsFromOneEnemy()
+    {
+        GameDataFixture.ResetSettings(28);
+        RandomizerLogic.Settings.SkillsFromEnemies = true;
+        RandomizerLogic.Settings.DuplicateSkillDrops = false;
+        RandomizerLogic.Randomize(saveData: false);
+
+        Assert.NotEmpty(SkillItems.Placed);
+        Assert.All(SkillItems.Placed.Values, enemies => Assert.Single(enemies));
+        var loot = Controllers.ItemsController.ItemsSources.OfType<EnemyLootDropsItemSource>().Single();
+        foreach (var (skill, enemies) in SkillItems.Placed)
+        {
+            var carriers = loot.SourceSections.Count(s => s.Value.Any(p => p.Item.CodeName == SkillItems.ItemName(skill)));
+            Assert.Equal(1, carriers);
+        }
+    }
+
+    [Fact]
     public void WorksWithoutSkillRandomizationOnTheOriginalTrees()
     {
         Randomize(26, skillsFromEnemies: true);

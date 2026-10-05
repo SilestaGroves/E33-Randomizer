@@ -16,7 +16,8 @@ public static class SkillItems
     public const string ItemSuffix = "_Unlock";
     /// <summary>The row the new item rows are copied from: Maelle's painter skills unlock, an item that unlocks skills.</summary>
     public const string TemplateRow = "Quest_MaellePainterSkillsUnlock";
-    private const int EnemiesPerSkill = 2;
+    /// <summary>Each skill drops from one enemy, or from a second one too ("duplicate skill drops").</summary>
+    private static int EnemiesPerSkill => RandomizerLogic.Settings.DuplicateSkillDrops ? 2 : 1;
 
     /// <summary>Works with the original trees too: without skill randomization every skill stays on its node.</summary>
     public static bool IsActive => RandomizerLogic.Settings.SkillsFromEnemies;
