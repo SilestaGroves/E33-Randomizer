@@ -679,6 +679,7 @@ public class SettingsViewModel : INotifyPropertyChanged
     public bool MakeEveryItemVisible { get; set; } = true;
 
     public bool EnsurePaintedPowerFromPaintress { get; set; } = true;
+    public bool PaintedPowerOnlyInActThree { get; set; } = true;
     public bool IncludeGearInPrologue { get; set; } = false;
     public bool RandomizeStartingWeapons { get; set; } = false;
     public bool RandomizeStartingCosmetics { get; set; } = false;

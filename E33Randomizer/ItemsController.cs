@@ -339,6 +339,7 @@ public class ItemsController: Controller<ItemData>
             ProgressionLogic.PlaceKeyItems();
         }
         ItemsSources.ForEach(i => i.Checks.ForEach(SpecialRules.ApplySpecialRulesToCheck));
+        PaintedPowerRule.Apply();
         if (!RandomizerLogic.Settings.IncludeCutContentItems && !cutContentAlreadyExcluded)
         {
             RandomizerLogic.CustomItemPlacement.RemoveExcluded("Cut Content Items");

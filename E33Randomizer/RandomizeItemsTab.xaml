@@ -35,6 +35,10 @@
                                   IsChecked="{Binding EnsurePaintedPowerFromPaintress}"
                                   Margin="0,6,0,0"
                                   FontSize="14" />
+                        <CheckBox Content="{local:Tr It_PaintedPowerActThree}" ToolTip="{local:TrTip It_PaintedPowerActThreeTip}"
+                                  IsChecked="{Binding PaintedPowerOnlyInActThree}"
+                                  Margin="0,6,0,0"
+                                  FontSize="14" />
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
                             <CheckBox Name="RandomizeStartingWeaponsCheckBox"
                                 Content="{local:Tr It_StartWeapons}" ToolTip="{local:TrTip It_StartWeaponsTip}"
